@@ -4,11 +4,11 @@
 export const demoCircuit = {
   breadboard: "half",
   parts: [
-    { id: "red", type: "led", color: "red", at: "F5", step: 1, label: "red LED" },
+    { id: "red", type: "led", color: "red", at: "H5", step: 1, label: "red LED" },
     { id: "r1", type: "resistor-220", at: "E5", rotate: 270, step: 1, label: "220Ω" },
-    { id: "yellow", type: "led", color: "yellow", at: "F10", step: 2, label: "yellow LED" },
+    { id: "yellow", type: "led", color: "yellow", at: "H10", step: 2, label: "yellow LED" },
     { id: "r2", type: "resistor-220", at: "E10", rotate: 270, step: 2, label: "220Ω" },
-    { id: "green", type: "led", color: "green", at: "F15", step: 3, label: "green LED" },
+    { id: "green", type: "led", color: "green", at: "H15", step: 3, label: "green LED" },
     { id: "r3", type: "resistor-220", at: "E15", rotate: 270, step: 3, label: "220Ω" },
     { id: "b1", type: "button", at: "F20", step: 4, label: "button" },
     { id: "pot", type: "potentiometer", at: "E26", step: 5, label: "knob" },

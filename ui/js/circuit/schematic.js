@@ -41,6 +41,14 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
   const { parts: active } = activeItems(circuit, board);
   const defs = new Map(active.filter((p) => parts.types?.[p.type]).map((p) => [p.id, parts.types[p.type]]));
   const partOrder = active.filter((p) => defs.has(p.id));
+  // Legs joined inside a part (a button's two legs on each side) are one
+  // connection in the schematic: only the first of each is drawn.
+  const hiddenLegs = new Set();
+  for (const p of partOrder) {
+    for (const bus of defs.get(p.id).buses || []) for (const leg of bus.slice(1)) hiddenLegs.add(`${p.id}:${leg}`);
+  }
+  const shown = (l) => !hiddenLegs.has(`${l.part}:${l.leg}`);
+  const legsOf = (id) => defs.get(id).legs.filter((l) => !hiddenLegs.has(`${id}:${l.id}`));
   const kindOf = (n) => {
     if (!n) return "none";
     const pw = net.powerOnNet(n);
@@ -61,17 +69,17 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
   // Rows of parts.
   const placed = new Map(); // id → {row, enter}
   const rows = [];
-  const twoLeg = (id) => defs.get(id).legs.length === 2;
+  const twoLeg = (id) => legsOf(id).length === 2;
   const startRow = (id, enter) => {
     const row = [{ id, enter }];
     placed.set(id, row);
     rows.push(row);
     let cur = row[0];
     while (twoLeg(cur.id)) {
-      const other = defs.get(cur.id).legs.find((l) => l.id !== cur.enter)?.id;
+      const other = legsOf(cur.id).find((l) => l.id !== cur.enter)?.id;
       const n = net.legNet(cur.id, other);
       if (kindOf(n) !== "internal") break;
-      const next = net.legsOnNet(n).find((l) => !placed.has(l.part) && defs.has(l.part));
+      const next = net.legsOnNet(n).find((l) => !placed.has(l.part) && defs.has(l.part) && shown(l));
       if (!next) break;
       cur = { id: next.part, enter: next.leg };
       row.push(cur);
@@ -79,9 +87,9 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
     }
   };
   for (const { net: n } of usedPins) {
-    for (const l of net.legsOnNet(n)) if (!placed.has(l.part) && defs.has(l.part)) startRow(l.part, l.leg);
+    for (const l of net.legsOnNet(n)) if (!placed.has(l.part) && defs.has(l.part) && shown(l)) startRow(l.part, l.leg);
   }
-  for (const p of partOrder) if (!placed.has(p.id)) startRow(p.id, defs.get(p.id).legs[0].id);
+  for (const p of partOrder) if (!placed.has(p.id)) startRow(p.id, legsOf(p.id)[0].id);
 
   // Symbols: rotate two-leg parts so they read left to right.
   const symbols = [];
@@ -94,8 +102,9 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
     const syms = row.map(({ id, enter }) => {
       const def = defs.get(id);
       let best = placedSymbol(def, 0);
-      if (def.legs.length === 2) {
-        const out = def.legs.find((l) => l.id !== enter).id;
+      const eff = legsOf(id);
+      if (eff.length === 2) {
+        const out = eff.find((l) => l.id !== enter).id;
         let bestScore = Infinity;
         for (const rot of [0, 90, 180, 270]) {
           const s = placedSymbol(def, rot);
@@ -126,7 +135,7 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
     // In a chain, nudge each next symbol so its entering leg is level with the previous exit.
     for (let i = 1; i < syms.length; i++) {
       const prev = syms[i - 1], s = syms[i];
-      const exit = prev.def.legs.find((l) => l.id !== prev.enter)?.id;
+      const exit = legsOf(prev.id).find((l) => l.id !== prev.enter)?.id;
       const dy = prev.legsAbs[exit].y - s.legsAbs[s.enter].y;
       s.y += dy;
       for (const l of Object.values(s.legsAbs)) l.y += dy;
@@ -144,7 +153,7 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
   // Board pins: level with the leg they feed where possible.
   let lastY = 10;
   const pinRows = usedPins.map(({ code, net: n }) => {
-    const legs = net.legsOnNet(n).filter((l) => symById.has(l.part));
+    const legs = net.legsOnNet(n).filter((l) => symById.has(l.part) && shown(l));
     const ys = legs.map((l) => symById.get(l.part).legsAbs[l.leg].y);
     let py = ys.length ? Math.min(...ys) : lastY + 14;
     if (py < lastY + 12) py = lastY + 12;
@@ -160,19 +169,20 @@ export function layoutSchematic({ board, circuit, parts, pins }) {
   const lines = [];
   let lane = 0;
   for (const p of pinRows) {
-    const legs = net.legsOnNet(p.net).filter((l) => symById.has(l.part));
+    const legs = net.legsOnNet(p.net).filter((l) => symById.has(l.part) && shown(l));
     const lx = lanesStart + 16 + lane++ * 7;
     lines.push({ kind: "pin", net: p.net.id, from: { x: boardBox.x + boardBox.w, y: p.y }, lane: lx, legs: legs.map((l) => ({ ...l, ...symById.get(l.part).legsAbs[l.leg] })) });
   }
   for (const n of net.nets) {
     if (kindOf(n) !== "internal") continue;
-    const legs = net.legsOnNet(n).filter((l) => symById.has(l.part)).map((l) => ({ ...l, ...symById.get(l.part).legsAbs[l.leg] }));
+    const legs = net.legsOnNet(n).filter((l) => symById.has(l.part) && shown(l)).map((l) => ({ ...l, ...symById.get(l.part).legsAbs[l.leg] }));
     if (legs.length < 2) continue;
     lines.push({ kind: "internal", net: n.id, legs, lane: lanesStart + 16 + lane++ * 7 });
   }
   const power = [];
   for (const s of symbols) {
     for (const [leg, l] of Object.entries(s.legsAbs)) {
+      if (hiddenLegs.has(`${s.id}:${leg}`)) continue;
       const n = net.legNet(s.id, leg);
       const k = kindOf(n);
       if (k === "gnd" || k === "vcc") {
@@ -256,10 +266,13 @@ export function drawSchematic(container, opts) {
   boardG.append(svgEl("rect", { x: bb.x, y: bb.y, width: bb.w, height: bb.h, fill: "#fff", stroke: LINE, "stroke-width": 1.2 }));
   const title = board.short || board.name || board.id;
   boardG.append(svgEl("text", { x: bb.x + 10, y: bb.y + 14, "font-size": 9, "font-weight": "bold", fill: LINE, "font-family": font }, title));
-  for (const p of L.pins) {
-    boardG.append(svgEl("text", { x: bb.x + bb.w - 4, y: p.y + 3, "font-size": 7.5, fill: "#333", "text-anchor": "end", "font-family": font }, p.label));
-  }
   svg.append(boardG);
+  for (const p of L.pins) {
+    const t = svgEl("text", { x: bb.x + bb.w - 4, y: p.y + 3, "font-size": 7.5, fill: "#333", "text-anchor": "end", "font-family": font }, p.label);
+    svg.append(t);
+    const steps = L.netlist.legsOnNet(p.net).map((l) => stepOfPart.get(l.part)).filter((s) => s != null);
+    items.push({ step: steps.length ? Math.min(...steps) : null, el: t });
+  }
 
   // Lines.
   const lineLayer = svgEl("g", { class: "cp-sch-lines", fill: "none", stroke: LINE, "stroke-width": 1 });

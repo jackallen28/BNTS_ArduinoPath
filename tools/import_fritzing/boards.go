@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -19,6 +20,9 @@ type BoardSpec struct {
 	Match func(c Connector, code string, number int) bool
 	// Art draws our own board; it fills pins (element id → code or power name).
 	Art func(pins map[string]string) (bb, sch *Node)
+	// Skip lists connectors not to use (the ICSP header's 5V and GND:
+	// students never wire to those).
+	Skip []string
 }
 
 // contentBoard is what the importer reads from content/boards/<id>.json.
@@ -89,8 +93,8 @@ func avrMatch(c Connector, code string, _ int) bool {
 
 func boardSpecs() []BoardSpec {
 	return []BoardSpec{
-		{ID: "uno", FZP: "core/arduino_Uno_Rev3(fix).fzp", Match: avrMatch},
-		{ID: "nano", FZP: "core/Arduino Nano3(fix).fzp", Match: avrMatch},
+		{ID: "uno", FZP: "core/arduino_Uno_Rev3(fix).fzp", Match: avrMatch, Skip: []string{"connector40", "connector44", "connector46", "connector50"}},
+		{ID: "nano", FZP: "core/Arduino Nano3(fix).fzp", Match: avrMatch, Skip: []string{"connector56", "connector60"}},
 		{ID: "mega", FZP: "core/Arduino_MEGA_2560-Rev3(fix).fzp", Match: avrMatch},
 		{ID: "nodemcu", FZP: "core/Amica_NodeMCU_DEVKIT_1.0.fzp", Match: func(c Connector, code string, number int) bool {
 			d := c.Description
@@ -168,6 +172,9 @@ func buildBoard(src *Source, spec BoardSpec, cb *contentBoard) (*BoardJSON, []by
 		for _, name := range names {
 			found := 0
 			for _, c := range b.Module.Connectors {
+				if slices.Contains(spec.Skip, c.ID) {
+					continue
+				}
 				if spec.Match(c, name, numbers[name]) {
 					targets = append(targets, target{name, c.ID})
 					found++

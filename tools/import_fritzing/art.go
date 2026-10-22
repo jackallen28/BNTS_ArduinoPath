@@ -301,7 +301,7 @@ func oledArt() (*Node, *Node) {
 	for i, id := range ids {
 		x := 39 + float64(i)*10
 		g.Add(sidePin(x, 0, 13, "up", "pin-"+id)...)
-		g.Add(label(x, 15, 5.5, names[i], silk, "middle"))
+		g.Add(label(x, 15, 4, names[i], silk, "middle"))
 	}
 	g.Add(rect(4, 22, w-8, 66, "#0b0b0b", "rx", "2"))
 	g.Add(rect(9, 30, w-18, 45, "#101820"))

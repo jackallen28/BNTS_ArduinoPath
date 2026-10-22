@@ -70,14 +70,28 @@ export function partMatrix(part, def, breadboard) {
   return null;
 }
 
-/** Where a board sits: to the left of the breadboard, centred on it. */
+/**
+ * Where a board sits: to the left of the breadboard, centred on it. Tall
+ * boards (Nano, NodeMCU, ESP32...) are turned on their side, so their pins
+ * face up and down and wires leave them above and below, like the Uno's.
+ */
 export function boardPlace(boardArt, breadboard) {
   const w = boardArt.breadboard.width, h = boardArt.breadboard.height;
-  if (!breadboard) return T(-w - BOARD_GAP, 0);
-  return T(-w - BOARD_GAP, Math.round((breadboard.height - h) / 2));
+  const r = h > w * 1.15 ? R(-90) : I;
+  const b = boxOf(r, w, h);
+  const y = breadboard ? Math.round((breadboard.height - b.h) / 2) : 0;
+  return mul(T(-b.w - BOARD_GAP - b.x, y - b.y), r);
 }
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+
+// A wire leaves a board pin through the nearest edge of the board.
+function exitDir(p, box) {
+  const d = { up: p.y - box.y, down: box.y + box.h - p.y, left: p.x - box.x, right: box.x + box.w - p.x };
+  let best = "up";
+  for (const k of ["down", "right", "left"]) if (d[k] < d[best]) best = k;
+  return DIRS[best];
+}
 
 /**
  * Picks a wire's colour: its own `color`, else red for power, black for
@@ -176,13 +190,14 @@ export function layoutCircuit({ board, circuit, parts, pins }) {
       const r = resolve(e.name);
       const pin = r && boardArt.breadboard.pins[r.code];
       if (!pin) return null;
-      return { ...apply(bm, pin.x, pin.y), dir: DIRS[pin.exit] };
+      const pt = apply(bm, pin.x, pin.y);
+      return { ...pt, dir: exitDir(pt, boardLayout.box) };
     }
     if (e.kind === "power") {
       const name = e.name === "VCC" ? board.power?.vcc || "5V" : e.name;
       const list = boardArt.breadboard.power[name];
       if (!list?.length) return null;
-      const pts = list.map((p) => ({ ...apply(bm, p.x, p.y), dir: DIRS[p.exit] }));
+      const pts = list.map((p) => { const pt = apply(bm, p.x, p.y); return { ...pt, dir: exitDir(pt, boardLayout.box) }; });
       if (!other) return pts[0];
       pts.sort((p, q) => Math.hypot(p.x - other.x, p.y - other.y) - Math.hypot(q.x - other.x, q.y - other.y));
       return pts[0];
