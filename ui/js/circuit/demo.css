@@ -1,0 +1,23 @@
+/* The circuit demo page (circuit-demo.html): a developer page, not part of the app. */
+body.cp-demo { padding: 10px; height: 100vh; margin: 0; }
+.cp-demo-window { height: calc(100vh - 20px); }
+.cp-demo-toolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 4px 8px; background: var(--toolbar); border: 1px solid var(--toolbar-border); margin-bottom: 4px;
+}
+.cp-demo-toolbar .sep { width: 1px; align-self: stretch; background: var(--separator-dark); box-shadow: 1px 0 0 var(--separator-light); }
+.cp-demo-toolbar .btn {
+  padding: 2px 10px; border: 1px solid var(--button-border); border-radius: 3px; background: var(--button);
+  font: inherit; cursor: pointer;
+}
+.cp-demo-toolbar .btn:hover { background: var(--button-hover); border-color: var(--button-border-hover); }
+.cp-demo-toolbar .btn[aria-pressed="true"] { background: var(--button-down); border-color: var(--button-border-down); }
+.cp-demo-body { display: grid; grid-template-columns: 3fr 2fr; gap: 6px; padding: 6px; overflow: auto; }
+.cp-demo-pane { display: flex; flex-direction: column; min-height: 0; gap: 6px; }
+.cp-demo-view { flex: 1; min-height: 300px; border: 1px solid var(--groupbox-border); border-radius: 3px; }
+.cp-demo-side .cp-demo-view { flex: 2; }
+.cp-demo-info { flex: none; font-size: var(--font-size-small); }
+.cp-demo-info h3 { margin: 4px 0 2px; }
+.cp-demo-info ul { margin: 0; padding-left: 18px; max-height: 90px; overflow: auto; }
+.cp-demo-info .error { color: var(--bad); }
+.cp-demo-info .warning { color: var(--warn); }

@@ -73,7 +73,7 @@ func cleanSVG(root *Node, opt cleanOptions) (defs []*Node, content []*Node) {
 	root.Walk(func(n, _ *Node) bool {
 		out := n.Attrs[:0]
 		for _, a := range n.Attrs {
-			if keptAttrs[a.Name] || presentationProps[a.Name] || strings.HasPrefix(a.Name, "data-cp") {
+			if keptAttrs[a.Name] || presentationProps[a.Name] || strings.HasPrefix(a.Name, "data-") {
 				out = append(out, a)
 			}
 		}

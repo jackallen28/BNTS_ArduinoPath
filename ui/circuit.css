@@ -1,0 +1,176 @@
+/*
+ * The circuit drawings (ui/js/circuit/): breadboard and schematic views,
+ * simulated behaviour and the part controls. Colours come from theme.css.
+ */
+
+.cp-circuit {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  background: linear-gradient(180deg, #fbfcfd, #eef2f6);
+  border-radius: 3px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.cp-circuit.cp-schematic { background: #fff; }
+
+.cp-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Text inside the art (Fritzing labels) shouldn't be selectable or catch the mouse. */
+.cp-svg text { pointer-events: none; }
+
+/* ---------- Simulated behaviour ---------- */
+
+.cp-glow, .cp-pixel-halo { mix-blend-mode: screen; }
+
+.cp-wave {
+  opacity: 0;
+  animation: cp-wave var(--cp-wave-speed, 0.6s) ease-out infinite;
+}
+.cp-wave-1 { animation-delay: calc(var(--cp-wave-speed, 0.6s) / 3); }
+.cp-wave-2 { animation-delay: calc(var(--cp-wave-speed, 0.6s) * 2 / 3); }
+@keyframes cp-wave {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+/* The wiring step's new parts and wires pulse gently (the glow is an SVG filter). */
+.cp-current { animation: cp-pulse 1.6s ease-in-out infinite; }
+@keyframes cp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-current, .cp-wave { animation: none; }
+  .cp-wave { opacity: 0.8; }
+}
+
+/* ---------- Controls ---------- */
+
+.cp-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cp-controls > * { pointer-events: auto; position: absolute; }
+.cp-controls > [hidden] { display: none; }
+
+/* Hotspots: transparent, exactly over a part's button, knob or keys. */
+.cp-hot {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cp-hot-round { border-radius: 50%; }
+.cp-hot:hover { background: radial-gradient(circle, rgba(25, 193, 202, 0.18), rgba(25, 193, 202, 0.06) 70%, transparent 72%); }
+.cp-hot:focus-visible {
+  outline: 2px solid var(--bnts-teal);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px rgba(25, 193, 202, 0.25);
+}
+.cp-knob { cursor: grab; }
+.cp-knob:active, .cp-stick:active { cursor: grabbing; }
+.cp-stick { cursor: move; }
+.cp-key:active { background: rgba(0, 0, 0, 0.12); }
+
+/* Chips: small Vista balloons with sliders and buttons, next to a part. */
+.cp-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 150px;
+  max-width: 220px;
+  padding: 3px 7px 5px;
+  font: var(--font-size-small) / 1.3 var(--font-ui);
+  color: var(--text);
+  background: var(--balloon);
+  border: 1px solid var(--balloon-border);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28), inset 0 1px 0 #fff;
+  z-index: 2;
+}
+.cp-chip-title {
+  font-weight: 600;
+  color: var(--instruction);
+  white-space: nowrap;
+}
+.cp-chip-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 5px;
+}
+.cp-chip-label { color: var(--text-muted); }
+.cp-chip-value {
+  min-width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A glossy Vista slider */
+.cp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-width: 70px;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.cp-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border: 1px solid #8e99a6;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #d6dde5, #f8fafc);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15);
+}
+.cp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 17px;
+  margin-top: -7px;
+  border: 1px solid var(--button-border);
+  border-radius: 3px 3px 6px 6px / 3px 3px 7px 7px;
+  background: var(--button);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+.cp-range:hover::-webkit-slider-thumb { background: var(--button-hover); border-color: var(--button-border-hover); }
+.cp-range:active::-webkit-slider-thumb { background: var(--button-down); border-color: var(--button-border-down); }
+.cp-range::-moz-range-track {
+  height: 4px; border: 1px solid #8e99a6; border-radius: 2px;
+  background: linear-gradient(180deg, #d6dde5, #f8fafc);
+}
+.cp-range::-moz-range-thumb {
+  width: 9px; height: 15px; border: 1px solid var(--button-border); border-radius: 3px;
+  background: var(--button);
+}
+.cp-range:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+
+.cp-chip-button {
+  margin: 2px 0 0;
+  padding: 2px 10px;
+  font: inherit;
+  color: #000;
+  border: 1px solid var(--pill-border);
+  border-radius: 10px;
+  background: var(--pill);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cp-chip-button:hover { background: var(--pill-hover); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), var(--default-glow); }
+.cp-chip-button:active, .cp-chip-button.cp-active { background: var(--pill-purple); border-color: var(--pill-purple-border); color: #fff; text-shadow: none; }
