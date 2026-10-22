@@ -144,11 +144,13 @@ function behaviourFor(item, g, defs, uid) {
       const box = sim.screen;
       if (!box) return null;
       const W = def.options?.width || 128, H = def.options?.height || 64;
-      const path = svgEl("path", { d: "", fill: "#bfefff", class: "cp-oled" });
+      const path = svgEl("path", { d: "", fill: "#bfefff", class: "cp-oled-pixels" });
       g.append(path);
       return (v) => {
-        const buf = v?.buffer || v;
-        path.setAttribute("d", oledPath(buf || [], v?.width || W, v?.height || H, box));
+        // A buffer (array or Uint8Array), or the engine's event {width, height, buffer}.
+        const raw = Array.isArray(v) || ArrayBuffer.isView(v);
+        const buf = raw ? v : v?.buffer;
+        path.setAttribute("d", oledPath(buf || [], (!raw && v?.width) || W, (!raw && v?.height) || H, box));
       };
     }
     case "lcd": {
