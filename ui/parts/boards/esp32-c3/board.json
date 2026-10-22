@@ -1,8 +1,8 @@
 {
   "id": "esp32-c3",
   "title": "ESP32-C3 SuperMini",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "unit": "0.01in",
   "breadboard": {
     "file": "breadboard.svg",

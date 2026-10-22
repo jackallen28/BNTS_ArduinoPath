@@ -1,8 +1,8 @@
 {
   "type": "dht",
   "title": "DHT11 temperature and humidity module",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "dht",
   "unit": "0.01in",
   "legs": [

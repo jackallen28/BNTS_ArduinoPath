@@ -1,8 +1,8 @@
 {
   "type": "joystick",
   "title": "Joystick module (KY-023)",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "joystick",
   "unit": "0.01in",
   "legs": [

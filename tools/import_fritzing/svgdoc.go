@@ -8,16 +8,16 @@ import (
 	"strings"
 )
 
-// Unit is CircuitPath's drawing unit: 0.01 inch, so the breadboard's
+// Unit is ArduinoPath's drawing unit: 0.01 inch, so the breadboard's
 // 0.1" pitch is 10 units.
 const unitsPerInch = 100.0
 
-// SVGDoc is a source SVG with its mapping to CircuitPath units.
+// SVGDoc is a source SVG with its mapping to ArduinoPath units.
 type SVGDoc struct {
 	Root *Node
 	VB   [4]float64 // the source viewBox
-	Base Matrix     // source user space → CircuitPath units
-	W, H float64    // size in CircuitPath units
+	Base Matrix     // source user space → ArduinoPath units
+	W, H float64    // size in ArduinoPath units
 }
 
 // loadSVG parses an SVG and works out its real size.
@@ -75,13 +75,13 @@ func lengthInches(s string) (float64, bool) {
 	return v * per, true
 }
 
-// Point is a position in CircuitPath units.
+// Point is a position in ArduinoPath units.
 type Point struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`
 }
 
-// Box returns an element's box in CircuitPath units.
+// Box returns an element's box in ArduinoPath units.
 func (d *SVGDoc) Box(id string) (Rect, error) {
 	e := d.Root.Find(id)
 	if e == nil {
@@ -99,7 +99,7 @@ func (d *SVGDoc) Box(id string) (Rect, error) {
 	return out, nil
 }
 
-// Centre returns the centre of an element, in CircuitPath units.
+// Centre returns the centre of an element, in ArduinoPath units.
 func (d *SVGDoc) Centre(id string) (Point, error) {
 	r, err := d.Box(id)
 	if err != nil {
@@ -143,7 +143,7 @@ func (d *SVGDoc) precision() int {
 	return p
 }
 
-// Output writes the cleaned SVG. bounds (in CircuitPath units) may be
+// Output writes the cleaned SVG. bounds (in ArduinoPath units) may be
 // bigger than the viewBox (for legs drawn outside it); the result's
 // viewBox starts at 0,0, and shift says how far everything moved.
 func (d *SVGDoc) Output(prefix string, bounds Rect) ([]byte, Point) {
@@ -172,7 +172,7 @@ func assembleSVG(defs, content []*Node, m Matrix, w, h float64) []byte {
 	return b.Bytes()
 }
 
-// viewRect is the viewBox in CircuitPath units.
+// viewRect is the viewBox in ArduinoPath units.
 func (d *SVGDoc) viewRect() Rect {
 	return Rect{0, 0, d.W, d.H, true}
 }

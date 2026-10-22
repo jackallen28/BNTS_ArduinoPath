@@ -1,8 +1,8 @@
 package main
 
-// CircuitPath's own art, for parts and boards that aren't in the Fritzing
+// ArduinoPath's own art, for parts and boards that aren't in the Fritzing
 // parts library. Drawn in the Fritzing breadboard style (flat colours, the
-// real pin labels, 0.1" pitch) in CircuitPath units (0.01 inch).
+// real pin labels, 0.1" pitch) in ArduinoPath units (0.01 inch).
 
 import (
 	"fmt"

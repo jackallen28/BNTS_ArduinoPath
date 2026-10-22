@@ -227,7 +227,7 @@ func TestFootprintOffGrid(t *testing.T) {
 }
 
 func TestBreadboardNamesAndArt(t *testing.T) {
-	// Own art: every part drawn by CircuitPath loads and has its connectors.
+	// Own art: every part drawn by ArduinoPath loads and has its connectors.
 	for _, spec := range partSpecs() {
 		if spec.Art == nil {
 			continue

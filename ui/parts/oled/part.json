@@ -1,8 +1,8 @@
 {
   "type": "oled",
   "title": "OLED screen 0.96\" (SSD1306, I2C)",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "oled",
   "unit": "0.01in",
   "legs": [

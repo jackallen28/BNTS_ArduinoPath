@@ -1,8 +1,8 @@
 {
   "type": "tm1637",
   "title": "4-digit display (TM1637)",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "tm1637",
   "unit": "0.01in",
   "legs": [

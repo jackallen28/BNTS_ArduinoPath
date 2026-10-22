@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Module is what CircuitPath needs from a Fritzing .fzp file.
+// Module is what ArduinoPath needs from a Fritzing .fzp file.
 type Module struct {
 	Title      string
 	Properties map[string]string

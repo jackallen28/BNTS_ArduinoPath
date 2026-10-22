@@ -1,8 +1,8 @@
 {
   "type": "lcd-i2c",
   "title": "16×2 LCD screen with I2C backpack",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "lcd",
   "unit": "0.01in",
   "legs": [

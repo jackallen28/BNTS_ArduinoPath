@@ -1,6 +1,6 @@
 # Parts art: Fritzing parts library (CC BY-SA 3.0)
 
-Most of CircuitPath's breadboard and schematic pictures come from the
+Most of ArduinoPath's breadboard and schematic pictures come from the
 **Fritzing parts library** (https://github.com/fritzing/fritzing-parts), by the
 Fritzing team and contributors, used under the
 **Creative Commons Attribution-ShareAlike 3.0** licence
@@ -14,12 +14,12 @@ press or turn them (LED colours, resistor colour bands, the servo horn, the
 button cap, the potentiometer's rotor). These changed SVG files under
 `ui/parts/` are adaptations of the Fritzing art and are shared under the
 same licence, **CC BY-SA 3.0**. The licence applies to those SVG files only:
-CircuitPath's own code, and the art CircuitPath drew itself (listed below),
+ArduinoPath's own code, and the art ArduinoPath drew itself (listed below),
 are not covered by it.
 
 ## From the Fritzing parts library
 
-| CircuitPath | Fritzing part | Files (in fritzing-parts) |
+| ArduinoPath | Fritzing part | Files (in fritzing-parts) |
 |---|---|---|
 | board d1-mini | WeMos D1 Mini | `core/WeMos-D1-mini-male-headers-above_fixed.fzp`, `svg/core/breadboard/WeMos-D1-mini-male-headers-above_breadboard.svg`, `svg/core/schematic/WeMos-D1-mini_schematic.svg` |
 | board mega | Arduino Mega 2560 (Rev3) | `core/Arduino_MEGA_2560-Rev3(fix).fzp`, `svg/core/breadboard/Arduino_MEGA_2560-Rev3_breadboard.svg`, `svg/core/schematic/Arduino_MEGA_2560-Rev3(fix)_schematic.svg` |
@@ -42,12 +42,12 @@ are not covered by it.
 | servo | Basic Servo | `core/servo.fzp`, `svg/core/breadboard/servo.svg`, `svg/core/schematic/servo_schematic.svg` |
 | soil-moisture | Soil Moisture Sensor | `core/SparkFun_Soil_Moisture_Sensor.fzp`, `svg/core/breadboard/SparkFun_Soil_Moisture_Sensor_breadboard.svg`, `svg/core/schematic/SparkFun_Soil_Moisture_Sensor_schematic.svg` |
 
-## Drawn by CircuitPath (not from Fritzing)
+## Drawn by ArduinoPath (not from Fritzing)
 
-These parts and boards aren't in the Fritzing core library, so CircuitPath
-drew them in the same style (part.json says `"art": "circuitpath"`):
+These parts and boards aren't in the Fritzing core library, so ArduinoPath
+drew them in the same style (part.json says `"art": "arduinopath"`):
 
-| CircuitPath | Picture |
+| ArduinoPath | Picture |
 |---|---|
 | board esp32 | ESP32 DevKit V1 (30 pins) |
 | board esp32-c3 | ESP32-C3 SuperMini |

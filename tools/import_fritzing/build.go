@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-// PartSpec says how to make one CircuitPath part type.
+// PartSpec says how to make one ArduinoPath part type.
 type PartSpec struct {
 	Type      string
 	Behaviour string
-	FZP       string // path in fritzing-parts; "" for CircuitPath's own art
+	FZP       string // path in fritzing-parts; "" for ArduinoPath's own art
 	Legs      []LegSpec
 	// OnBreadboard parts plug into the breadboard: their footprint is
 	// worked out from the leg positions (which must sit on the 0.1" grid).
@@ -26,12 +26,12 @@ type PartSpec struct {
 	// Tweak changes the source SVGs (tag elements for the renderer,
 	// recolour...) and records simulator geometry.
 	Tweak func(b *partBuild) error
-	// Art draws CircuitPath's own breadboard and schematic SVGs (connector
+	// Art draws ArduinoPath's own breadboard and schematic SVGs (connector
 	// elements have the ids in LegSpec.Conn and LegSpec.SchConn).
 	Art func() (bb, sch *Node)
 }
 
-// LegSpec is one leg: CircuitPath's id, a description, and the Fritzing
+// LegSpec is one leg: ArduinoPath's id, a description, and the Fritzing
 // connector id (or the element id in our own art).
 type LegSpec struct {
 	ID, Name, Conn string
@@ -160,8 +160,8 @@ func buildPart(src *Source, spec PartSpec) (*built, error) {
 			return nil, err
 		}
 		out.Title = bb.Get("data-title")
-		out.Art = "circuitpath"
-		out.Licence = "CircuitPath's own art (drawn in the Fritzing style)"
+		out.Art = "arduinopath"
+		out.Licence = "ArduinoPath's own art (drawn in the Fritzing style)"
 	}
 	if spec.SchScale != 0 {
 		b.Sch.Base = scale(spec.SchScale, spec.SchScale).Mul(b.Sch.Base)

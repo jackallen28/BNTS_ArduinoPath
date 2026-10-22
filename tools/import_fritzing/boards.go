@@ -190,8 +190,8 @@ func buildBoard(src *Source, spec BoardSpec, cb *contentBoard) (*BoardJSON, []by
 		if b.Sch, err = loadSVG(nodeBytes(sch)); err != nil {
 			return nil, nil, nil, err
 		}
-		out.Title, out.Art = bb.Get("data-title"), "circuitpath"
-		out.Licence = "CircuitPath's own art (drawn in the Fritzing style)"
+		out.Title, out.Art = bb.Get("data-title"), "arduinopath"
+		out.Licence = "ArduinoPath's own art (drawn in the Fritzing style)"
 		for _, id := range sortedKeys(pins) {
 			targets = append(targets, target{pins[id], id})
 		}

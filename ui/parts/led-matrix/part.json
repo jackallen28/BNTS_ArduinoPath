@@ -1,8 +1,8 @@
 {
   "type": "led-matrix",
   "title": "8×8 LED matrix (MAX7219)",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "led-matrix",
   "unit": "0.01in",
   "legs": [

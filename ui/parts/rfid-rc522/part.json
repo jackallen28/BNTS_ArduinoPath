@@ -1,8 +1,8 @@
 {
   "type": "rfid-rc522",
   "title": "RFID reader (RC522)",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "rfid",
   "unit": "0.01in",
   "legs": [

@@ -1,8 +1,8 @@
 {
   "type": "keypad-4x4",
   "title": "4×4 membrane keypad",
-  "art": "circuitpath",
-  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
   "behaviour": "keypad",
   "unit": "0.01in",
   "legs": [

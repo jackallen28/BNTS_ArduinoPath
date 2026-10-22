@@ -1,4 +1,4 @@
-// Command import_fritzing makes CircuitPath's parts library (ui/parts/)
+// Command import_fritzing makes ArduinoPath's parts library (ui/parts/)
 // from the official Fritzing parts library (CC BY-SA 3.0), pinned to one
 // commit so the import is reproducible:
 //
@@ -8,7 +8,7 @@
 // breadboard and schematic SVGs, and writes ui/parts/<type>/breadboard.svg,
 // schematic.svg and part.json; the half+ breadboard (ui/parts/breadboard/)
 // and the boards (ui/parts/boards/<id>/). Parts and boards that aren't in
-// the Fritzing library are drawn by CircuitPath (art.go). It also writes
+// the Fritzing library are drawn by ArduinoPath (art.go). It also writes
 // content/parts/LICENSE-fritzing.md.
 //
 // SVGs are cleaned for the web app: no editor metadata, styles turned into
@@ -39,9 +39,9 @@ func main() {
 	commit := flag.String("commit", defaultCommit, "fritzing-parts commit to import from")
 	repo := flag.String("repo", "", "a local checkout of fritzing-parts (instead of downloading)")
 	cacheDir, _ := os.UserCacheDir()
-	cache := flag.String("cache", filepath.Join(cacheDir, "circuitpath-fritzing"), "folder for downloaded files")
+	cache := flag.String("cache", filepath.Join(cacheDir, "arduinopath-fritzing"), "folder for downloaded files")
 	out := flag.String("out", "ui/parts", "where to write the parts library")
-	content := flag.String("content", "content", "CircuitPath's content folder")
+	content := flag.String("content", "content", "ArduinoPath's content folder")
 	flag.Parse()
 	src := &Source{Commit: *commit, Repo: *repo, Cache: *cache,
 		Log: func(format string, args ...any) { fmt.Fprintf(os.Stderr, format+"\n", args...) }}
@@ -168,7 +168,7 @@ func licence(commit string, fromFritzing, ours []string) []byte {
 	var b strings.Builder
 	fmt.Fprintf(&b, `# Parts art: Fritzing parts library (CC BY-SA 3.0)
 
-Most of CircuitPath's breadboard and schematic pictures come from the
+Most of ArduinoPath's breadboard and schematic pictures come from the
 **Fritzing parts library** (https://github.com/fritzing/fritzing-parts), by the
 Fritzing team and contributors, used under the
 **Creative Commons Attribution-ShareAlike 3.0** licence
@@ -182,21 +182,21 @@ press or turn them (LED colours, resistor colour bands, the servo horn, the
 button cap, the potentiometer's rotor). These changed SVG files under
 `+"`ui/parts/`"+` are adaptations of the Fritzing art and are shared under the
 same licence, **CC BY-SA 3.0**. The licence applies to those SVG files only:
-CircuitPath's own code, and the art CircuitPath drew itself (listed below),
+ArduinoPath's own code, and the art ArduinoPath drew itself (listed below),
 are not covered by it.
 
 ## From the Fritzing parts library
 
-| CircuitPath | Fritzing part | Files (in fritzing-parts) |
+| ArduinoPath | Fritzing part | Files (in fritzing-parts) |
 |---|---|---|
 %s
 
-## Drawn by CircuitPath (not from Fritzing)
+## Drawn by ArduinoPath (not from Fritzing)
 
-These parts and boards aren't in the Fritzing core library, so CircuitPath
-drew them in the same style (part.json says `+"`\"art\": \"circuitpath\"`"+`):
+These parts and boards aren't in the Fritzing core library, so ArduinoPath
+drew them in the same style (part.json says `+"`\"art\": \"arduinopath\"`"+`):
 
-| CircuitPath | Picture |
+| ArduinoPath | Picture |
 |---|---|
 %s
 `, commit, strings.Join(fromFritzing, "\n"), strings.Join(ours, "\n"))
