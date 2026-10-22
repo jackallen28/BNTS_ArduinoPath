@@ -35,7 +35,7 @@ export function runHeadless(source, { board, ms = 5000, events = [], inputs = nu
   R.load(c.program);
   const end = ms * 1000;
   R.run(end);
-  if (!R.done) R.events.push({ type: "stopped", t: R.us / 1000, reason: "time" });
+  if (!R.done) R.events.push({ type: "stopped", t: Math.min(R.us, end) / 1000, reason: "time" });
   const error = R.error;
   return {
     ok: !error,
