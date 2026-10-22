@@ -33,6 +33,7 @@ export class Machine {
     this.ln = 0;
     this.loopLine = 0;
     this.fuel = FUEL;
+    this.deadline = Infinity;
     this.depth = 0;
     this.maxDepth = board.id === "mega" ? 600 : this.avr ? 200 : 500;
     this.rv = 0;
@@ -61,7 +62,7 @@ export class Machine {
     this.httpQueue = [];
     this.servers = [];
     this.wifi = { status: "idle", ip: "0.0.0.0" };
-    this.time = { synced: false, offset: 0 };
+    this.mac = opts.mac ?? (board.family === "esp32" ? "24:6F:28:A1:B2:C3" : "5C:CF:7F:A1:B2:C3");
   }
 
   // ------------------------------------------------------------ events
@@ -196,11 +197,17 @@ export class Machine {
   /** Drives a generator to its end without pausing (with a safety limit). */
   runToEnd(gen, what = "function") {
     let n = 0;
-    for (;;) {
-      const r = gen.next();
-      if (r.done) return r.value;
-      if (++n > 200) throw new SimError(`Your ${what} took too long. Interrupt functions must be short and can't use delay().`);
-      this.fuel = FUEL;
+    const saveDeadline = this.deadline;
+    this.deadline = Infinity;
+    try {
+      for (;;) {
+        const r = gen.next();
+        if (r.done) return r.value;
+        if (++n > 200) throw new SimError(`Your ${what} took too long. Interrupt functions must be short and can't use delay().`);
+        this.fuel = FUEL;
+      }
+    } finally {
+      this.deadline = saveDeadline;
     }
   }
 
@@ -227,7 +234,7 @@ export class Machine {
       this.us += this.cost;
       this.progress();
       if (se && this.serial?.rx.length) { if (se.g) yield* se.call(); else se.call(); }
-      if (--this.fuel < 0) { this.loopLine = 0; yield 0; }
+      if (this.us >= this.deadline || --this.fuel < 0) { this.loopLine = 0; yield 0; }
     }
   }
 
@@ -258,7 +265,8 @@ export class Machine {
         if (this.us >= untilUs && this.sleeping()) break;
       }
       const deadline = Math.min(untilUs, this.nextTimer());
-      this.fuel = Math.max(1, Math.min(FUEL, Math.ceil((deadline - this.us) / this.cost)));
+      this.deadline = deadline;
+      this.fuel = FUEL;
       try {
         const r = this.gen.next();
         if (r.done) { this.stop("ended"); break; }
@@ -316,8 +324,9 @@ export class Machine {
    * A request from the phone panel to the sketch's web server.
    * Resolves with { status, type, body, headers }; status 0 when no server answers.
    */
-  httpRequest(req) {
-    return new Promise((resolve) => {
+  httpRequest(req, done) {
+    return new Promise((resolve0) => {
+      const resolve = (res) => { done?.(res); resolve0(res); };
       const server = this.servers.find((s) => s.running);
       if (!server || (this.wifi.status !== "connected" && this.wifi.status !== "ap")) {
         resolve({ status: 0, type: "text/plain", body: "", headers: {}, error: server ? "no-wifi" : "no-server" });

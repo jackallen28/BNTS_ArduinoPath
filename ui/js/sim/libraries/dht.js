@@ -33,7 +33,6 @@ export class DHT {
     R.progress();
     const v = R.inputs.dht[this.pin];
     if (!v) return null;
-    if (this.type === 11) return { t: Math.round(v.t), h: Math.round(v.h) };
     return { t: Math.round(v.t * 10) / 10, h: Math.round(v.h * 10) / 10 };
   }
   read() { return this.reading() ? 1 : 0; }

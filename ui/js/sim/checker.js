@@ -1556,7 +1556,7 @@ class Checker {
       }
       this.fail(pos, `no matching function for call to '${display}(${args.map((a) => argTypeName(a)).join(", ")})'`);
     }
-    let best = null, bestScore = -1, tie = false;
+    let best = null, bestScore = -Infinity, tie = false;
     for (const f of viable) {
       let score = 0;
       let ok = true;
@@ -1567,7 +1567,7 @@ class Checker {
         let r;
         if (p.ref) r = (a.lv || p.type.cnst) && (same(unconst(at), unconst(p.type)) || (isArith(at) && isArith(p.type) && p.type.cnst)) ? "exact" : null;
         else if (p.type.k === "ptr" && isInt(at) && a.cv === 0) r = "convert";
-        else if (p.type.k === "String" && at.k === "class" && at.cls?.impl?.prototype?.toString && at.cls.name === "IPAddress") r = "convert";
+        else if (p.type.k === "String" && at.k === "class" && hasToString(at)) r = "convert";
         else r = convertRank(at, p.type);
         if (r === null) { ok = false; break; }
         score += r === "exact" ? 3 : r === "promote" ? 2 : 1;
@@ -1673,7 +1673,7 @@ class Checker {
     const out = args.map((a) => this.rv(a));
     if (out[0]) {
       const t = out[0].type;
-      const ok = isArith(t) || t.k === "String" || isCStr(t) || (t.k === "class" && t.cls?.impl?.prototype?.toString) ||
+      const ok = isArith(t) || t.k === "String" || isCStr(t) || (t.k === "class" && hasToString(t)) ||
         (t.k === "ptr" && t.to.k === "struct" && t.to.name === "tm" && !T.avr);
       if (!ok || t.k === "void") {
         this.fail(e.pos, `no matching function for call to '${cls.name}::${name}(${args.map(argTypeName).join(", ")})'`);
@@ -1779,7 +1779,7 @@ class Checker {
     if (to.k === "String") {
       if (from.k === "String") return e;
       if (isCStr(from)) return mk();
-      if (from.k === "class" && from.cls?.impl?.prototype?.toString) return mk();
+      if (from.k === "class" && hasToString(from)) return mk();
       this.fail(pos, `conversion from '${typeNameAka(from)}' to non-scalar type 'String' requested`);
     }
     if (isArith(to)) {
@@ -1869,6 +1869,12 @@ class Checker {
       }
     }
   }
+}
+
+/** A library class that prints as text (IPAddress). */
+function hasToString(t) {
+  const p = t.cls?.impl?.prototype;
+  return !!p && Object.hasOwn(p, "toString");
 }
 
 function typeNameAka(t) {

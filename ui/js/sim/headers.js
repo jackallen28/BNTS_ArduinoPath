@@ -7,7 +7,7 @@ import { ARDUINO_H, boardHeader } from "./core-header.js";
 import * as core from "./api.js";
 import { LIBRARIES } from "./libraries/index.js";
 
-const ALWAYS = ["math.h", "stdlib.h", "string.h", "stdio.h", "stdint.h", "ctype.h", "stdbool.h", "inttypes.h", "limits.h",
+const ALWAYS = ["math.h", "stdlib.h", "string.h", "stdio.h", "stdint.h", "ctype.h", "stdbool.h", "inttypes.h", "limits.h", "Printable.h",
   "avr/pgmspace.h", "pgmspace.h", "Arduino.h", "WString.h", "Print.h", "Stream.h", "HardwareSerial.h"];
 const AVR_ONLY = ["avr/io.h", "avr/interrupt.h", "util/delay.h", "avr/wdt.h", "avr/sleep.h", "avr/power.h"];
 

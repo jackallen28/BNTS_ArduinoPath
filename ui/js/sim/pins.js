@@ -50,57 +50,40 @@ export function resolvePin(name, board, project = null) {
   return null;
 }
 
-/** The role names a text uses, in order of first use (comments ignored). */
-function rolesIn(text, known) {
-  const out = [];
-  const code = String(text || "").replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, " ");
-  for (const m of code.matchAll(/\b[A-Z][A-Z0-9_]*\b/g)) {
-    if (known.has(m[0]) && !out.includes(m[0])) out.push(m[0]);
+/**
+ * The pin roles a sketch uses, in the order they first appear
+ * (mirrors RolesIn in internal/content/pins.go).
+ * @param {string} code
+ * @param {Record<string,string>} plan
+ */
+export function rolesIn(code, plan) {
+  const roles = [];
+  for (const m of String(code || "").matchAll(/\b[A-Z][A-Z0-9_]*\b/g)) {
+    if (Object.hasOwn(plan, m[0]) && !roles.includes(m[0])) roles.push(m[0]);
   }
-  return out;
-}
-
-/** Does a part or wire apply to this board? ("when": "3v3" / "5v") */
-function applies(item, board) {
-  if (!item.when) return true;
-  const v = (board.logic_volts ?? (board.family === "avr" ? 5 : 3.3)) >= 4.5 ? "5v" : "3v3";
-  return item.when === v;
+  return roles;
 }
 
 /**
- * The {{pins}} header for a board: one #define per role the project's circuit
- * and the source use, in the order they first appear (circuit first).
- * Adds ANALOG_MAX when the source uses it.
+ * What {{pins}} becomes: a #define for each role the code uses (and
+ * ANALOG_MAX when it's used), for this board. Mirrors PinHeader in
+ * internal/content/pins.go exactly.
  * @param {object} project
  * @param {object} board
- * @param {string} [source]
+ * @param {string} [code]
  */
-export function pinHeader(project, board, source = "") {
+export function pinHeader(project, board, code = "") {
   const plan = pinPlan(project, board);
-  const known = new Set([...ROLES, ...Object.keys(plan)]);
-  const roles = [];
-  for (const w of project?.circuit?.wires || []) {
-    if (!applies(w, board)) continue;
-    for (const end of [w.from, w.to]) {
-      const m = /^pin:([A-Z0-9_]+)$/.exec(end || "");
-      if (m && known.has(m[1]) && !roles.includes(m[1])) roles.push(m[1]);
-    }
-  }
-  for (const r of rolesIn(source.replace(/\{\{pins\}\}/g, ""), known)) if (!roles.includes(r)) roles.push(r);
-  const lines = [`// Pins for your ${board.name} (from the Wiring Wizard)`];
-  for (const r of roles) {
-    if (plan[r] != null) lines.push(`#define ${r} ${plan[r]}`);
-    else lines.push(`// ${r}: this board has no pin for it`);
-  }
-  if (/\bANALOG_MAX\b/.test(source)) lines.push(`#define ANALOG_MAX ${board.analog_max ?? 1023}`);
-  return lines.join("\n");
+  let out = `// Pins for your ${board.name} (from the Wiring Wizard)\n`;
+  for (const role of rolesIn(code, plan)) out += `#define ${role} ${plan[role]}\n`;
+  if (/\bANALOG_MAX\b/.test(code)) out += `#define ANALOG_MAX ${board.analog_max ?? 0}\n`;
+  return out;
 }
 
-/** Replaces {{pins}} in a step's starter or demo with the board's header. */
+/** Replaces {{pins}} in a starter or demo with the pin header (the first one, like the Go code). */
 export function expandPins(text, project, board) {
   if (!text || !text.includes("{{pins}}")) return text;
-  const header = pinHeader(project, board, text);
-  return text.replace(/\{\{pins\}\}/g, header);
+  return text.replace("{{pins}}", () => pinHeader(project, board, text));
 }
 
 /** Constants the simulator defines for a board: A0, D5, LED_BUILTIN, SDA... → pin number. */

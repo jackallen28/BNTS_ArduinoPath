@@ -486,7 +486,9 @@ class Parser {
       throw this.unsupported("function pointers", this.tok);
     }
     let name = null, nameTok = this.tok, cls = null;
-    if (this.tok.t === "id" && !this.isTypeName(this.tok.v) || (this.tok.t === "id" && ctx !== "param" && !BASE_WORDS.has(this.tok.v))) {
+    const nameEnds = (t) => t.t === "op" && [",", ")", "[", "=", ";"].includes(t.v);
+    if ((this.tok.t === "id" && !this.isTypeName(this.tok.v)) || (this.tok.t === "id" && ctx !== "param" && !BASE_WORDS.has(this.tok.v)) ||
+        (this.tok.t === "id" && !BASE_WORDS.has(this.tok.v) && nameEnds(this.peek()))) {
       nameTok = this.next();
       name = nameTok.v;
       if (this.isOp("::") && this.peek().t === "id") { // Class::method definition

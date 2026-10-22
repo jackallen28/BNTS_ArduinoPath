@@ -68,10 +68,14 @@ export function applyEvent(R, ev, board, project, httpLog) {
   if (ev.serial != null && R.serial) R.serial.input(fromText(ev.serial));
   if (ev.key != null) R.pressKey(String(ev.key));
   if (ev.card != null) R.tapCard(ev.card);
+  if (ev.espnow != null) {
+    const m = typeof ev.espnow === "object" && !Array.isArray(ev.espnow) ? ev.espnow : { data: ev.espnow };
+    R.espNowReceive?.(m.from, m.text ?? m.data ?? "");
+  }
   if (ev.http) {
     const req = { method: "GET", path: "/", query: {}, ...ev.http };
     const entry = { request: req, response: null };
     httpLog?.push(entry);
-    R.httpRequest(req).then((res) => { entry.response = res; });
+    R.httpRequest(req, (res) => { entry.response = res; });
   }
 }

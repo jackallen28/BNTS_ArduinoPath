@@ -297,6 +297,7 @@ public:
   uint32_t getCycleCount();
 };
 extern EspClass ESP;
+#include <time.h>
 #endif
 `;
 

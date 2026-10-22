@@ -1,0 +1,42 @@
+{
+  "id": "sim-fixture",
+  "title": "Simulator fixture",
+  "tier": "getting-started",
+  "boards": ["all"],
+  "parts": [{ "type": "led" }, { "type": "button" }],
+  "minutes": 10,
+  "intro": "A tiny project that proves the content-demo test works.",
+  "pins": { "avr": { "LED_PIN": "12" } },
+  "steps": [
+    {
+      "title": "Blink",
+      "support": "guided",
+      "text": "Blink the LED.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  Serial.begin(9600);\n  Serial.println(\"Blinking\");\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, HIGH);\n  delay(500);\n  digitalWrite(LED_PIN, LOW);\n  delay(500);\n}\n",
+      "sim_ms": 2100,
+      "checks": [
+        { "type": "pin_seen", "pin": "LED_PIN", "value": "HIGH", "times": 2, "label": "The LED turns on" },
+        { "type": "serial_contains", "text": "Blinking", "label": "It says hello" },
+        { "type": "uses_function", "name": "delay", "label": "You used delay()" },
+        { "type": "confirm", "label": "I saw it blink" }
+      ]
+    },
+    {
+      "title": "Button",
+      "support": "scaffolded",
+      "text": "Light the LED while the button is pressed.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  digitalWrite(LED_PIN, digitalRead(BUTTON_PIN) == LOW ? HIGH : LOW);\n}\n",
+      "sim_ms": 1000,
+      "sim_events": [
+        { "at_ms": 300, "set": { "digital": { "BUTTON_PIN": 0 } } },
+        { "at_ms": 600, "set": { "digital": { "BUTTON_PIN": null } } }
+      ],
+      "checks": [
+        { "type": "pin_seen", "pin": "LED_PIN", "value": "HIGH", "label": "Pressed: on" },
+        { "type": "pin_seen", "pin": "LED_PIN", "value": "LOW", "times": 2, "label": "Let go: off" },
+        { "type": "code_regex", "pattern": "INPUT_PULLUP", "label": "Uses the pull-up" },
+        { "type": "run_count", "min": 2, "label": "Ran it twice" }
+      ]
+    }
+  ]
+}

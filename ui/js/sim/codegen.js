@@ -1038,7 +1038,7 @@ export function instantiate(program, R, natives) {
         return G_(function* (f) {
           for (;;) {
             R.us += C; R.ln = L;
-            if (--R.fuel < 0) { R.loopLine = L; yield 0; }
+            if (R.us >= R.deadline || --R.fuel < 0) { R.loopLine = L; yield 0; }
             const v = c.g ? yield* c.f(f) : c.f(f);
             if (!v) return undefined;
             const r = body.g ? yield* body.f(f) : body.f(f);
@@ -1052,7 +1052,7 @@ export function instantiate(program, R, natives) {
         return G_(function* (f) {
           for (;;) {
             R.us += C; R.ln = L;
-            if (--R.fuel < 0) { R.loopLine = L; yield 0; }
+            if (R.us >= R.deadline || --R.fuel < 0) { R.loopLine = L; yield 0; }
             const r = body.g ? yield* body.f(f) : body.f(f);
             if (r === BRK) return undefined;
             if (r === RET) return r;
@@ -1072,7 +1072,7 @@ export function instantiate(program, R, natives) {
             if (inf) inf(f);
             for (;;) {
               R.us += C; R.ln = L;
-              if (--R.fuel < 0) { R.loopLine = L; yield 0; }
+              if (R.us >= R.deadline || --R.fuel < 0) { R.loopLine = L; yield 0; }
               if (cf && !cf(f)) return undefined;
               const r = bf(f);
               if (r === BRK) return undefined;
@@ -1085,7 +1085,7 @@ export function instantiate(program, R, natives) {
           if (init) init.g ? yield* init.f(f) : init.f(f);
           for (;;) {
             R.us += C; R.ln = L;
-            if (--R.fuel < 0) { R.loopLine = L; yield 0; }
+            if (R.us >= R.deadline || --R.fuel < 0) { R.loopLine = L; yield 0; }
             if (c && !(c.g ? yield* c.f(f) : c.f(f))) return undefined;
             const r = body.g ? yield* body.f(f) : body.f(f);
             if (r === BRK) return undefined;
@@ -1104,7 +1104,7 @@ export function instantiate(program, R, natives) {
           const a = range.g ? yield* range.f(f) : range.f(f);
           for (let i = 0; i < a.length; i++) {
             R.us += C; R.ln = L;
-            if (--R.fuel < 0) { R.loopLine = L; yield 0; }
+            if (R.us >= R.deadline || --R.fuel < 0) { R.loopLine = L; yield 0; }
             f[slot] = ref ? new Ptr(a, i) : cl ? cl(a[i]) : cv ? cv(a[i]) : a[i];
             const r = body.g ? yield* body.f(f) : body.f(f);
             if (r === BRK) return undefined;
@@ -1244,7 +1244,7 @@ export function instantiate(program, R, natives) {
       const recursive = !!info.recursive;
       h.enter = function* (fr) {
         R.us += C;
-        if (--R.fuel < 0) { R.loopLine = line; yield 0; }
+        if (R.us >= R.deadline || --R.fuel < 0) { R.loopLine = line; yield 0; }
         if (recursive && ++R.depth > R.maxDepth) {
           R.depth = 0;
           throw new SimError(`The function '${fn.name}' calls itself too many times, so the board ran out of memory (a "stack overflow"). Check that it has a way to stop.`);
