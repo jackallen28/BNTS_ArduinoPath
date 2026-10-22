@@ -129,7 +129,7 @@ student laptop (Windows 10/11, no admin rights)
 │    http://localhost:47820 ◀──────────▶│ projects, Wiring Wizard,│ │
 │    (this laptop only)                 │ simulator, editor,      │ │
 │  - profiles + saves (SQLite in        │ Serial Monitor          │ │
-│    %LOCALAPPDATA%\ArduinoPath)        │ Upload: Web Serial → USB│ │
+│    %LOCALAPPDATA%\ArduinoPath)        │ Upload: the app → USB   │ │
 │  - WIPE                               └────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -146,20 +146,26 @@ student laptop (Windows 10/11, no admin rights)
     20 minutes after the last window closes (open windows ping every minute)
   - writes `arduinopath.log` next to the database; shows a message box if it can't start
 - **The simulator runs entirely in the browser** (§6).
-- **Uploading to a real board happens in the browser** with **Web Serial** (Edge / Chrome;
-  `http://localhost` counts as a secure site): STK500v1 (Optiboot) for Uno / Nano, STK500v2 for
-  Mega, `esptool-js` (Apache-2.0, vendored) for ESP8266 / ESP32. The Serial Monitor and the Wiring
-  Wizard's test also use Web Serial.
-- **Compiling for Upload** (arduino-cli and the board cores) is **still to decide** for the local
-  app: shipping them with the app is roughly 300 MB for AVR and over 1 GB with ESP32, unpacked into
-  `%LOCALAPPDATA%` on first use (no admin needed). `internal/arduino` already pins and checks them.
+- **Compiling and uploading happen in the app (decided):** the board tools (arduino-cli 1.5.1, the
+  AVR / ESP8266 / ESP32 cores and every library the projects use, pinned in
+  `internal/arduino/requirements.json`) are **built in**: appended to `ArduinoPath.exe` and the Pi
+  binary, or `Contents/Resources/boards.zip` in the Mac app (trimmed to stay under 2 GB). Each board
+  family is unpacked into the data folder the first time it's needed (no admin). The app compiles
+  with arduino-cli and uploads over USB itself (`/api/compile`, `/api/upload`, one job at a time),
+  and the Serial Monitor reads the port in Go and streams it to the page (`/api/serial`). No Web
+  Serial needed, so any Chromium browser works.
 - **The web app** is plain HTML / CSS / ES modules, no build step; third-party code is vendored
-  with its licence (CodeMirror, esptool-js), never loaded from a CDN.
+  with its licence, never loaded from a CDN.
 - **macOS: `ArduinoPath.app`**, the same program as one universal binary (Intel + Apple Silicon,
   built by `tools/macapp`, signed ad hoc, not notarised yet). Work in
   `~/Library/Application Support/ArduinoPath`. The app starts the server as a background process
   and quits (macOS won't relaunch a running app), and has no Dock icon (`LSUIElement`).
-- **Releases:** changing `VERSION` publishes `ArduinoPath.exe` (+ ARM64) and `ArduinoPath-macOS.zip`
+- **Raspberry Pi: ArduinoPath for 64-bit Raspberry Pi OS** (Pi 4 / 5), the same program built for
+  linux/arm64 with the board tools appended, shipped as `ArduinoPath-RaspberryPi.tar.gz`. It opens
+  a Chromium app window, keeps work in `~/.config/ArduinoPath`, and adds its own menu entry and
+  desktop icon in the user's home folder on first start (no sudo). Students plug their board into
+  the Pi's USB port. Teacher guide: `docs/raspberry-pi.md`; CI builds and tests it on an ARM runner.
+- **Releases:** changing `VERSION` publishes `ArduinoPath.exe` (+ ARM64), `ArduinoPath-RaspberryPi.tar.gz` and `ArduinoPath-macOS.zip`
   as a GitHub release, after testing each on real Windows and macOS. No automatic updates yet
   (students download the new file).
 - **Performance target:** the app window opens in under 2 s, a project in under 0.5 s.
@@ -432,20 +438,21 @@ Classroom kits differ: keep a `content/kit.json` of what the school owns, so the
    button, buzzer, pot, servo) and the **renderer** (breadboard + schematic, wires).
 3. **Interpreter + simulated API** for the Getting Started projects; Serial Monitor (simulated).
 4. **Wiring Wizard** with generated test sketches in the simulator.
-5. **Compiling for Upload** (decide how arduino-cli ships with the app) + the Coach on real
-   compiler errors; then **Web Serial upload** (Uno / Nano first, then ESP via esptool-js) and the
-   real Serial Monitor; the wizard's Test on real boards.
+5. **Compiling for Upload** (the board tools built into the app) + the Coach on real compiler
+   errors; uploading over USB from the app, and the real Serial Monitor. **Done** (the wizard's
+   Test on real boards waits for the Wiring Wizard).
 6. Getting Started projects, then Free Play, then the other tiers, then WiFi & IoT (phone panel).
 7. Adaptive coach, help levels, code review, curriculum in Settings.
 8. Hardware checklist on real laptops, then a classroom trial.
 
 ## 14. Decisions already made (don't relitigate without reason)
 
-- **An app on each student laptop** (`ArduinoPath.exe` on Windows, `ArduinoPath.app` on macOS), like PiPath: no server, no teacher
+- **An app on each student laptop** (`ArduinoPath.exe` on Windows, `ArduinoPath.app` on macOS, and
+  ArduinoPath for Raspberry Pi on a Pi the student sits at), like PiPath: no server, no teacher
   controls, works offline. (The Raspberry Pi server couldn't be reached on the school network; a
   cloud server was started and parked.)
-- **The web app in Edge / Chrome**, served by the exe on localhost: the same UI, and Web Serial for
-  Upload (localhost is a secure site).
+- **The web app in Edge / Chrome / Chromium**, served by the app on localhost; the app itself
+  compiles (built-in arduino-cli) and uploads over USB.
 - **Welcome screen with names** (first name(s) + school, no password); a **WIPE page** on the
   laptop, with Save everyone's work first.
 - **Work saved on the laptop** (`%LOCALAPPDATA%\ArduinoPath`, or `~/Library/Application Support/ArduinoPath`

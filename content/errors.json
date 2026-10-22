@@ -381,6 +381,20 @@
       "example_output": "/tmp/sketch/sketch.ino:3:9: error: something unusual happened"
     },
     {
+      "id": "port-permission",
+      "kind": "upload",
+      "pattern": "(?:/dev/tty\\S*[^\\n]*?permission denied|\\[Errno 13\\])",
+      "title": "This computer won't let ArduinoPath use the USB port",
+      "explain": "On a Raspberry Pi (or another Linux computer), you need permission to use USB boards. The usual Pi user has it already, but this account doesn't.",
+      "hints": [
+        "Ask your teacher to give this account permission to use USB boards (see the Raspberry Pi guide).",
+        "After that, log out of the Pi and log back in, then try again.",
+        "If it still happens, close any other program using the board, like the Arduino IDE."
+      ],
+      "tech": "The user isn't in the dialout group, so opening /dev/ttyUSB* or /dev/ttyACM* fails with EACCES. Fix: sudo usermod -aG dialout $USER, then log out and in.",
+      "example_output": "avrdude: ser_open(): can't open device \"/dev/ttyACM0\": Permission denied"
+    },
+    {
       "id": "port-not-found",
       "kind": "upload",
       "pattern": "(?:can't open device|could not open port|cannot find the file specified|no such file or directory|Port .* not found|No device found on)",

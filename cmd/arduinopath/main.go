@@ -96,6 +96,7 @@ func main() {
 	}
 	log, closeLog := openLog(cfg)
 	defer closeLog()
+	installShortcuts(cfg, log)
 	if startsInBackground(cfg) {
 		if err := launchInBackground(cfg, log); err != nil {
 			log.Error("couldn't start", "err", err)
@@ -293,7 +294,7 @@ func run(cfg config, log *slog.Logger) error {
 	if !cfg.noBrowser {
 		if err := openBrowser(url); err != nil {
 			log.Warn("couldn't open a browser", "err", err)
-			showError("ArduinoPath is running", "Open Edge or Chrome and go to "+url)
+			showError("ArduinoPath is running", "Open "+browserNames+" and go to "+url)
 		}
 	}
 

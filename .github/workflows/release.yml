@@ -7,7 +7,8 @@
 #     or a change to this file
 # Each app is tested on its own system (started and used) before anything
 # is published: ArduinoPath.exe (64-bit Intel/AMD), ArduinoPath-arm64.exe,
-# ArduinoPath-macOS.zip (one app for Intel and Apple Silicon Macs) and SHA256SUMS.
+# ArduinoPath-macOS.zip (one app for Intel and Apple Silicon Macs),
+# ArduinoPath-RaspberryPi.tar.gz (64-bit Raspberry Pi OS) and SHA256SUMS.
 name: Release
 
 on:
@@ -193,8 +194,73 @@ jobs:
           path: dist/ArduinoPath-macOS.zip
           retention-days: 3
 
+  pi:
+    needs: version
+    if: needs.version.outputs.skip != 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 150
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: go test ./...
+
+      - name: Restore the board tools
+        id: tools-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Install the board tools
+        run: |
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
+          rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
+
+      - name: Save the board tools
+        if: steps.tools-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Build (with the board tools built in)
+        run: |
+          mkdir -p dist/ArduinoPath
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath \
+            -ldflags "-s -w -X arduinopath.Version=$VERSION" -o dist/ArduinoPath/ArduinoPath ./cmd/arduinopath
+          go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out "$RUNNER_TEMP/boards.zip"
+          go run ./tools/packboards -append dist/ArduinoPath/ArduinoPath -bundle "$RUNNER_TEMP/boards.zip"
+
+      - name: Unpack the built-in tools and compile for every board
+        env:
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath/ArduinoPath
+        run: go test -v -timeout 120m -run TestRealBundle ./internal/arduino
+
+      - name: Start ArduinoPath and use it
+        env:
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: tests/linux/smoke.sh dist/ArduinoPath/ArduinoPath
+
+      - name: Pack for download
+        run: |
+          cp docs/raspberry-pi-readme.txt dist/ArduinoPath/README.txt
+          tar -C dist -czf "$RUNNER_TEMP/ArduinoPath-RaspberryPi.tar.gz" ArduinoPath
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pi
+          path: ${{ runner.temp }}/ArduinoPath-RaspberryPi.tar.gz
+          retention-days: 3
+
   publish:
-    needs: [version, windows, macos]
+    needs: [version, windows, macos, pi]
     runs-on: ubuntu-latest
     env:
       TAG: ${{ needs.version.outputs.tag }}
@@ -211,10 +277,11 @@ jobs:
           (cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
           notes="**Windows:** download **ArduinoPath.exe** and double-click it (ArduinoPath-arm64.exe is for Windows laptops with ARM chips, such as Snapdragon).
           **Mac:** download **ArduinoPath-macOS.zip**, open it, and drag ArduinoPath into Applications (one app for Intel and Apple Silicon Macs).
-          ArduinoPath opens in Chrome or Edge. Nothing to install, no admin rights needed. If Windows or macOS blocks it the first time, see docs/windows-app.md or docs/mac-app.md."
+          **Raspberry Pi** (Pi 4 or 5, 64-bit Raspberry Pi OS): download **ArduinoPath-RaspberryPi.tar.gz**, right-click it and choose Extract Here, then double-click ArduinoPath in the new folder (choose Execute). It adds itself to the menu (Education) and the desktop.
+          ArduinoPath opens in Chrome, Edge or Chromium. Nothing to install, no admin rights needed. If Windows or macOS blocks it the first time, see docs/windows-app.md or docs/mac-app.md. Raspberry Pi help: docs/raspberry-pi.md."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title "ArduinoPath $VERSION (Windows and Mac)" --notes "$notes" --latest
+              --title "ArduinoPath $VERSION (Windows, Mac and Raspberry Pi)" --notes "$notes" --latest
           fi

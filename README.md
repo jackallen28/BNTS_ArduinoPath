@@ -3,9 +3,10 @@
 A step-by-step Arduino and ESP coding tutor for secondary students, made for the
 Banyule Nillumbik Tech School (BNTS).
 
-- **One app on each student laptop: `ArduinoPath.exe` (Windows) or `ArduinoPath.app` (Mac).**
-  Double-click it and ArduinoPath opens in Edge or Chrome. Nothing to install, no admin rights,
-  no server, no internet needed.
+- **One app on each student computer: `ArduinoPath.exe` (Windows), `ArduinoPath.app` (Mac) or
+  ArduinoPath for Raspberry Pi** (Pi 4 / 5, 64-bit Raspberry Pi OS: see
+  [docs/raspberry-pi.md](docs/raspberry-pi.md)). Double-click it and ArduinoPath opens in Edge,
+  Chrome or Chromium. Nothing to install, no admin rights, no server, no internet needed.
 - **Welcome screen like PiPath:** students pick their name, or make a profile with their first
   name(s) and school. Work saves on the laptop by itself.
 - **A WIPE page** clears the laptop for the next group (after offering to save everyone's work).

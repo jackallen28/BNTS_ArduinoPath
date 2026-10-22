@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -53,3 +54,9 @@ func showError(title, text string) {
 	syscall.NewLazyDLL("user32.dll").NewProc("MessageBoxW").
 		Call(0, uintptr(unsafe.Pointer(m)), uintptr(unsafe.Pointer(t)), mbIconWarning)
 }
+
+// browserNames is what the "open a browser" message suggests.
+const browserNames = "Edge or Chrome"
+
+// installShortcuts is only needed on Linux (see desktop_linux.go).
+func installShortcuts(cfg config, log *slog.Logger) {}

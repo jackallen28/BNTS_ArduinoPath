@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -46,3 +47,9 @@ func showError(title, text string) {
 		"-e", "end run",
 		title, text).Run()
 }
+
+// browserNames is what the "open a browser" message suggests.
+const browserNames = "Edge or Chrome"
+
+// installShortcuts is only needed on Linux (see desktop_linux.go).
+func installShortcuts(cfg config, log *slog.Logger) {}
