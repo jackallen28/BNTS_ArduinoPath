@@ -42,18 +42,16 @@ export class Servo {
   write(v) {
     if (v < 544) {
       const a = Math.max(0, Math.min(180, v));
-      this.us = Math.round(this.min + ((this.max - this.min) * a) / 180);
-      this.angle = a;
+      this.us = Math.trunc(this.min + ((this.max - this.min) * a) / 180);
     } else {
       this.us = Math.max(this.min, Math.min(this.max, v));
-      this.angle = null;
     }
     this.show();
   }
   writeMicroseconds(v) { this.write(Math.max(544, v)); }
   read() {
-    if (this.angle != null) return this.angle;
-    return Math.round(((this.us - this.min) * 180) / (this.max - this.min));
+    // Servo.cpp: map(readMicroseconds() + 1, min, max, 0, 180)
+    return Math.trunc(((this.us + 1 - this.min) * 180) / (this.max - this.min));
   }
   readMicroseconds() { return this.us; }
   show() {

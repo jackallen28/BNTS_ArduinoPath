@@ -29,6 +29,9 @@ export class Machine {
     this.family = board.family;
     this.avr = board.family === "avr";
     this.cost = this.avr ? 1 : 0.5;
+    // Time the core spends between two calls of loop() (serialEventRun on
+    // AVR; the watchdog and WiFi housekeeping on ESP boards).
+    this.loopCost = this.avr ? 1 : 2;
     this.us = 0;
     this.ln = 0;
     this.loopLine = 0;
@@ -231,7 +234,7 @@ export class Machine {
     const loop = code.loop, se = code.serialEvent;
     for (;;) {
       if (loop.g) yield* loop.call(); else loop.call();
-      this.us += this.cost;
+      this.us += this.loopCost;
       this.progress();
       if (se && this.serial?.rx.length) { if (se.g) yield* se.call(); else se.call(); }
       if (this.us >= this.deadline || --this.fuel < 0) { this.loopLine = 0; yield 0; }

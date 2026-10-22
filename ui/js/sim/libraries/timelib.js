@@ -46,7 +46,7 @@ export function parseTZ(tz) {
     const m = /^([+-]?)(\d+)(?::(\d+))?(?::(\d+))?$/.exec(s);
     if (!m) return null;
     const v = Number(m[2]) * 3600 + Number(m[3] || 0) * 60 + Number(m[4] || 0);
-    return m[1] === "-" ? v : -v; // POSIX offsets count west of UTC
+    return m[1] === "-" ? v : -v || 0; // POSIX offsets count west of UTC
   };
   const name = "([A-Za-z]{3,}|<[^>]+>)";
   const num = "([+-]?\\d+(?::\\d+){0,2})";

@@ -92,7 +92,9 @@ class Parser {
     if (this.types.has(t.v)) {
       const n = this.peek();
       // `String(x)` and `Type::member` start expressions.
-      if (this.isOp("(", n) || this.isOp("::", n) || this.isOp(".", n) || this.isOp("{", n)) return false;
+      // Class::Type name is a declaration; Class::CONSTANT starts an expression.
+      if (this.isOp("::", n)) return this.peek(2).t === "id" && (this.peek(3).t === "id" || this.isOp("*", this.peek(3)));
+      if (this.isOp("(", n) || this.isOp(".", n) || this.isOp("{", n)) return false;
       return true;
     }
     return false;
