@@ -160,6 +160,33 @@ runHeadless(source, { board, ms: 5000, events: simEvents, inputs })
   LiquidCrystal_I2C, TM1637Display, Keypad, MFRC522, MD_MAX72XX, ESP8266WiFi / WiFi,
   ESP8266WebServer / WebServer, time / NTP (`configTime`, `getLocalTime`: the laptop's clock).
 
+**Engine details (additions; everything above still holds):**
+
+- The page's CSP forbids `eval`, so `compile()` builds JavaScript closures, not source; `program`
+  is opaque. `compile()` also returns `{ ok: false, unsupported: true, message, line, col, errors: [] }`.
+  A missing `setup` / `loop` is gcc's link error ``undefined reference to `setup'`` with `line: 0`.
+- `runHeadless(source, { board, ms, events, inputs, project, clock })`: `project` resolves role
+  names in `events` / `inputs`; `clock` (ms since 1970) fixes the laptop clock for `time()`.
+  The result also has `http: [{ request, response }]` (the `http` sim_events) and `truncated`
+  (over 200 000 events). `serial` has `\r\n` turned into `\n`; `serial` events keep `\r\n`.
+  A sim_event with no `at_ms` happens at 0; an analog value may be `"ANALOG_MAX"`; and
+  `{ at_ms, espnow: { from, text | data } }` delivers an ESP-NOW message.
+- `new Simulation(...)` also takes `project` (role names in `setInputs`); `start(source)` resolves
+  with the compile result; `setSpeed(0)` pauses, `Infinity` runs flat out; `sim.espNowReceive(from,
+  data)`. `onError` gets `{ kind: "compile" | "unsupported" | "runtime", line, message, errors? }`.
+- Event details: `digital` / `pwm` / `servo` / `tone` are sent when the value changes;
+  `analogWrite` on a non-PWM AVR pin sends `digital` (like the Arduino core). `oled.buffer` is
+  the SSD1306 layout (byte `x + (y >> 3) * width`, bit `y & 7`). `matrix.rows[r]` bit `c` is
+  `getPoint(r, c)`, plus `devices` and `intensity`. `lcd` also has `custom` (createChar).
+  `tm1637` also has `brightness`, `on`. `http_route` is sent when `server.on()` registers a page;
+  `http_response {method, path, status}` when a request is answered; `wifi.status` is
+  `connecting | connected | disconnected | failed | ap`; `espnow {from, to, data, text}`.
+  `warning` kinds besides `busy-loop`: `serial-no-begin`, `pin` (a pin the board doesn't have),
+  `interrupt`, `keypad-key`, `oled-begin`, `lcd-init`, each with a student-friendly `message`.
+- Timing: each statement costs 1 µs on AVR and 0.5 µs on ESP; `loop()` itself 1 / 2 µs; library
+  calls cost about what they take on the board (`analogRead` 112 µs on AVR); Serial output takes
+  the baud rate's time once its 64-byte buffer is full; `pulseIn` with no echo waits its timeout.
+
 ## 5. Checks (`ui/js/sim/checks.js`)
 
 A step's `checks[]`, each with a `label` (the checklist line). Evaluated after a Run (simulator)
