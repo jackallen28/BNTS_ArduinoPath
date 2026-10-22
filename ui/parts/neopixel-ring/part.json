@@ -1,0 +1,144 @@
+{
+  "type": "neopixel-ring",
+  "title": "12 NeoPixel Ring",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "contrib/adafruit_ffd51df0b5410b3e06f7e782c37b6870_1_15.fzp",
+    "title": "12 NeoPixel Ring",
+    "breadboard": "svg/contrib/breadboard/adafruit_88be198d12b447cdfecbbe9dfb4bc1a8_1_breadboard_15.svg",
+    "schematic": "svg/contrib/schematic/adafruit_88be198d12b447cdfecbbe9dfb4bc1a8_1_schematic_15.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "neopixel",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "vcc",
+      "name": "PWR (5V)",
+      "fritzing": "connector19"
+    },
+    {
+      "id": "din",
+      "name": "Data Input",
+      "fritzing": "connector17"
+    },
+    {
+      "id": "dout",
+      "name": "Data Out (to the next ring)",
+      "fritzing": "connector18"
+    },
+    {
+      "id": "gnd",
+      "name": "GND",
+      "fritzing": "connector20"
+    }
+  ],
+  "footprint": null,
+  "options": {
+    "pixels": 12
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 145,
+    "height": 145,
+    "connectors": {
+      "din": {
+        "x": 90.06,
+        "y": 7
+      },
+      "dout": {
+        "x": 24.46,
+        "y": 24.45
+      },
+      "gnd": {
+        "x": 120.56,
+        "y": 120.56
+      },
+      "vcc": {
+        "x": 54.95,
+        "y": 138.02
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 90,
+    "height": 100,
+    "connectors": {
+      "din": {
+        "x": 0,
+        "y": 40,
+        "dir": "left"
+      },
+      "dout": {
+        "x": 90,
+        "y": 40,
+        "dir": "right"
+      },
+      "gnd": {
+        "x": 40,
+        "y": 100,
+        "dir": "down"
+      },
+      "vcc": {
+        "x": 40,
+        "y": 0,
+        "dir": "up"
+      }
+    }
+  },
+  "sim": {
+    "pixel_r": 6,
+    "pixels": [
+      {
+        "x": 72.5,
+        "y": 14.5
+      },
+      {
+        "x": 101.5,
+        "y": 22.27
+      },
+      {
+        "x": 122.73,
+        "y": 43.5
+      },
+      {
+        "x": 130.5,
+        "y": 72.5
+      },
+      {
+        "x": 122.73,
+        "y": 101.5
+      },
+      {
+        "x": 101.5,
+        "y": 122.73
+      },
+      {
+        "x": 72.5,
+        "y": 130.5
+      },
+      {
+        "x": 43.5,
+        "y": 122.73
+      },
+      {
+        "x": 22.27,
+        "y": 101.5
+      },
+      {
+        "x": 14.5,
+        "y": 72.5
+      },
+      {
+        "x": 22.27,
+        "y": 43.5
+      },
+      {
+        "x": 43.5,
+        "y": 22.27
+      }
+    ]
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "type": "joystick",
+  "title": "Joystick module (KY-023)",
+  "art": "circuitpath",
+  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "behaviour": "joystick",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "gnd",
+      "name": "GND"
+    },
+    {
+      "id": "vcc",
+      "name": "+5V (power)"
+    },
+    {
+      "id": "vrx",
+      "name": "VRx: left and right (analog)"
+    },
+    {
+      "id": "vry",
+      "name": "VRy: up and down (analog)"
+    },
+    {
+      "id": "sw",
+      "name": "SW: press the stick (a button to GND)"
+    }
+  ],
+  "footprint": null,
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 114,
+    "height": 134,
+    "connectors": {
+      "gnd": {
+        "x": 1,
+        "y": 47
+      },
+      "sw": {
+        "x": 1,
+        "y": 87
+      },
+      "vcc": {
+        "x": 1,
+        "y": 57
+      },
+      "vrx": {
+        "x": 1,
+        "y": 67
+      },
+      "vry": {
+        "x": 1,
+        "y": 77
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 100,
+    "height": 60,
+    "connectors": {
+      "gnd": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      },
+      "sw": {
+        "x": 1,
+        "y": 50,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      },
+      "vrx": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      },
+      "vry": {
+        "x": 1,
+        "y": 40,
+        "dir": "left"
+      }
+    }
+  },
+  "sim": {
+    "knob": {
+      "x": 74,
+      "y": 67,
+      "r": 21
+    },
+    "travel": 14
+  }
+}

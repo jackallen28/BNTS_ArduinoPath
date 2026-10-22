@@ -1,0 +1,77 @@
+{
+  "type": "tm1637",
+  "title": "4-digit display (TM1637)",
+  "art": "circuitpath",
+  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "behaviour": "tm1637",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "clk",
+      "name": "CLK"
+    },
+    {
+      "id": "dio",
+      "name": "DIO"
+    },
+    {
+      "id": "vcc",
+      "name": "VCC"
+    },
+    {
+      "id": "gnd",
+      "name": "GND"
+    }
+  ],
+  "footprint": null,
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 178,
+    "height": 76,
+    "connectors": {
+      "clk": {
+        "x": 178,
+        "y": 23
+      },
+      "dio": {
+        "x": 178,
+        "y": 33
+      },
+      "gnd": {
+        "x": 178,
+        "y": 53
+      },
+      "vcc": {
+        "x": 178,
+        "y": 43
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 100,
+    "height": 50,
+    "connectors": {
+      "clk": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      },
+      "dio": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      },
+      "gnd": {
+        "x": 1,
+        "y": 40,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      }
+    }
+  }
+}

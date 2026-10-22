@@ -1,0 +1,36 @@
+{
+  "boards": [
+    "uno",
+    "nano",
+    "mega",
+    "nodemcu",
+    "d1-mini",
+    "esp32",
+    "esp32-c3"
+  ],
+  "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+  "parts": [
+    "led",
+    "rgb-led",
+    "resistor-220",
+    "resistor-10k",
+    "button",
+    "buzzer",
+    "potentiometer",
+    "joystick",
+    "keypad-4x4",
+    "servo",
+    "ldr",
+    "hc-sr04",
+    "pir",
+    "dht",
+    "soil-moisture",
+    "rfid-rc522",
+    "oled",
+    "lcd-i2c",
+    "tm1637",
+    "led-matrix",
+    "neopixel-ring",
+    "neopixel-strip"
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "type": "rfid-rc522",
+  "title": "RFID reader (RC522)",
+  "art": "circuitpath",
+  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "behaviour": "rfid",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "sda",
+      "name": "SDA (SS: chip select)"
+    },
+    {
+      "id": "sck",
+      "name": "SCK"
+    },
+    {
+      "id": "mosi",
+      "name": "MOSI"
+    },
+    {
+      "id": "miso",
+      "name": "MISO"
+    },
+    {
+      "id": "irq",
+      "name": "IRQ (not used)"
+    },
+    {
+      "id": "gnd",
+      "name": "GND"
+    },
+    {
+      "id": "rst",
+      "name": "RST (reset)"
+    },
+    {
+      "id": "vcc",
+      "name": "3.3V (never 5V!)"
+    }
+  ],
+  "footprint": null,
+  "options": {
+    "cards": [
+      {
+        "name": "Blue tag",
+        "uid": [
+          18,
+          52,
+          86,
+          120
+        ]
+      },
+      {
+        "name": "White card",
+        "uid": [
+          222,
+          173,
+          190,
+          239
+        ]
+      }
+    ]
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 160,
+    "height": 250,
+    "connectors": {
+      "gnd": {
+        "x": 95,
+        "y": 249
+      },
+      "irq": {
+        "x": 85,
+        "y": 249
+      },
+      "miso": {
+        "x": 75,
+        "y": 249
+      },
+      "mosi": {
+        "x": 65,
+        "y": 249
+      },
+      "rst": {
+        "x": 105,
+        "y": 249
+      },
+      "sck": {
+        "x": 55,
+        "y": 249
+      },
+      "sda": {
+        "x": 45,
+        "y": 249
+      },
+      "vcc": {
+        "x": 115,
+        "y": 249
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 100,
+    "height": 90,
+    "connectors": {
+      "gnd": {
+        "x": 1,
+        "y": 60,
+        "dir": "left"
+      },
+      "irq": {
+        "x": 1,
+        "y": 50,
+        "dir": "left"
+      },
+      "miso": {
+        "x": 1,
+        "y": 40,
+        "dir": "left"
+      },
+      "mosi": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      },
+      "rst": {
+        "x": 1,
+        "y": 70,
+        "dir": "left"
+      },
+      "sck": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      },
+      "sda": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 80,
+        "dir": "left"
+      }
+    }
+  }
+}

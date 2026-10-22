@@ -1,0 +1,72 @@
+{
+  "type": "resistor-10k",
+  "title": "220 Ω Resistor",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/resistor.fzp",
+    "title": "220 Ω Resistor",
+    "breadboard": "svg/core/breadboard/resistor_220.svg",
+    "schematic": "svg/core/schematic/resistor.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "resistor",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "1",
+      "name": "leg 1 (either way round)",
+      "fritzing": "connector0"
+    },
+    {
+      "id": "2",
+      "name": "leg 2 (either way round)",
+      "fritzing": "connector1"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      4,
+      0
+    ]
+  ],
+  "options": {
+    "ohms": 10000
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 42.92,
+    "height": 9.71,
+    "connectors": {
+      "1": {
+        "x": 1.46,
+        "y": 5.05
+      },
+      "2": {
+        "x": 41.46,
+        "y": 5.05
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 40.97,
+    "height": 8.6,
+    "connectors": {
+      "1": {
+        "x": 0.49,
+        "y": 4.3,
+        "dir": "left"
+      },
+      "2": {
+        "x": 40.49,
+        "y": 4.3,
+        "dir": "right"
+      }
+    }
+  }
+}

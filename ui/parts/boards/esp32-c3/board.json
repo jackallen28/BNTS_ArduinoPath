@@ -1,0 +1,197 @@
+{
+  "id": "esp32-c3",
+  "title": "ESP32-C3 SuperMini",
+  "art": "circuitpath",
+  "licence": "CircuitPath's own art (drawn in the Fritzing style)",
+  "unit": "0.01in",
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 72,
+    "height": 92,
+    "pins": {
+      "0": {
+        "x": 6,
+        "y": 86,
+        "exit": "down"
+      },
+      "1": {
+        "x": 6,
+        "y": 76,
+        "exit": "left"
+      },
+      "10": {
+        "x": 66,
+        "y": 66,
+        "exit": "right"
+      },
+      "2": {
+        "x": 6,
+        "y": 66,
+        "exit": "left"
+      },
+      "20": {
+        "x": 66,
+        "y": 76,
+        "exit": "right"
+      },
+      "21": {
+        "x": 66,
+        "y": 86,
+        "exit": "down"
+      },
+      "3": {
+        "x": 6,
+        "y": 56,
+        "exit": "left"
+      },
+      "4": {
+        "x": 6,
+        "y": 46,
+        "exit": "left"
+      },
+      "5": {
+        "x": 66,
+        "y": 16,
+        "exit": "right"
+      },
+      "6": {
+        "x": 66,
+        "y": 26,
+        "exit": "right"
+      },
+      "7": {
+        "x": 66,
+        "y": 36,
+        "exit": "right"
+      },
+      "8": {
+        "x": 66,
+        "y": 46,
+        "exit": "right"
+      },
+      "9": {
+        "x": 66,
+        "y": 56,
+        "exit": "right"
+      }
+    },
+    "power": {
+      "3V3": [
+        {
+          "x": 6,
+          "y": 36,
+          "exit": "left"
+        }
+      ],
+      "5V": [
+        {
+          "x": 6,
+          "y": 16,
+          "exit": "left"
+        }
+      ],
+      "GND": [
+        {
+          "x": 6,
+          "y": 26,
+          "exit": "left"
+        }
+      ]
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 130,
+    "height": 90,
+    "pins": {
+      "0": {
+        "x": 1,
+        "y": 80,
+        "exit": "left"
+      },
+      "1": {
+        "x": 1,
+        "y": 70,
+        "exit": "left"
+      },
+      "10": {
+        "x": 129,
+        "y": 60,
+        "exit": "right"
+      },
+      "2": {
+        "x": 1,
+        "y": 60,
+        "exit": "left"
+      },
+      "20": {
+        "x": 129,
+        "y": 70,
+        "exit": "right"
+      },
+      "21": {
+        "x": 129,
+        "y": 80,
+        "exit": "right"
+      },
+      "3": {
+        "x": 1,
+        "y": 50,
+        "exit": "left"
+      },
+      "4": {
+        "x": 1,
+        "y": 40,
+        "exit": "left"
+      },
+      "5": {
+        "x": 129,
+        "y": 10,
+        "exit": "right"
+      },
+      "6": {
+        "x": 129,
+        "y": 20,
+        "exit": "right"
+      },
+      "7": {
+        "x": 129,
+        "y": 30,
+        "exit": "right"
+      },
+      "8": {
+        "x": 129,
+        "y": 40,
+        "exit": "right"
+      },
+      "9": {
+        "x": 129,
+        "y": 50,
+        "exit": "right"
+      }
+    },
+    "power": {
+      "3V3": [
+        {
+          "x": 1,
+          "y": 30,
+          "exit": "left"
+        }
+      ],
+      "5V": [
+        {
+          "x": 1,
+          "y": 10,
+          "exit": "left"
+        }
+      ],
+      "GND": [
+        {
+          "x": 1,
+          "y": 20,
+          "exit": "left"
+        }
+      ]
+    }
+  }
+}

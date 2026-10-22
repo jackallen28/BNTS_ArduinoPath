@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- an Illustrator-style file: 1 unit = 0.01in -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="0.2in" height="0.3in" viewBox="0 0 20 30">
+  <metadata><rdf>junk</rdf></metadata>
+  <style>.body{fill:#E60000;opacity:0.5} #lens{stroke:#000}</style>
+  <defs><linearGradient id="grad"><stop offset="0" style="stop-color:#fff"/></linearGradient></defs>
+  <g id="breadboard" inkscape:label="layer" transform="translate(0,0)">
+    <rect id="connector0pin" x="4" y="29" width="2" height="1" fill="none"/>
+    <rect id="connector1pin" x="14" y="29" width="2" height="1" fill="none"/>
+    <line id="connector0leg" x1="5" y1="30" x2="5" y2="60" stroke="#8C8C8C" stroke-width="2"/>
+    <line id="connector1leg" x1="15" y1="30" x2="15" y2="60" stroke="#8C8C8C" stroke-width="2"/>
+    <path id="color_body" class="body" d="M0,0 L20,0 L20,30 L0,30 Z"/>
+    <circle id="lens" cx="10.123456" cy="10" r="4" style="fill:url(#grad);stroke-width:0.5"/>
+    stray text
+  </g>
+</svg>

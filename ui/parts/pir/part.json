@@ -1,0 +1,81 @@
+{
+  "type": "pir",
+  "title": "PIR sensor",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "contrib/PIR_sensor__723e9e78d3d1bdc76f4badecd521c4cb_6B.fzp",
+    "title": "PIR sensor",
+    "breadboard": "svg/contrib/breadboard/PIR_sensor__723e9e78d3d1bdc76f4badecd521__breadboard__bde4d2a73b9c7784602c3b4f93cfb0ab_6B.svg",
+    "schematic": "svg/contrib/schematic/PIR_sensor__723e9e78d3d1bdc76f4badecd521__schematic__4c698e9578a08c9d23d9979cd290117a_6B.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "pir",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "vcc",
+      "name": "VCC (5V)",
+      "fritzing": "connector1"
+    },
+    {
+      "id": "out",
+      "name": "OUT (signal)",
+      "fritzing": "connector2"
+    },
+    {
+      "id": "gnd",
+      "name": "GND",
+      "fritzing": "connector3"
+    }
+  ],
+  "footprint": null,
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 140,
+    "height": 230,
+    "connectors": {
+      "gnd": {
+        "x": 80,
+        "y": 220
+      },
+      "out": {
+        "x": 70,
+        "y": 220
+      },
+      "vcc": {
+        "x": 60,
+        "y": 220
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 94.49,
+    "height": 70.87,
+    "connectors": {
+      "gnd": {
+        "x": 10.24,
+        "y": 47.25,
+        "dir": "left"
+      },
+      "out": {
+        "x": 10.24,
+        "y": 35.43,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 10.24,
+        "y": 23.62,
+        "dir": "left"
+      }
+    }
+  },
+  "sim": {
+    "dome": {
+      "x": 70,
+      "y": 46,
+      "r": 42
+    }
+  }
+}
