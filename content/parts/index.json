@@ -1,27 +1,182 @@
 {
   "$schema": "../schema/parts.schema.json",
   "parts": {
-    "led": { "name": "LED", "plural": "LEDs", "group": "output" },
-    "rgb-led": { "name": "RGB LED", "plural": "RGB LEDs", "group": "output" },
-    "resistor-220": { "name": "220Ω resistor", "plural": "220Ω resistors", "group": "passive" },
-    "resistor-10k": { "name": "10kΩ resistor", "plural": "10kΩ resistors", "group": "passive" },
-    "button": { "name": "push button", "plural": "push buttons", "group": "input" },
-    "buzzer": { "name": "piezo buzzer", "plural": "piezo buzzers", "group": "output" },
-    "potentiometer": { "name": "potentiometer", "plural": "potentiometers", "group": "input" },
-    "joystick": { "name": "joystick", "plural": "joysticks", "group": "input" },
-    "keypad-4x4": { "name": "4×4 keypad", "plural": "4×4 keypads", "group": "input" },
-    "servo": { "name": "servo motor", "plural": "servo motors", "group": "motor" },
-    "ldr": { "name": "light sensor (LDR)", "plural": "light sensors (LDRs)", "group": "sensor" },
-    "hc-sr04": { "name": "ultrasonic distance sensor (HC-SR04)", "plural": "ultrasonic distance sensors (HC-SR04)", "group": "sensor", "needs_5v": true },
-    "pir": { "name": "motion sensor (PIR)", "plural": "motion sensors (PIR)", "group": "sensor" },
-    "dht": { "name": "temperature and humidity sensor (DHT11 / DHT22)", "plural": "temperature and humidity sensors (DHT11 / DHT22)", "group": "sensor" },
-    "soil-moisture": { "name": "soil moisture sensor", "plural": "soil moisture sensors", "group": "sensor" },
-    "rfid-rc522": { "name": "RFID reader (RC522) and cards", "plural": "RFID readers (RC522) and cards", "group": "sensor" },
-    "oled": { "name": "OLED screen (SSD1306)", "plural": "OLED screens (SSD1306)", "group": "display" },
-    "lcd-i2c": { "name": "16×2 LCD screen (I2C)", "plural": "16×2 LCD screens (I2C)", "group": "display" },
-    "tm1637": { "name": "4-digit display (TM1637)", "plural": "4-digit displays (TM1637)", "group": "display" },
-    "led-matrix": { "name": "8×8 LED matrix (MAX7219)", "plural": "8×8 LED matrices (MAX7219)", "group": "display" },
-    "neopixel-ring": { "name": "NeoPixel ring (WS2812)", "plural": "NeoPixel rings (WS2812)", "group": "output" },
-    "neopixel-strip": { "name": "NeoPixel strip (WS2812)", "plural": "NeoPixel strips (WS2812)", "group": "output" }
+    "led": {
+      "name": "LED",
+      "plural": "LEDs",
+      "group": "output",
+      "what": "An LED is a tiny light. It glows when electricity flows through it the right way.",
+      "legs": "The long leg is + (the anode). The short leg is − (the cathode), on the side where the rim is flat.",
+      "did_you_know": "LED stands for light-emitting diode. LEDs use far less power than old light globes and can last for 50,000 hours."
+    },
+    "rgb-led": {
+      "name": "RGB LED",
+      "plural": "RGB LEDs",
+      "group": "output",
+      "what": "An RGB LED is three tiny lights in one: red, green and blue. Mix them to make almost any colour.",
+      "legs": "The longest leg is − (common cathode). The single leg beside it is red, and on the other side are green, then blue.",
+      "did_you_know": "Your screen makes every colour you see with tiny red, green and blue dots, just like this LED."
+    },
+    "resistor-220": {
+      "name": "220Ω resistor",
+      "plural": "220Ω resistors",
+      "group": "passive",
+      "what": "A resistor slows down the electricity. A 220Ω resistor keeps an LED from getting too much and burning out.",
+      "legs": "It works either way round. Read its colour bands: red, red, brown means 220Ω.",
+      "did_you_know": "The coloured bands are a code. Red is 2 and brown means 'add one zero', so red-red-brown is 22 then 0: 220."
+    },
+    "resistor-10k": {
+      "name": "10kΩ resistor",
+      "plural": "10kΩ resistors",
+      "group": "passive",
+      "what": "A 10kΩ resistor slows electricity a lot. Two of them can share a voltage, like turning 5V into 2.5V.",
+      "legs": "It works either way round. Read its colour bands: brown, black, orange means 10,000Ω (10kΩ).",
+      "did_you_know": "The k in 10k means 'thousand', just like in kilometre. So 10kΩ is 10,000 ohms."
+    },
+    "button": {
+      "name": "push button",
+      "plural": "push buttons",
+      "group": "input",
+      "what": "A push button joins two wires while you press it. Your code can check if it's pressed.",
+      "legs": "It has four legs. The two legs on each side are always joined. Pressing the button joins the left side to the right side.",
+      "did_you_know": "Computer keyboards have a tiny button like this under every key."
+    },
+    "buzzer": {
+      "name": "piezo buzzer",
+      "plural": "piezo buzzers",
+      "group": "output",
+      "what": "A piezo buzzer makes beeps and notes. Your code chooses how high or low the note is.",
+      "legs": "The + leg is longer, or has a red wire, or a + mark on top. The other leg goes to GND.",
+      "did_you_know": "Inside is a thin crystal disc that bends when electricity flows. It bends thousands of times a second to make sound."
+    },
+    "potentiometer": {
+      "name": "potentiometer",
+      "plural": "potentiometers",
+      "group": "input",
+      "what": "A potentiometer (pot) is a knob. Turning it changes a number your board can read, from 0 up to the top.",
+      "legs": "The middle leg is the wiper: it goes to an analog pin. The two outside legs go to power and GND.",
+      "did_you_know": "Old radios used potentiometers for the volume knob. Many guitar amps still do!"
+    },
+    "joystick": {
+      "name": "joystick",
+      "plural": "joysticks",
+      "group": "input",
+      "what": "A joystick is two knobs in one: left–right and up–down. You can also press it down like a button.",
+      "legs": "The pins are labelled: GND, +5V (power), VRx (left–right), VRy (up–down) and SW (the press).",
+      "did_you_know": "Game controllers have joysticks just like this one inside their thumbsticks."
+    },
+    "keypad-4x4": {
+      "name": "4×4 keypad",
+      "plural": "4×4 keypads",
+      "group": "input",
+      "what": "A keypad has 16 buttons in rows and columns. Your code works out which key you pressed.",
+      "legs": "It has eight pins on its ribbon: four rows (R1 to R4) then four columns (C1 to C4), from left to right.",
+      "did_you_know": "With rows and columns, 16 keys need only 8 wires. A big keyboard uses the same trick."
+    },
+    "servo": {
+      "name": "servo motor",
+      "plural": "servo motors",
+      "group": "motor",
+      "what": "A servo is a motor that turns to the angle you choose, from 0° to 180°, and holds there.",
+      "legs": "It has three wires: brown (or black) is GND, red is power (5V) and orange (or yellow) is the signal.",
+      "did_you_know": "Servos steer remote-control cars and move the arms of robots."
+    },
+    "ldr": {
+      "name": "light sensor (LDR)",
+      "plural": "light sensors (LDRs)",
+      "group": "sensor",
+      "what": "A light sensor (LDR) lets more electricity through in bright light. Your board reads it as a number.",
+      "legs": "It works either way round. It's used with a 10kΩ resistor so the board can measure the light.",
+      "did_you_know": "LDR stands for light-dependent resistor. Street lights use sensors like this to turn on at night."
+    },
+    "hc-sr04": {
+      "name": "ultrasonic distance sensor (HC-SR04)",
+      "plural": "ultrasonic distance sensors (HC-SR04)",
+      "group": "sensor",
+      "needs_5v": true,
+      "what": "An ultrasonic sensor measures distance. It squeaks too high for us to hear and times the echo, like a bat.",
+      "legs": "The pins are labelled: VCC (5V), Trig, Echo and Gnd. On a 3.3V board, Echo needs two resistors to make it safe.",
+      "did_you_know": "Sound travels about 343 metres every second, so an echo from 1 metre away comes back in under a hundredth of a second."
+    },
+    "pir": {
+      "name": "motion sensor (PIR)",
+      "plural": "motion sensors (PIR)",
+      "group": "sensor",
+      "what": "A motion sensor (PIR) notices warm things moving, like people. It sends a signal when it sees movement.",
+      "legs": "It has three pins: VCC (power), OUT (the signal) and GND. Some boards label them on the back under the white dome.",
+      "did_you_know": "PIR stands for passive infrared. It sees the heat your body gives off, even in the dark."
+    },
+    "dht": {
+      "name": "temperature and humidity sensor (DHT11 / DHT22)",
+      "plural": "temperature and humidity sensors (DHT11 / DHT22)",
+      "group": "sensor",
+      "what": "A DHT sensor measures temperature and humidity (how damp the air is).",
+      "legs": "The module has three pins: S (data), + (power) and − (GND).",
+      "did_you_know": "Weather stations measure humidity because damp air makes hot days feel even hotter."
+    },
+    "soil-moisture": {
+      "name": "soil moisture sensor",
+      "plural": "soil moisture sensors",
+      "group": "sensor",
+      "what": "A soil moisture sensor tells you how wet the soil is, so you know when a plant needs water.",
+      "legs": "It has three pins: VCC (power), GND and SIG (the signal, to an analog pin). The two long prongs go in the soil.",
+      "did_you_know": "Wet soil lets electricity flow more easily than dry soil. That's how the sensor knows!"
+    },
+    "rfid-rc522": {
+      "name": "RFID reader (RC522) and cards",
+      "plural": "RFID readers (RC522) and cards",
+      "group": "sensor",
+      "what": "An RFID reader can read cards and tags without touching them. Each card has its own number.",
+      "legs": "Its 8 pins are labelled. It needs 3.3V, never 5V. SDA, SCK, MOSI and MISO talk to the board, RST resets it and IRQ isn't used.",
+      "did_you_know": "Bus cards, library cards and school passes often use RFID."
+    },
+    "oled": {
+      "name": "OLED screen (SSD1306)",
+      "plural": "OLED screens (SSD1306)",
+      "group": "display",
+      "what": "An OLED screen is a tiny screen (128 × 64 dots) that can show words, numbers and pictures.",
+      "legs": "It has four pins: GND, VCC (power), SCL and SDA. SCL and SDA go to the board's I2C pins.",
+      "did_you_know": "Each dot on an OLED makes its own light, so black parts of the picture use no power at all."
+    },
+    "lcd-i2c": {
+      "name": "16×2 LCD screen (I2C)",
+      "plural": "16×2 LCD screens (I2C)",
+      "group": "display",
+      "what": "An LCD screen shows two lines of 16 letters. The little board on the back means it needs only four wires.",
+      "legs": "The four pins on the back are GND, VCC (5V), SDA and SCL. SDA and SCL go to the board's I2C pins.",
+      "did_you_know": "Each letter is drawn with a grid of 5 × 8 dots. Look closely and you'll see them!"
+    },
+    "tm1637": {
+      "name": "4-digit display (TM1637)",
+      "plural": "4-digit displays (TM1637)",
+      "group": "display",
+      "what": "A 4-digit display shows numbers, like a digital clock, with a colon in the middle.",
+      "legs": "It has four pins: CLK, DIO, VCC (power) and GND.",
+      "did_you_know": "Each digit has 7 bars (segments). Lighting different bars makes the numbers 0 to 9."
+    },
+    "led-matrix": {
+      "name": "8×8 LED matrix (MAX7219)",
+      "plural": "8×8 LED matrices (MAX7219)",
+      "group": "display",
+      "what": "An LED matrix is a grid of 64 red LEDs (8 × 8). You can light any of them to draw pictures and games.",
+      "legs": "Use the five pins at the DIN end: VCC, GND, DIN, CS and CLK. The pins at the other end can join another matrix.",
+      "did_you_know": "The MAX7219 chip on the back controls all 64 LEDs, so your board needs only three wires to talk to it."
+    },
+    "neopixel-ring": {
+      "name": "NeoPixel ring (WS2812)",
+      "plural": "NeoPixel rings (WS2812)",
+      "group": "output",
+      "what": "A NeoPixel ring is a circle of 12 colour LEDs. Your code can set every one to its own colour.",
+      "legs": "Use the pins marked PWR (5V), GND and Data Input (DI). Data Out joins another ring.",
+      "did_you_know": "Every NeoPixel has its own tiny chip inside, so one wire can control hundreds of them."
+    },
+    "neopixel-strip": {
+      "name": "NeoPixel strip (WS2812)",
+      "plural": "NeoPixel strips (WS2812)",
+      "group": "output",
+      "what": "A NeoPixel strip is a line of 8 colour LEDs. Your code can set every one to its own colour.",
+      "legs": "Use the pins at the DIN end: 4-7VDC (power), DIN (data in) and GND. The other end joins another strip.",
+      "did_you_know": "Light shows at concerts often use long strips of LEDs like these."
+    }
   }
 }

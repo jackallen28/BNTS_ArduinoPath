@@ -22,6 +22,18 @@
           "needs_5v": {
             "description": "The part runs on 5V, so 3.3V boards need a level shifter or divider (the Wiring Wizard adds one).",
             "type": "boolean"
+          },
+          "what": {
+            "description": "Meet the parts: what it does, in one or two short sentences (Year 7 reading level).",
+            "type": "string", "minLength": 1, "maxLength": 300
+          },
+          "legs": {
+            "description": "Meet the parts: how to tell which leg or pin is which.",
+            "type": "string", "minLength": 1, "maxLength": 300
+          },
+          "did_you_know": {
+            "description": "Meet the parts: one fun fact.",
+            "type": "string", "minLength": 1, "maxLength": 300
           }
         }
       }
