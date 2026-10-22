@@ -4,7 +4,7 @@
 // about a second; web pages are asked for by the phone panel (sim.http()).
 
 import { sleep } from "../api.js";
-import { cstr, toText, fromText } from "../values.js";
+import { toText, fromText } from "../values.js";
 
 const WIFI_TYPES = `
 typedef enum { WL_NO_SHIELD = 255, WL_IDLE_STATUS = 0, WL_NO_SSID_AVAIL = 1, WL_SCAN_COMPLETED = 2, WL_CONNECTED = 3, WL_CONNECT_FAILED = 4, WL_CONNECTION_LOST = 5, WL_DISCONNECTED = 6 } wl_status_t;
@@ -358,4 +358,3 @@ export default [
   },
 ];
 
-export { cstr };

@@ -5,9 +5,6 @@
 import { Ptr, SimError, cstr, writeCStr, itoa, dtostrf, atol, atof, format, toText, upper, lower } from "./values.js";
 import { MODES } from "./runtime.js";
 
-const isGen = (f) => f && f.constructor && f.constructor.name === "GeneratorFunction";
-void isGen;
-
 /** Sleeps for `us` simulated microseconds (the sketch pauses). */
 export function* sleep(R, us) {
   const end = R.us + us;

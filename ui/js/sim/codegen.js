@@ -66,9 +66,6 @@ export function instantiate(program, R, natives) {
 
   // ------------------------------------------------------------ helpers
 
-  function run(x, f) { return x.f(f); } // sync only
-  void run;
-
   /** Evaluates kids in order, then combine(...values); sync if all kids are. */
   function seq(kids, combine) {
     if (kids.every((k) => !k.g)) {
