@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "parts.schema.json",
-  "title": "CircuitPath part names",
+  "title": "ArduinoPath part names",
   "description": "Every part type a project or kit can mention, with the names students see.",
   "type": "object",
   "additionalProperties": false,

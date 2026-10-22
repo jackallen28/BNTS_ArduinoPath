@@ -11,17 +11,17 @@ import (
 	"testing"
 	"time"
 
-	"circuitpath/internal/content"
+	"arduinopath/internal/content"
 )
 
-// TestRealBundle unpacks a real bundle (CI sets CIRCUITPATH_BOARDS to a
-// boards.zip or a CircuitPath.exe with the tools appended) and compiles for
+// TestRealBundle unpacks a real bundle (CI sets ARDUINOPATH_BOARDS to a
+// boards.zip or an ArduinoPath.exe with the tools appended) and compiles for
 // every board: a blink everywhere, the whole kit check (every library) on
 // the boards whose tools were trimmed when packing, and a broken sketch.
 func TestRealBundle(t *testing.T) {
-	path := os.Getenv("CIRCUITPATH_BOARDS")
+	path := os.Getenv("ARDUINOPATH_BOARDS")
 	if path == "" {
-		t.Skip("CIRCUITPATH_BOARDS isn't set")
+		t.Skip("ARDUINOPATH_BOARDS isn't set")
 	}
 	b, err := OpenBundle(path)
 	if err != nil {

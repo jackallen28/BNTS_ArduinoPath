@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
 
-	"circuitpath/internal/content"
+	"arduinopath/internal/content"
 )
 
 func TestDefaults(t *testing.T) {
@@ -29,15 +30,15 @@ func TestDefaults(t *testing.T) {
 	}
 }
 
-func TestRunningSpotsCircuitPath(t *testing.T) {
+func TestRunningSpotsArduinoPath(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{"app":"CircuitPath"}`))
+		w.Write([]byte(`{"app":"ArduinoPath"}`))
 	}))
 	defer ts.Close()
 	_, port, _ := net.SplitHostPort(ts.Listener.Addr().String())
 	p, _ := strconv.Atoi(port)
 	if !running(p) {
-		t.Fatal("didn't spot CircuitPath")
+		t.Fatal("didn't spot ArduinoPath")
 	}
 	other := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>something else</html>`))
@@ -46,7 +47,7 @@ func TestRunningSpotsCircuitPath(t *testing.T) {
 	_, port, _ = net.SplitHostPort(other.Listener.Addr().String())
 	p, _ = strconv.Atoi(port)
 	if running(p) {
-		t.Fatal("mistook another program for CircuitPath")
+		t.Fatal("mistook another program for ArduinoPath")
 	}
 }
 
@@ -78,5 +79,30 @@ func TestBoardsToCheckIncludesVariants(t *testing.T) {
 		if !seen[fqbn] {
 			t.Errorf("%s isn't checked (%v)", fqbn, boards)
 		}
+	}
+}
+
+func TestMoveOldWork(t *testing.T) {
+	base := t.TempDir()
+	old := filepath.Join(base, "CircuitPath")
+	os.MkdirAll(old, 0o700)
+	os.WriteFile(filepath.Join(old, "circuitpath.db"), []byte("db"), 0o600)
+	os.WriteFile(filepath.Join(old, "circuitpath.db-wal"), []byte("wal"), 0o600)
+	dir := filepath.Join(base, "ArduinoPath")
+	moveOldWork(dir)
+	if b, err := os.ReadFile(filepath.Join(dir, "arduinopath.db")); err != nil || string(b) != "db" {
+		t.Fatalf("database not moved: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "arduinopath.db-wal")); err != nil {
+		t.Fatal("WAL file not moved")
+	}
+	if dirExists(old) {
+		t.Fatal("old folder still there")
+	}
+	// A second time, with both folders, nothing is touched.
+	os.MkdirAll(old, 0o700)
+	moveOldWork(dir)
+	if !dirExists(old) {
+		t.Fatal("old folder was moved over newer work")
 	}
 }

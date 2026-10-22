@@ -1,4 +1,4 @@
-// CircuitPath kit check: uses every library the projects need, so a board
+// ArduinoPath kit check: uses every library the projects need, so a board
 // that compiles this has everything a student will use. CI compiles it
 // for every board after installing the Arduino tools.
 
@@ -8,11 +8,11 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <esp_now.h>
-#include <Servo.h> // CircuitPath's Servo.h for ESP32 (ESP32Servo)
+#include <Servo.h> // ArduinoPath's Servo.h for ESP32 (ESP32Servo)
 WebServer server(80);
 #elif defined(ESP8266)
-#include <WiFi.h>      // CircuitPath's WiFi.h for ESP8266 (ESP8266WiFi)
-#include <WebServer.h> // CircuitPath's WebServer.h for ESP8266 (ESP8266WebServer)
+#include <WiFi.h>      // ArduinoPath's WiFi.h for ESP8266 (ESP8266WiFi)
+#include <WebServer.h> // ArduinoPath's WebServer.h for ESP8266 (ESP8266WebServer)
 #include <espnow.h>
 #include <Servo.h>
 WebServer server(80);

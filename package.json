@@ -1,7 +1,7 @@
 {
-  "name": "circuitpath-dev",
+  "name": "arduinopath-dev",
   "private": true,
-  "description": "Development-only tooling for CircuitPath (tests). Nothing here is needed to run CircuitPath.",
+  "description": "Development-only tooling for ArduinoPath (tests). Nothing here is needed to run ArduinoPath.",
   "type": "module",
   "scripts": {
     "test": "node --test \"tests/js/**/*.test.js\"",

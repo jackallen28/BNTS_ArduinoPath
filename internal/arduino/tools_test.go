@@ -161,7 +161,7 @@ func TestPackAndExtract(t *testing.T) {
 
 func TestBundleAppendedToAProgram(t *testing.T) {
 	bundlePath := packBundle(t, fakeInstall(t, "cli"))
-	exe := filepath.Join(t.TempDir(), "CircuitPath.exe")
+	exe := filepath.Join(t.TempDir(), "ArduinoPath.exe")
 	os.WriteFile(exe, bytes.Repeat([]byte("MZprogram"), 1000), 0o755)
 	if _, err := OpenBundle(exe); err != ErrNoBundle {
 		t.Fatalf("a plain program: %v", err)
@@ -204,8 +204,8 @@ func TestExtractRefusesEscapingNames(t *testing.T) {
 }
 
 func TestParseDiagnostics(t *testing.T) {
-	out := `C:\Users\ava\AppData\Local\CircuitPath\arduino-x\sketches\ab\sketch\sketch.ino: In function 'void loop()':
-C:\Users\ava\AppData\Local\CircuitPath\arduino-x\sketches\ab\sketch\sketch.ino:7:3: error: expected ';' before '}' token
+	out := `C:\Users\ava\AppData\Local\ArduinoPath\arduino-x\sketches\ab\sketch\sketch.ino: In function 'void loop()':
+C:\Users\ava\AppData\Local\ArduinoPath\arduino-x\sketches\ab\sketch\sketch.ino:7:3: error: expected ';' before '}' token
    }
    ^
 /tmp/sketch/sketch.ino:3:10: fatal error: Servo2.h: No such file or directory

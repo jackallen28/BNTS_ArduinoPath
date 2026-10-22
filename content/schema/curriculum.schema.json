@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "curriculum.schema.json",
-  "title": "CircuitPath curriculum topics",
+  "title": "ArduinoPath curriculum topics",
   "type": "object",
   "additionalProperties": false,
   "required": ["name", "topics"],

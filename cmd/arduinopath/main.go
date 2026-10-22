@@ -1,14 +1,14 @@
-// Command circuitpath is CircuitPath for one laptop: double-click
-// CircuitPath.exe (Windows) or CircuitPath.app (macOS) and it opens in Edge
+// Command arduinopath is ArduinoPath for one laptop: double-click
+// ArduinoPath.exe (Windows) or ArduinoPath.app (macOS) and it opens in Edge
 // or Chrome as an app window. Nothing to install and no admin rights needed.
 // It serves the web app to this computer only (http://localhost:47820) and
-// keeps everyone's work in %LOCALAPPDATA%\CircuitPath (Windows) or
-// ~/Library/Application Support/CircuitPath (macOS). It closes itself a while
+// keeps everyone's work in %LOCALAPPDATA%\ArduinoPath (Windows) or
+// ~/Library/Application Support/ArduinoPath (macOS). It closes itself a while
 // after the window closes.
 //
 // For development:
 //
-//	go run ./cmd/circuitpath -dev
+//	go run ./cmd/arduinopath -dev
 //
 // then open http://localhost:8080 (ui/ and content/ are read live from disk).
 package main
@@ -34,12 +34,12 @@ import (
 	"syscall"
 	"time"
 
-	"circuitpath"
-	"circuitpath/internal/arduino"
-	"circuitpath/internal/content"
-	"circuitpath/internal/serialmon"
-	"circuitpath/internal/server"
-	"circuitpath/internal/store"
+	"arduinopath"
+	"arduinopath/internal/arduino"
+	"arduinopath/internal/content"
+	"arduinopath/internal/serialmon"
+	"arduinopath/internal/server"
+	"arduinopath/internal/store"
 )
 
 // defaultPort stays the same every time, so the browser keeps the same site
@@ -48,7 +48,7 @@ const defaultPort = 47820
 
 // errStartFailed means the background server (macOS) stopped while starting;
 // it has already shown its own message.
-var errStartFailed = errors.New("the CircuitPath server stopped while starting (see circuitpath.log)")
+var errStartFailed = errors.New("the ArduinoPath server stopped while starting (see arduinopath.log)")
 
 type config struct {
 	dev        bool
@@ -66,13 +66,13 @@ type config struct {
 func main() {
 	var cfg config
 	flag.BoolVar(&cfg.dev, "dev", false, "development mode: port 8080, data in ./dev-data, ui/ and content/ read live from disk, no browser")
-	flag.StringVar(&cfg.dataDir, "data", "", `folder for everyone's work (default %LOCALAPPDATA%\CircuitPath, or ./dev-data with -dev)`)
+	flag.StringVar(&cfg.dataDir, "data", "", `folder for everyone's work (default %LOCALAPPDATA%\ArduinoPath, or ./dev-data with -dev)`)
 	flag.IntVar(&cfg.port, "port", 0, "port on this computer (default 47820, or 8080 with -dev)")
 	flag.StringVar(&cfg.uiDir, "ui", "", "serve the web app from this folder instead of the built-in copy")
 	flag.StringVar(&cfg.contentDir, "content", "", "read content from this folder instead of the built-in copy")
 	flag.StringVar(&cfg.school, "school", "", "the school name shown on the welcome screen (saved; only needed once)")
 	flag.BoolVar(&cfg.noBrowser, "no-browser", false, "don't open a browser window")
-	flag.DurationVar(&cfg.idleExit, "idle-exit", 20*time.Minute, "close after this long with no CircuitPath window open (0: never)")
+	flag.DurationVar(&cfg.idleExit, "idle-exit", 20*time.Minute, "close after this long with no ArduinoPath window open (0: never)")
 	flag.StringVar(&cfg.boards, "boards", "", "use the board tools in this boards.zip instead of the built-in ones")
 	flag.StringVar(&cfg.arduinoDir, "arduino-dir", "", "use board tools already installed in this folder (by -setup-arduino)")
 	setupArduino := flag.Bool("setup-arduino", false, "install arduino-cli, the board cores and libraries, check every board compiles, and stop (for CI)")
@@ -83,7 +83,7 @@ func main() {
 	cfg.applyDefaults()
 
 	if *showVersion {
-		fmt.Println("CircuitPath", circuitpath.Version)
+		fmt.Println("ArduinoPath", arduinopath.Version)
 		return
 	}
 	if *setupArduino || *checkArduino || *installArduino {
@@ -100,7 +100,7 @@ func main() {
 		if err := launchInBackground(cfg, log); err != nil {
 			log.Error("couldn't start", "err", err)
 			if err != errStartFailed {
-				showError("CircuitPath can't start", err.Error()+"\n\nTry again, or ask your teacher for help.")
+				showError("ArduinoPath can't start", err.Error()+"\n\nTry again, or ask your teacher for help.")
 			}
 			closeLog()
 			os.Exit(1)
@@ -109,7 +109,7 @@ func main() {
 	}
 	if err := run(cfg, log); err != nil {
 		log.Error("stopped", "err", err)
-		showError("CircuitPath can't start", err.Error()+"\n\nTry again, or ask your teacher for help.")
+		showError("ArduinoPath can't start", err.Error()+"\n\nTry again, or ask your teacher for help.")
 		closeLog()
 		os.Exit(1)
 	}
@@ -135,26 +135,47 @@ func (cfg *config) applyDefaults() {
 	}
 	if cfg.dataDir == "" {
 		cfg.dataDir = defaultDataDir()
+		moveOldWork(cfg.dataDir)
 	}
 	if cfg.port == 0 {
 		cfg.port = defaultPort
 	}
 }
 
-// defaultDataDir is %LOCALAPPDATA%\CircuitPath on Windows and
-// ~/Library/Application Support/CircuitPath on macOS: inside the student's
+// defaultDataDir is %LOCALAPPDATA%\ArduinoPath on Windows and
+// ~/Library/Application Support/ArduinoPath on macOS: inside the student's
 // own account, which needs no admin rights and isn't shared with other
 // people who log in to the laptop.
 func defaultDataDir() string {
 	if runtime.GOOS == "windows" {
 		if d := os.Getenv("LOCALAPPDATA"); d != "" {
-			return filepath.Join(d, "CircuitPath")
+			return filepath.Join(d, "ArduinoPath")
 		}
 	}
 	if d, err := os.UserConfigDir(); err == nil {
-		return filepath.Join(d, "CircuitPath")
+		return filepath.Join(d, "ArduinoPath")
 	}
-	return "CircuitPath-data"
+	return "ArduinoPath-data"
+}
+
+// moveOldWork moves work saved before the app was renamed: from the
+// CircuitPath folder next to dir (CircuitPath.exe, versions 0.3.0 and
+// before) into dir, if dir doesn't exist yet. If the move fails, the old
+// folder is left as it was.
+func moveOldWork(dir string) {
+	old := filepath.Join(filepath.Dir(dir), "Circuit"+"Path")
+	if dirExists(dir) || !dirExists(old) {
+		return
+	}
+	if err := os.Rename(old, dir); err != nil {
+		return
+	}
+	for _, suffix := range []string{"", "-wal", "-shm"} {
+		from := filepath.Join(dir, "circuit"+"path.db"+suffix)
+		if _, err := os.Stat(from); err == nil {
+			os.Rename(from, filepath.Join(dir, "arduinopath.db"+suffix))
+		}
+	}
 }
 
 func dirExists(p string) bool {
@@ -162,13 +183,13 @@ func dirExists(p string) bool {
 	return err == nil && fi.IsDir()
 }
 
-// openLog writes to circuitpath.log in the data folder (CircuitPath.exe has
+// openLog writes to arduinopath.log in the data folder (ArduinoPath.exe has
 // no console window), and to the terminal too with -dev.
 func openLog(cfg config) (*slog.Logger, func()) {
 	var w io.Writer = os.Stderr
 	closeFn := func() {}
 	if err := os.MkdirAll(cfg.dataDir, 0o700); err == nil {
-		path := filepath.Join(cfg.dataDir, "circuitpath.log")
+		path := filepath.Join(cfg.dataDir, "arduinopath.log")
 		if fi, err := os.Stat(path); err == nil && fi.Size() > 1<<20 {
 			os.Rename(path, path+".old")
 		}
@@ -211,7 +232,7 @@ func run(cfg config, log *slog.Logger) error {
 	if err := os.MkdirAll(cfg.dataDir, 0o700); err != nil {
 		return err
 	}
-	db, err := store.Open(filepath.Join(cfg.dataDir, "circuitpath.db"))
+	db, err := store.Open(filepath.Join(cfg.dataDir, "arduinopath.db"))
 	if err != nil {
 		return fmt.Errorf("opening the saved work: %w", err)
 	}
@@ -224,7 +245,7 @@ func run(cfg config, log *slog.Logger) error {
 			return err
 		}
 	}
-	var uiFS, contentFS fs.FS = circuitpath.UI(), circuitpath.Content()
+	var uiFS, contentFS fs.FS = arduinopath.UI(), arduinopath.Content()
 	if cfg.uiDir != "" {
 		uiFS = os.DirFS(cfg.uiDir)
 	}
@@ -244,7 +265,7 @@ func run(cfg config, log *slog.Logger) error {
 		Catalogue:   cat,
 		Problems:    problems,
 		UI:          uiFS,
-		Version:     circuitpath.Version,
+		Version:     arduinopath.Version,
 		Log:         log,
 		CacheStatic: cfg.uiDir == "",
 		Hosts:       []string{"localhost", "127.0.0.1", "::1"},
@@ -268,11 +289,11 @@ func run(cfg config, log *slog.Logger) error {
 	for _, l := range listeners {
 		go func() { errs <- hs.Serve(l) }()
 	}
-	log.Info("CircuitPath is ready", "url", url, "version", circuitpath.Version, "data", cfg.dataDir)
+	log.Info("ArduinoPath is ready", "url", url, "version", arduinopath.Version, "data", cfg.dataDir)
 	if !cfg.noBrowser {
 		if err := openBrowser(url); err != nil {
 			log.Warn("couldn't open a browser", "err", err)
-			showError("CircuitPath is running", "Open Edge or Chrome and go to "+url)
+			showError("ArduinoPath is running", "Open Edge or Chrome and go to "+url)
 		}
 	}
 
@@ -291,7 +312,7 @@ func run(cfg config, log *slog.Logger) error {
 		case <-tick.C:
 			db.DeleteExpiredSessions(ctx)
 			if cfg.idleExit > 0 && idle.since() > cfg.idleExit {
-				log.Info("no CircuitPath window open for a while; closing", "idle", idle.since().Round(time.Second))
+				log.Info("no ArduinoPath window open for a while; closing", "idle", idle.since().Round(time.Second))
 				return shutdown(hs)
 			}
 		}
@@ -299,7 +320,7 @@ func run(cfg config, log *slog.Logger) error {
 }
 
 // boardTools finds the board tools: installed in -arduino-dir, a -boards
-// zip, or built into CircuitPath itself. None is fine: the simulator works
+// zip, or built into ArduinoPath itself. None is fine: the simulator works
 // without them.
 func boardTools(cfg config, log *slog.Logger) (*arduino.Tools, func()) {
 	if cfg.arduinoDir != "" {
@@ -345,7 +366,7 @@ func (t *idleTracker) wrap(h http.Handler) http.Handler {
 	})
 }
 
-// running reports whether CircuitPath is already answering on port.
+// running reports whether ArduinoPath is already answering on port.
 func running(port int) bool {
 	c := &http.Client{Timeout: 3 * time.Second}
 	req, _ := http.NewRequest("GET", "http://127.0.0.1:"+strconv.Itoa(port)+"/api/info", nil)
@@ -356,7 +377,7 @@ func running(port int) bool {
 	}
 	defer res.Body.Close()
 	var info struct{ App string }
-	return json.NewDecoder(io.LimitReader(res.Body, 1<<16)).Decode(&info) == nil && info.App == "CircuitPath"
+	return json.NewDecoder(io.LimitReader(res.Body, 1<<16)).Decode(&info) == nil && info.App == "ArduinoPath"
 }
 
 // boardsToCheck lists every board and board setting students can pick.
@@ -377,7 +398,7 @@ func boardsToCheck(cat *content.Catalogue) []arduino.Board {
 func runArduino(cfg config, log *slog.Logger, setup, check bool) error {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
-	contentFS := circuitpath.Content()
+	contentFS := arduinopath.Content()
 	if cfg.contentDir != "" {
 		contentFS = os.DirFS(cfg.contentDir)
 	}

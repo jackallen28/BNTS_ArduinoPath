@@ -93,7 +93,7 @@ func (t *Tools) unpacked(family string) bool {
 	return err == nil && strings.TrimSpace(string(b)) == t.bundle.Manifest.Hash
 }
 
-// removeOldTools deletes tools unpacked by older versions of CircuitPath.
+// removeOldTools deletes tools unpacked by older versions of ArduinoPath.
 func removeOldTools(dataDir, keep string, log *slog.Logger) {
 	entries, _ := os.ReadDir(dataDir)
 	for _, e := range entries {
@@ -199,7 +199,7 @@ func (t *Tools) waitReady(ctx context.Context, family string) error {
 		st, ok := t.status[family]
 		switch {
 		case !ok || st.State == "missing":
-			return fmt.Errorf("the tools for these boards aren't built into this copy of CircuitPath")
+			return fmt.Errorf("the tools for these boards aren't built into this copy of ArduinoPath")
 		case st.State == "ready":
 			return nil
 		case st.State == "failed":

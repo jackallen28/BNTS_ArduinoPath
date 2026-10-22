@@ -1,4 +1,4 @@
-// CircuitPath: on ESP8266 boards, <WebServer.h> gives the ESP8266's web
+// ArduinoPath: on ESP8266 boards, <WebServer.h> gives the ESP8266's web
 // server under the ESP32's name, so one sketch runs on every ESP board.
 #pragma once
 #include <ESP8266WiFi.h>

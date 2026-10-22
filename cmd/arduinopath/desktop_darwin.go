@@ -38,7 +38,7 @@ func openBrowser(url string) error {
 	return nil
 }
 
-// showError shows a dialog (CircuitPath.app has no window of its own).
+// showError shows a dialog (ArduinoPath.app has no window of its own).
 func showError(title, text string) {
 	exec.Command("osascript",
 		"-e", "on run argv",

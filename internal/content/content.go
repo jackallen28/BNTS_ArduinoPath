@@ -1,4 +1,4 @@
-// Package content loads and checks CircuitPath's data files: tiers, part
+// Package content loads and checks ArduinoPath's data files: tiers, part
 // names, the class kit, boards and projects. Every file is checked against
 // its JSON schema (content/schema) and against the other files (a project's
 // tier and parts must exist, and so on).
@@ -375,7 +375,7 @@ func (l *loader) compileSchemas() error {
 }
 
 // schemaURL names a schema. It is only an identifier: nothing is fetched.
-func schemaURL(file string) string { return "file:///circuitpath/content/schema/" + file }
+func schemaURL(file string) string { return "file:///arduinopath/content/schema/" + file }
 
 func (l *loader) list(dir string) []string {
 	files, _ := fs.Glob(l.fsys, dir+"/*.json")

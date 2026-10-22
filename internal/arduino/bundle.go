@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-// The board tools are built into CircuitPath as a zip ("the bundle"): every
+// The board tools are built into ArduinoPath as a zip ("the bundle"): every
 // file of an installed Arduino folder (see Env), each under its family's
 // prefix, so one family can be unpacked without the others:
 //
@@ -29,9 +29,9 @@ import (
 //	esp8266/data/packages/esp8266/...   NodeMCU, D1 mini
 //	esp32/data/packages/esp32/...       ESP32 boards
 //
-// On Windows the zip is appended to CircuitPath.exe, followed by a 16-byte
+// On Windows the zip is appended to ArduinoPath.exe, followed by a 16-byte
 // trailer (bundleMagic and the zip's offset); on macOS it's
-// CircuitPath.app/Contents/Resources/boards.zip.
+// ArduinoPath.app/Contents/Resources/boards.zip.
 
 // Families are the board families, in the order they're packed.
 var Families = []string{"avr", "esp8266", "esp32"}
@@ -70,7 +70,7 @@ func familyOf(rel string) string {
 
 // skipWhenPacking leaves out what a laptop doesn't need: downloads, caches,
 // settings (rewritten when unpacked), and for the ESP32 the debuggers and
-// the libraries of ESP32 chips CircuitPath doesn't support. Directories are
+// the libraries of ESP32 chips ArduinoPath doesn't support. Directories are
 // kept (empty) so arduino-cli still sees every tool as installed.
 func skipWhenPacking(rel string) bool {
 	switch rel {
@@ -219,7 +219,7 @@ func Pack(dir string, w io.Writer, hash string) (BundleManifest, error) {
 	return m, zw.Close()
 }
 
-// AppendBundle adds a bundle to the end of a program (CircuitPath.exe).
+// AppendBundle adds a bundle to the end of a program (ArduinoPath.exe).
 func AppendBundle(exe, bundle string) error {
 	out, err := os.OpenFile(exe, os.O_WRONLY|os.O_APPEND, 0)
 	if err != nil {
@@ -255,8 +255,8 @@ type Bundle struct {
 	zr       *zip.Reader
 }
 
-// ErrNoBundle means this copy of CircuitPath has no board tools built in.
-var ErrNoBundle = errors.New("no board tools are built into this copy of CircuitPath")
+// ErrNoBundle means this copy of ArduinoPath has no board tools built in.
+var ErrNoBundle = errors.New("no board tools are built into this copy of ArduinoPath")
 
 // OpenBundle opens the bundle in path: a zip, or a program with a zip
 // appended (see AppendBundle).

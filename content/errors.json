@@ -119,7 +119,7 @@
       "kind": "compile",
       "pattern": "fatal error: ([\\w./-]+): No such file or directory",
       "title": "Arduino can't find {1}",
-      "explain": "The #include line asks for a library called {1}, but CircuitPath doesn't have one with exactly that name. Library names are fussy: capitals, spaces and the .h at the end all matter.",
+      "explain": "The #include line asks for a library called {1}, but ArduinoPath doesn't have one with exactly that name. Library names are fussy: capitals, spaces and the .h at the end all matter.",
       "hints": [
         "Look at the #include line at the top of your code.",
         "Check the name against the project's starter code, letter by letter.",
@@ -377,14 +377,14 @@
         "Check that line and the one above it for missing ; , ) or }.",
         "Compare your code with the starter code or the goal. Undo your last change if you're stuck."
       ],
-      "tech": "An error not in CircuitPath's database. Read GCC's full message and the lines around it.",
+      "tech": "An error not in ArduinoPath's database. Read GCC's full message and the lines around it.",
       "example_output": "/tmp/sketch/sketch.ino:3:9: error: something unusual happened"
     },
     {
       "id": "port-not-found",
       "kind": "upload",
       "pattern": "(?:can't open device|could not open port|cannot find the file specified|no such file or directory|Port .* not found|No device found on)",
-      "title": "CircuitPath can't find your board",
+      "title": "ArduinoPath can't find your board",
       "explain": "Your board isn't on the port you picked. It might be unplugged, plugged in after you chose the port, or the USB cable might only charge (some cables can't carry data).",
       "hints": [
         "Check the USB cable is plugged in at both ends. A light on the board should be on.",
@@ -399,10 +399,10 @@
       "kind": "upload",
       "pattern": "(?:Access is denied|Permission denied|Resource busy|port is busy|being used by another|Could not exclusively lock port)",
       "title": "Another program is using your board",
-      "explain": "Something else is talking to your board, so CircuitPath can't upload. It might be the Arduino IDE, another Serial Monitor, or another CircuitPath window.",
+      "explain": "Something else is talking to your board, so ArduinoPath can't upload. It might be the Arduino IDE, another Serial Monitor, or another ArduinoPath window.",
       "hints": [
         "Close the Arduino IDE and any other Serial Monitor.",
-        "Close other CircuitPath windows that might be using the board.",
+        "Close other ArduinoPath windows that might be using the board.",
         "Unplug the board, wait 5 seconds, plug it back in and try again."
       ],
       "tech": "The serial port is held open by another process (exclusive access on Windows).",
@@ -413,7 +413,7 @@
       "kind": "upload",
       "pattern": "(?:stk500_recv\\(\\): programmer is not responding|stk500_getsync\\(\\)|not in sync|stk500v2_ReceiveMessage\\(\\): timeout)",
       "title": "The board didn't answer",
-      "explain": "CircuitPath found the port but the board didn't answer. Usually the board setting doesn't match your board. Many Nano clones need the \"old bootloader\" setting.",
+      "explain": "ArduinoPath found the port but the board didn't answer. Usually the board setting doesn't match your board. Many Nano clones need the \"old bootloader\" setting.",
       "hints": [
         "Check the board in Settings matches the board in your hand (Uno, Nano or Mega).",
         "Using a Nano? In Settings, choose \"Old bootloader (most Nano clones)\" and try again.",
@@ -461,7 +461,7 @@
         "Close other programs using the board, like the Arduino IDE.",
         "Unplug the board, wait 5 seconds, plug it back in, and try again."
       ],
-      "tech": "An upload error not in CircuitPath's database. Read the uploader's full output.",
+      "tech": "An upload error not in ArduinoPath's database. Read the uploader's full output.",
       "example_output": "Failed uploading: uploading error: exit status 1"
     }
   ]

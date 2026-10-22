@@ -1,4 +1,4 @@
-// Package arduino installs and checks the Arduino tools CircuitPath compiles
+// Package arduino installs and checks the Arduino tools ArduinoPath compiles
 // with: arduino-cli, the board cores (AVR, ESP8266, ESP32) and every library
 // the projects use, at the exact versions in requirements.json.
 //
@@ -189,7 +189,7 @@ func (e *Env) Setup(ctx context.Context) error {
 //go:embed libraries
 var ownLibraries embed.FS
 
-// installOwnLibraries copies CircuitPath's own small libraries (such as the
+// installOwnLibraries copies ArduinoPath's own small libraries (such as the
 // one that makes <Servo.h> work on ESP32 boards) into the libraries folder.
 func installOwnLibraries(dir string) error {
 	return fs.WalkDir(ownLibraries, "libraries", func(p string, d fs.DirEntry, err error) error {
@@ -218,7 +218,7 @@ type Result struct {
 
 // Check compiles the kit-check sketch for each board.
 func (e *Env) Check(ctx context.Context, boards []Board) ([]Result, error) {
-	tmp, err := os.MkdirTemp("", "circuitpath-kitcheck-")
+	tmp, err := os.MkdirTemp("", "arduinopath-kitcheck-")
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +267,7 @@ func tail(s string, lines int) string {
 
 func (e *Env) writeConfig(r Requirements) error {
 	var b strings.Builder
-	b.WriteString("# Written by CircuitPath (internal/arduino). Changes are overwritten.\n")
+	b.WriteString("# Written by ArduinoPath (internal/arduino). Changes are overwritten.\n")
 	b.WriteString("board_manager:\n  additional_urls:\n")
 	for _, u := range r.BoardManagerURLs {
 		fmt.Fprintf(&b, "    - %s\n", u)

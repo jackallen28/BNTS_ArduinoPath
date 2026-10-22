@@ -17,7 +17,7 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],
   webServer: {
-    command: `node tests/e2e/fresh-data.js && go run ./cmd/circuitpath -dev -data test-results/e2e-data -port ${PORT}`,
+    command: `node tests/e2e/fresh-data.js && go run ./cmd/arduinopath -dev -data test-results/e2e-data -port ${PORT}`,
     url: `http://localhost:${PORT}/api/info`,
     reuseExistingServer: false,
     timeout: 180_000,

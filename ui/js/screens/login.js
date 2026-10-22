@@ -1,5 +1,5 @@
 // The welcome screen, in the style of Vista's welcome screen: pick your name,
-// or make a profile (first names and school). CircuitPath runs on this
+// or make a profile (first names and school). ArduinoPath runs on this
 // laptop, so there's no password. "Wipe this laptop" opens the WIPE page.
 
 import { api } from "../api.js";
@@ -13,11 +13,11 @@ export function loginScreen(root, { onLoggedIn, openWipe }) {
     h("header", { class: "logon-brand" },
       icon("app", "icon-48"),
       h("div", {},
-        h("div", { class: "logon-title", text: "CircuitPath" }),
+        h("div", { class: "logon-title", text: "ArduinoPath" }),
         h("div", { class: "logon-school", text: state.info?.school ?? "" }))),
     stage,
     h("footer", { class: "logon-footer" },
-      h("button", { class: "logon-link", type: "button", onclick: showAbout }, icon("about"), " About CircuitPath"),
+      h("button", { class: "logon-link", type: "button", onclick: showAbout }, icon("about"), " About ArduinoPath"),
       h("button", { class: "logon-link", type: "button", onclick: openWipe }, icon("warn"), " Wipe this laptop")),
     h("img", { class: "bnts-pixels", src: "img/bnts-pixels.svg", alt: "" }));
   clear(root).append(screen);
@@ -142,7 +142,7 @@ function newProfileWizard(stage, { first, schools, onCancel, onCreated }) {
         }
       },
     },
-    h("h2", { text: first ? "Welcome to CircuitPath!" : "Welcome!" }),
+    h("h2", { text: first ? "Welcome to ArduinoPath!" : "Welcome!" }),
     h("div", { class: "field" },
       h("label", { text: "Your first name" }),
       list,

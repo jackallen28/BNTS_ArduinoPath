@@ -1,10 +1,10 @@
 // Package savefile reads and writes .circuit save files: a zip of a
 // student's profile, progress and sketches that they can take home or open
-// on another CircuitPath server.
+// on another ArduinoPath server.
 //
 // Format version 1:
 //
-//	manifest.json        {"format": "circuitpath-save", "version": 1, ...}
+//	manifest.json        {"format": "arduinopath-save", "version": 1, ...}
 //	profile.json         names, school, settings (never the picture password)
 //	progress.json        [{project_id, data, updated_at}]
 //	sketches.json        [{project_id, updated_at}]
@@ -24,13 +24,16 @@ import (
 	"strings"
 	"time"
 
-	"circuitpath/internal/store"
+	"arduinopath/internal/store"
 )
 
 // Format and Version identify a save file.
 const (
-	Format  = "circuitpath-save"
-	Version = 1
+	Format = "arduinopath-save"
+	// OldFormat is what CircuitPath (the app's old name) wrote. Those files
+	// still open.
+	OldFormat = "circuit" + "path-save"
+	Version   = 1
 )
 
 // Limits for files being opened.
@@ -42,10 +45,10 @@ const (
 )
 
 var (
-	// ErrNotSaveFile means the file isn't a CircuitPath save file.
-	ErrNotSaveFile = errors.New("this isn't a CircuitPath save file")
-	// ErrNewerVersion means the file was made by a newer CircuitPath.
-	ErrNewerVersion = errors.New("this save file is from a newer version of CircuitPath")
+	// ErrNotSaveFile means the file isn't an ArduinoPath save file.
+	ErrNotSaveFile = errors.New("this isn't an ArduinoPath save file")
+	// ErrNewerVersion means the file was made by a newer ArduinoPath.
+	ErrNewerVersion = errors.New("this save file is from a newer version of ArduinoPath")
 )
 
 // Manifest describes a save file.
@@ -170,7 +173,7 @@ func Read(data []byte) (*File, error) {
 	}
 
 	f := &File{}
-	if err := json.Unmarshal(entries["manifest.json"], &f.Manifest); err != nil || f.Manifest.Format != Format {
+	if err := json.Unmarshal(entries["manifest.json"], &f.Manifest); err != nil || (f.Manifest.Format != Format && f.Manifest.Format != OldFormat) {
 		return nil, ErrNotSaveFile
 	}
 	if f.Manifest.Version > Version {

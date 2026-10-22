@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
-	"circuitpath/internal/arduino"
-	"circuitpath/internal/content"
-	"circuitpath/internal/serialmon"
-	"circuitpath/internal/store"
+	"arduinopath/internal/arduino"
+	"arduinopath/internal/content"
+	"arduinopath/internal/serialmon"
+	"arduinopath/internal/store"
 )
 
 // BoardTools compiles and uploads to real boards (arduino.Tools; tests use a fake).
@@ -190,7 +190,7 @@ func (s *Server) handleNewJob(kind string) http.HandlerFunc {
 			return
 		}
 		if s.Tools == nil {
-			writeError(w, http.StatusServiceUnavailable, "no_tools", "This copy of CircuitPath can't compile for real boards. Use the simulator, or get the full CircuitPath.")
+			writeError(w, http.StatusServiceUnavailable, "no_tools", "This copy of ArduinoPath can't compile for real boards. Use the simulator, or get the full ArduinoPath.")
 			return
 		}
 		if !store.ValidSketch(req.Code) || req.Code == "" {
@@ -244,7 +244,7 @@ func (s *Server) handlePorts(w http.ResponseWriter, r *http.Request) {
 	}
 	ports, err := s.Tools.Ports(r.Context())
 	if err != nil {
-		writeError(w, http.StatusServiceUnavailable, "ports", "CircuitPath couldn't look for boards: "+err.Error())
+		writeError(w, http.StatusServiceUnavailable, "ports", "ArduinoPath couldn't look for boards: "+err.Error())
 		return
 	}
 	writeJSON(w, http.StatusOK, ports)
@@ -265,7 +265,7 @@ func (s *Server) handleSerial(w http.ResponseWriter, r *http.Request) {
 	}
 	events, stop, err := s.Serial.Subscribe(port, baud)
 	if err != nil {
-		writeError(w, http.StatusConflict, "port_busy", "CircuitPath couldn't open "+port+". Is another program (like the Arduino IDE) using it? Close it and try again.")
+		writeError(w, http.StatusConflict, "port_busy", "ArduinoPath couldn't open "+port+". Is another program (like the Arduino IDE) using it? Close it and try again.")
 		return
 	}
 	defer stop()

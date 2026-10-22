@@ -1,4 +1,4 @@
-// Package auth makes login tokens. CircuitPath runs on the student's own
+// Package auth makes login tokens. ArduinoPath runs on the student's own
 // laptop, so there are no passwords: a login just remembers which profile
 // this browser is using.
 package auth

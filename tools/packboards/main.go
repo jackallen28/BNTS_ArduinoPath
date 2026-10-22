@@ -1,11 +1,11 @@
-// Command packboards builds the board tools bundle for CircuitPath (CI runs
+// Command packboards builds the board tools bundle for ArduinoPath (CI runs
 // it after -setup-arduino on each operating system):
 //
 //	go run ./tools/packboards -in $RUNNER_TEMP/cp/arduino -out dist/boards.zip
-//	go run ./tools/packboards -append dist/CircuitPath.exe -bundle dist/boards.zip
+//	go run ./tools/packboards -append dist/ArduinoPath.exe -bundle dist/boards.zip
 //
 // The first packs an installed Arduino folder (see internal/arduino); the
-// second adds the bundle to the end of CircuitPath.exe.
+// second adds the bundle to the end of ArduinoPath.exe.
 package main
 
 import (
@@ -17,7 +17,7 @@ import (
 	"sort"
 	"strings"
 
-	"circuitpath/internal/arduino"
+	"arduinopath/internal/arduino"
 )
 
 func main() {

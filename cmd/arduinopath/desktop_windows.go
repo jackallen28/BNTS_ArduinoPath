@@ -45,7 +45,7 @@ func openBrowser(url string) error {
 	return nil
 }
 
-// showError shows a message box (CircuitPath.exe has no console window).
+// showError shows a message box (ArduinoPath.exe has no console window).
 func showError(title, text string) {
 	t, _ := syscall.UTF16PtrFromString(title)
 	m, _ := syscall.UTF16PtrFromString(text)

@@ -16,8 +16,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"circuitpath/internal/content"
-	"circuitpath/internal/store"
+	"arduinopath/internal/content"
+	"arduinopath/internal/store"
 )
 
 type env struct {
@@ -40,7 +40,7 @@ func newEnv(t *testing.T, opts ...func(*Server)) *env {
 	s := &Server{
 		Store:     st,
 		Catalogue: cat,
-		UI:        fstest.MapFS{"index.html": {Data: []byte("<!doctype html><title>CircuitPath</title>")}, "js/main.js": {Data: []byte("export {}")}},
+		UI:        fstest.MapFS{"index.html": {Data: []byte("<!doctype html><title>ArduinoPath</title>")}, "js/main.js": {Data: []byte("export {}")}},
 		Version:   "test",
 		Log:       slog.New(slog.NewTextHandler(io.Discard, nil)),
 	}
@@ -84,7 +84,7 @@ func (c *client) do(method, path string, body any, headers ...string) (*http.Res
 		req.Header.Set("Content-Type", ct)
 	}
 	if method != http.MethodGet {
-		req.Header.Set("X-CircuitPath", "1")
+		req.Header.Set("X-ArduinoPath", "1")
 	}
 	for i := 0; i+1 < len(headers); i += 2 {
 		if headers[i+1] == "" {
@@ -126,7 +126,7 @@ func TestInfoCatalogueAndStatic(t *testing.T) {
 	c := e.client()
 	var info map[string]any
 	json.Unmarshal(c.want(200, "GET", "/api/info", nil), &info)
-	if info["school"] != defaultSchool || info["app"] != "CircuitPath" {
+	if info["school"] != defaultSchool || info["app"] != "ArduinoPath" {
 		t.Fatalf("info = %v", info)
 	}
 	var cat struct {
@@ -142,7 +142,7 @@ func TestInfoCatalogueAndStatic(t *testing.T) {
 	c.want(404, "GET", "/api/nothing-here", nil)
 
 	res, body := c.do("GET", "/", nil)
-	if res.StatusCode != 200 || !strings.Contains(string(body), "CircuitPath") {
+	if res.StatusCode != 200 || !strings.Contains(string(body), "ArduinoPath") {
 		t.Fatalf("GET / = %d %s", res.StatusCode, body)
 	}
 	if csp := res.Header.Get("Content-Security-Policy"); !strings.Contains(csp, "default-src 'self'") {
@@ -210,7 +210,7 @@ func TestCrossSiteWritesAreBlocked(t *testing.T) {
 	e := newEnv(t)
 	c := e.client()
 	body := map[string]any{"names": []string{"Ava"}, "school": "X"}
-	c.want(403, "POST", "/api/students", body, "X-CircuitPath", "")
+	c.want(403, "POST", "/api/students", body, "X-ArduinoPath", "")
 	c.want(403, "POST", "/api/students", body, "Sec-Fetch-Site", "cross-site")
 	c.want(403, "POST", "/api/wipe", map[string]any{"confirm": "WIPE"}, "Sec-Fetch-Site", "cross-site")
 	c.want(201, "POST", "/api/students", body, "Sec-Fetch-Site", "same-origin")
@@ -227,7 +227,7 @@ func TestOnlyThisComputerIsAnswered(t *testing.T) {
 	h := s.Handler()
 	for host, want := range map[string]int{
 		"localhost:47820": 200, "127.0.0.1:47820": 200, "LOCALHOST": 200,
-		"evil.example:47820": 421, "circuitpath.local": 421, "": 421,
+		"evil.example:47820": 421, "arduinopath.local": 421, "": 421,
 	} {
 		req := httptest.NewRequest("GET", "/", nil)
 		req.Host = host
@@ -248,11 +248,11 @@ func TestWipe(t *testing.T) {
 
 	// Save everyone's work first: one zip with a .circuit file each.
 	res, data := e.client().do("GET", "/api/everyone/export", nil)
-	if res.StatusCode != 200 || !strings.Contains(res.Header.Get("Content-Disposition"), "Everyone_CircuitPath_") {
+	if res.StatusCode != 200 || !strings.Contains(res.Header.Get("Content-Disposition"), "Everyone_ArduinoPath_") {
 		t.Fatalf("everyone export = %d %v", res.StatusCode, res.Header)
 	}
 	z, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
-	if err != nil || len(z.File) != 2 || !strings.HasPrefix(z.File[0].Name, "Ava_CircuitPath_") {
+	if err != nil || len(z.File) != 2 || !strings.HasPrefix(z.File[0].Name, "Ava_ArduinoPath_") {
 		t.Fatalf("zip = %v, %v", z, err)
 	}
 
@@ -330,7 +330,7 @@ func TestSaveMyWorkAndOpenMyWork(t *testing.T) {
 	if res.StatusCode != 200 || res.Header.Get("Content-Type") != "application/zip" {
 		t.Fatalf("export = %d", res.StatusCode)
 	}
-	if cd := res.Header.Get("Content-Disposition"); !strings.Contains(cd, `filename="Ava-Zo-_CircuitPath_`) && !strings.Contains(cd, `filename="Ava-Zo_CircuitPath_`) {
+	if cd := res.Header.Get("Content-Disposition"); !strings.Contains(cd, `filename="Ava-Zo-_ArduinoPath_`) && !strings.Contains(cd, `filename="Ava-Zo_ArduinoPath_`) {
 		t.Errorf("Content-Disposition = %q", cd)
 	}
 	if _, err := zip.NewReader(bytes.NewReader(file), int64(len(file))); err != nil {
