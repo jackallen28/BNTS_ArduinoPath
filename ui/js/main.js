@@ -1,4 +1,4 @@
-// CircuitPath's web app: starts up, then shows the right screen for the
+// ArduinoPath's web app: starts up, then shows the right screen for the
 // address (#/projects, #/project/<id>, #/freeplay, #/wipe...).
 
 import { api, onLoggedOut } from "./api.js";
@@ -74,7 +74,7 @@ function route() {
           openProject: (pid) => go(pid === "freeplay" ? "#/freeplay" : `#/project/${encodeURIComponent(pid)}`),
         });
     }
-    document.title = "CircuitPath";
+    document.title = "ArduinoPath";
   });
   return routing;
 }
@@ -109,7 +109,7 @@ async function start() {
   } catch (err) {
     clear(root).append(h("div", { class: "logon" },
       h("main", { class: "logon-stage" },
-        h("h1", { text: "CircuitPath can't start" }),
+        h("h1", { text: "ArduinoPath can't start" }),
         h("p", { class: "logon-lead", text: err.message }),
         h("button", { class: "pill", type: "button", onclick: () => location.reload() }, "Try again"))));
     return;
@@ -121,7 +121,7 @@ async function start() {
   }
   window.addEventListener("hashchange", route);
   route();
-  // CircuitPath.exe closes itself a while after the last window closes;
+  // ArduinoPath.exe closes itself a while after the last window closes;
   // this tells it a window is still open.
   setInterval(() => api.ping().catch(() => {}), 60_000);
 }

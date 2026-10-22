@@ -26,5 +26,192 @@
     "libraries"
   ],
   "intro": "Type the secret code on a keypad to unlock a safe. A servo opens the lock.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Read the keypad",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Keypad.h>\n\nchar keys[4][4] = {\n  { '1', '2', '3', 'A' },\n  { '4', '5', '6', 'B' },\n  { '7', '8', '9', 'C' },\n  { '*', '0', '#', 'D' }\n};\nbyte rowPins[4] = { KEYPAD_R1, KEYPAD_R2, KEYPAD_R3, KEYPAD_R4 };\nbyte colPins[4] = { KEYPAD_C1, KEYPAD_C2, KEYPAD_C3, KEYPAD_C4 };\nKeypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  char key = keypad.getKey();\n  if (key) {\n    Serial.print(\"You pressed \");\n    Serial.println(key);\n  }\n}\n",
+      "text": "A 4 × 4 keypad has 16 buttons in rows and columns. The **Keypad** library works out which key is pressed. `getKey()` gives the key, or nothing if no key is pressed.\n\n**Your task:** Run, open the **Serial Monitor**, and press some keys.",
+      "hints": [
+        "Each key appears once per press.",
+        "In the simulator, click the keypad's keys.",
+        "If the wrong keys appear, the row and column wires might be swapped."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It reads a key",
+          "text": "You pressed 5"
+        },
+        {
+          "type": "confirm",
+          "label": "The keys I press show up"
+        }
+      ],
+      "success": "16 buttons, and only 8 wires! The rows-and-columns trick saves pins.",
+      "demo": "{{pins}}\n#include <Keypad.h>\n\nchar keys[4][4] = {\n  { '1', '2', '3', 'A' },\n  { '4', '5', '6', 'B' },\n  { '7', '8', '9', 'C' },\n  { '*', '0', '#', 'D' }\n};\nbyte rowPins[4] = { KEYPAD_R1, KEYPAD_R2, KEYPAD_R3, KEYPAD_R4 };\nbyte colPins[4] = { KEYPAD_C1, KEYPAD_C2, KEYPAD_C3, KEYPAD_C4 };\nKeypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  char key = keypad.getKey();\n  if (key) {\n    Serial.print(\"You pressed \");\n    Serial.println(key);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "key": "5"
+        }
+      ],
+      "sim_ms": 800
+    },
+    {
+      "title": "Hello, LCD",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);  // try 0x3F if the screen stays blank\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lcd.setCursor(0, 0);  // column 0, row 0\n  lcd.print(\"Hello!\");\n  lcd.setCursor(0, 1);  // the second row\n  lcd.print(\"I'm a safe.\");\n}\n\nvoid loop() {\n}\n",
+      "text": "The LCD shows 2 rows of 16 letters. `setCursor(column, row)` chooses where the next letters go (counting from 0).\n\n**Your task:** change the second row to your own message, then Run.",
+      "hints": [
+        "Change the text inside the second `lcd.print`.",
+        "Keep it to 16 letters or fewer.",
+        "If the screen is blank, turn the little blue knob on the back to change the contrast."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "The screen says Hello!",
+          "text": "Hello!"
+        },
+        {
+          "type": "confirm",
+          "label": "I can read my message"
+        }
+      ],
+      "success": "Your screen works.",
+      "demo": "{{pins}}\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);  // try 0x3F if the screen stays blank\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lcd.setCursor(0, 0);  // column 0, row 0\n  lcd.print(\"Hello!\");\n  lcd.setCursor(0, 1);  // the second row\n  lcd.print(\"I'm a safe.\");\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Type the code",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Keypad.h>\n\nchar keys[4][4] = {\n  { '1', '2', '3', 'A' },\n  { '4', '5', '6', 'B' },\n  { '7', '8', '9', 'C' },\n  { '*', '0', '#', 'D' }\n};\nbyte rowPins[4] = { KEYPAD_R1, KEYPAD_R2, KEYPAD_R3, KEYPAD_R4 };\nbyte colPins[4] = { KEYPAD_C1, KEYPAD_C2, KEYPAD_C3, KEYPAD_C4 };\nKeypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);  // try 0x3F if the screen stays blank\n\nconst String SECRET = \"1234\";\nString entered = \"\";\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lcd.print(\"Enter code:\");\n}\n\nvoid loop() {\n  char key = keypad.getKey();\n  if (!key) return;\n  if (key == '#') {             // # checks the code\n    lcd.clear();\n    if (entered == ___) {\n      lcd.print(\"Correct!\");\n    } else {\n      lcd.print(\"Wrong code\");\n    }\n    entered = \"\";\n    delay(1500);\n    lcd.clear();\n    lcd.print(\"Enter code:\");\n  } else {\n    entered += ___;\n    lcd.setCursor(entered.length() - 1, 1);\n    lcd.print('*');             // hide what's typed\n  }\n}\n",
+      "text": "Collect the keys in a **String** called `entered`. When `#` is pressed, compare it with the secret code. The screen shows `*` for each key, so nobody can see the code over your shoulder.\n\n**Your task:** fill in the blanks.",
+      "hints": [
+        "Compare what was typed with the secret code.",
+        "`+=` adds the new key onto the end of the String.",
+        "The blanks are `SECRET` and `key`."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "The right code is accepted",
+          "text": "Correct!"
+        },
+        {
+          "type": "display_text",
+          "label": "Typing is hidden",
+          "text": "****"
+        },
+        {
+          "type": "confirm",
+          "label": "1234 then # says Correct!"
+        }
+      ],
+      "success": "Your code checker works, and it keeps the code hidden.",
+      "demo": "{{pins}}\n#include <Keypad.h>\n\nchar keys[4][4] = {\n  { '1', '2', '3', 'A' },\n  { '4', '5', '6', 'B' },\n  { '7', '8', '9', 'C' },\n  { '*', '0', '#', 'D' }\n};\nbyte rowPins[4] = { KEYPAD_R1, KEYPAD_R2, KEYPAD_R3, KEYPAD_R4 };\nbyte colPins[4] = { KEYPAD_C1, KEYPAD_C2, KEYPAD_C3, KEYPAD_C4 };\nKeypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);  // try 0x3F if the screen stays blank\n\nconst String SECRET = \"1234\";\nString entered = \"\";\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lcd.print(\"Enter code:\");\n}\n\nvoid loop() {\n  char key = keypad.getKey();\n  if (!key) return;\n  if (key == '#') {             // # checks the code\n    lcd.clear();\n    if (entered == SECRET) {\n      lcd.print(\"Correct!\");\n    } else {\n      lcd.print(\"Wrong code\");\n    }\n    entered = \"\";\n    delay(1500);\n    lcd.clear();\n    lcd.print(\"Enter code:\");\n  } else {\n    entered += key;\n    lcd.setCursor(entered.length() - 1, 1);\n    lcd.print('*');             // hide what's typed\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 200,
+          "key": "1"
+        },
+        {
+          "at_ms": 350,
+          "key": "2"
+        },
+        {
+          "at_ms": 500,
+          "key": "3"
+        },
+        {
+          "at_ms": 650,
+          "key": "4"
+        },
+        {
+          "at_ms": 800,
+          "key": "#"
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "The safe",
+      "support": "brief",
+      "text": "**Goal:** a real safe. The right code then `#` opens the lock (servo to 90°) and shows `OPEN`. `*` locks it again (servo to 0°). After 3 wrong codes, make guessers wait 10 seconds.",
+      "hints": [
+        "Add the Servo library and `lock.attach(SERVO_PIN);` in `setup()`.",
+        "Count wrong tries in a variable; reset it when the code is right.",
+        "Use `else if (key == '*')` to lock again."
+      ],
+      "checks": [
+        {
+          "type": "servo_angle",
+          "label": "The right code opens the lock",
+          "pin": "SERVO_PIN",
+          "angle": 90,
+          "tolerance": 3
+        },
+        {
+          "type": "display_text",
+          "label": "It says OPEN",
+          "text": "OPEN"
+        },
+        {
+          "type": "code_contains",
+          "label": "It counts wrong tries",
+          "text": "wrongTries"
+        },
+        {
+          "type": "confirm",
+          "label": "My safe opens and locks"
+        }
+      ],
+      "success": "A working safe! Limiting wrong tries is how phones stop people guessing PINs.",
+      "demo": "{{pins}}\n#include <Servo.h>\n#include <Keypad.h>\n\nchar keys[4][4] = {\n  { '1', '2', '3', 'A' },\n  { '4', '5', '6', 'B' },\n  { '7', '8', '9', 'C' },\n  { '*', '0', '#', 'D' }\n};\nbyte rowPins[4] = { KEYPAD_R1, KEYPAD_R2, KEYPAD_R3, KEYPAD_R4 };\nbyte colPins[4] = { KEYPAD_C1, KEYPAD_C2, KEYPAD_C3, KEYPAD_C4 };\nKeypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);  // try 0x3F if the screen stays blank\n\nconst String SECRET = \"1234\";\nString entered = \"\";\nint wrongTries = 0;\nServo lock;\n\nvoid showPrompt() {\n  lcd.clear();\n  lcd.print(\"Enter code:\");\n}\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lock.attach(SERVO_PIN);\n  lock.write(0);  // locked\n  showPrompt();\n}\n\nvoid loop() {\n  char key = keypad.getKey();\n  if (!key) return;\n  if (key == '*') {             // * locks the safe again\n    lock.write(0);\n    entered = \"\";\n    showPrompt();\n  } else if (key == '#') {\n    lcd.clear();\n    if (entered == SECRET) {\n      lcd.print(\"OPEN\");\n      lock.write(90);\n      wrongTries = 0;\n    } else {\n      wrongTries++;\n      lcd.print(\"Wrong code\");\n      if (wrongTries >= 3) {\n        lcd.setCursor(0, 1);\n        lcd.print(\"Wait 10 seconds\");\n        delay(10000);\n        wrongTries = 0;\n      } else {\n        delay(1500);\n      }\n      showPrompt();\n    }\n    entered = \"\";\n  } else if (entered.length() < 8) {\n    entered += key;\n    lcd.setCursor(entered.length() - 1, 1);\n    lcd.print('*');\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 200,
+          "key": "1"
+        },
+        {
+          "at_ms": 350,
+          "key": "2"
+        },
+        {
+          "at_ms": 500,
+          "key": "3"
+        },
+        {
+          "at_ms": 650,
+          "key": "4"
+        },
+        {
+          "at_ms": 800,
+          "key": "#"
+        }
+      ],
+      "sim_ms": 1500
+    }
+  ],
+  "pins": {
+    "avr": {
+      "SERVO_PIN": "10"
+    }
+  },
+  "curriculum": [
+    "910-algorithms",
+    "910-programming",
+    "910-networks",
+    "910-evaluate"
+  ],
+  "outro": "Your safe checks a secret code, hides it as you type, and locks out guessers. You used **Strings**, a **keypad library**, an **LCD**, and thought about **security**.",
+  "stretch": [
+    "Let the owner change the code: type the old code, then # then a new one.",
+    "After 3 wrong codes, lock the keypad for 30 seconds with a countdown.",
+    "Add a buzzer: a happy sound for the right code, a buzz for the wrong one."
+  ]
 }

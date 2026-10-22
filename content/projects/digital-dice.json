@@ -7,6 +7,12 @@
   "boards": [
     "all"
   ],
+  "pins": {
+    "esp32-c3": {
+      "TM1637_CLK": "3",
+      "TM1637_DIO": "4"
+    }
+  },
   "parts": [
     {
       "type": "tm1637"
@@ -22,5 +28,140 @@
     "displays"
   ],
   "intro": "Press a button to roll the dice and show the number on a 4-digit display.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Test the display",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <TM1637Display.h>\n\nTM1637Display display(TM1637_CLK, TM1637_DIO);\n\nvoid setup() {\n  display.setBrightness(5);\n  display.showNumberDec(___);\n}\n\nvoid loop() {\n}\n",
+      "text": "The display has four digits, each made of 7 little bars (segments). The **TM1637Display** library lights the right segments for any number.\n\n**Your task:** make it show 2024 (or any number you like), then Run.",
+      "hints": [
+        "Put a number up to 9999 in the brackets.",
+        "No quote marks: it's a number, not text.",
+        "Try `display.showNumberDec(2024);`"
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "The display shows a number",
+          "text": ""
+        },
+        {
+          "type": "confirm",
+          "label": "I can read my number on the display"
+        }
+      ],
+      "success": "Your display works. Calculators and microwave ovens use displays just like this.",
+      "demo": "{{pins}}\n#include <TM1637Display.h>\n\nTM1637Display display(TM1637_CLK, TM1637_DIO);\n\nvoid setup() {\n  display.setBrightness(5);\n  display.showNumberDec(1234);\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Roll!",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <TM1637Display.h>\n\nTM1637Display display(TM1637_CLK, TM1637_DIO);\n\nvoid setup() {\n  display.setBrightness(5);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  randomSeed(analogRead(0));  // a different start every time\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    int number = random(1, ___);  // 1 to 6\n    display.showNumberDec(___);\n    delay(300);\n  }\n}\n",
+      "text": "`random(1, 7)` picks a whole number from 1 up to 6 (the 7 isn't included). `randomSeed` gives it a different start each time.\n\n**Your task:** fill in the blanks so pressing the button shows a random number from 1 to 6.",
+      "hints": [
+        "The top number in `random()` isn't included.",
+        "For 1 to 6, the top number is 7. Then show the number you picked.",
+        "The blanks are `7` and `number`."
+      ],
+      "checks": [
+        {
+          "type": "code_regex",
+          "label": "It picks 1 to 6",
+          "pattern": "random\\(\\s*1\\s*,\\s*7\\s*\\)"
+        },
+        {
+          "type": "display_text",
+          "label": "The display shows the roll",
+          "text": ""
+        },
+        {
+          "type": "confirm",
+          "label": "Each press shows a new number"
+        }
+      ],
+      "success": "Roll! Computers can't really be random, but this is close enough for board games.",
+      "demo": "{{pins}}\n#include <TM1637Display.h>\n\nTM1637Display display(TM1637_CLK, TM1637_DIO);\n\nvoid setup() {\n  display.setBrightness(5);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  randomSeed(analogRead(0));  // a different start every time\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    int number = random(1, 7);  // 1 to 6\n    display.showNumberDec(number);\n    delay(300);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 700,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1200
+    },
+    {
+      "title": "Spin the dice",
+      "support": "brief",
+      "text": "**Goal:** make the roll exciting: when the button is pressed, quickly flash 10 random numbers, slowing down, then show the final roll and print `You rolled ` and the number in the Serial Monitor.",
+      "hints": [
+        "Use a `for` loop that counts to 10. Inside it, show a random number and wait.",
+        "To slow down, make the wait longer each time: `delay(30 + i * 20);`",
+        "After the loop, pick the real number, show it, and print it."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It prints the roll",
+          "text": "You rolled "
+        },
+        {
+          "type": "code_contains",
+          "label": "It uses a for loop",
+          "text": "for"
+        },
+        {
+          "type": "confirm",
+          "label": "The numbers spin, then stop on my roll"
+        }
+      ],
+      "success": "Suspense! Animations are just lots of pictures, shown quickly in a loop.",
+      "demo": "{{pins}}\n#include <TM1637Display.h>\n\nTM1637Display display(TM1637_CLK, TM1637_DIO);\n\nvoid setup() {\n  display.setBrightness(5);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  randomSeed(analogRead(0));\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    // Spin: show quick random numbers, slowing down.\n    for (int i = 0; i < 10; i++) {\n      display.showNumberDec(random(1, 7));\n      delay(30 + i * 20);\n    }\n    int number = random(1, 7);\n    display.showNumberDec(number);\n    Serial.print(\"You rolled \");\n    Serial.println(number);\n    delay(300);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 700,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 2000
+    }
+  ],
+  "curriculum": [
+    "78-algorithms",
+    "78-programming",
+    "78-data-binary",
+    "910-testing"
+  ],
+  "outro": "Your dice uses **random** numbers, a **display library**, and an **animation** made from a loop. Is it fair? Test it by rolling it lots of times!",
+  "stretch": [
+    "Roll two dice at once and show both, like 3 and 5.",
+    "Count how many times each number comes up in 60 rolls, and print the totals to check the dice is fair.",
+    "Make a 20-sided dice for board games, chosen by holding the button down."
+  ]
 }

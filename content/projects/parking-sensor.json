@@ -21,6 +21,11 @@
     },
     {
       "type": "buzzer"
+    },
+    {
+      "type": "resistor-10k",
+      "count": 2,
+      "note": "only for 3.3V boards"
     }
   ],
   "minutes": 90,
@@ -30,5 +35,255 @@
     "else if"
   ],
   "intro": "Measure distance with sound waves, then beep faster and light up as something gets closer.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Measure the distance",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  Serial.print(cm);\n  Serial.println(\" cm\");\n  delay(300);\n}\n",
+      "text": "The ultrasonic sensor works like a bat: it sends a squeak too high for us to hear, and times how long the echo takes to come back. A longer time means something further away.\n\nThe code is ready: the `measureCm()` function does the measuring. **Your task:** Run it, open the **Serial Monitor**, and move your hand towards the sensor. (In the simulator, drag the distance slider.)",
+      "hints": [
+        "Hold your hand in front of the two round \"eyes\" of the sensor.",
+        "In the simulator, the slider beside the sensor sets the distance.",
+        "The number should get smaller as your hand gets closer."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It measures 80 cm",
+          "text": "80 cm"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It measures 10 cm",
+          "text": "10 cm"
+        },
+        {
+          "type": "confirm",
+          "label": "The distance changes when I move my hand"
+        }
+      ],
+      "success": "Your board can measure distance with sound! Bats, dolphins and submarines do it this way too.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  Serial.print(cm);\n  Serial.println(\" cm\");\n  delay(300);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 1740
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Traffic-light distance",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid showDistance(long cm) {\n  digitalWrite(LED_GREEN, LOW);\n  digitalWrite(LED_YELLOW, LOW);\n  digitalWrite(LED_RED, LOW);\n  if (cm > ___) {\n    digitalWrite(LED_GREEN, HIGH);   // plenty of room\n  } else if (cm > ___) {\n    digitalWrite(LED_YELLOW, HIGH);  // getting close\n  } else {\n    digitalWrite(LED_RED, HIGH);     // stop!\n  }\n}\n\nvoid loop() {\n  showDistance(measureCm());\n  delay(100);\n}\n",
+      "text": "Now the three LEDs show how close something is: green when it's far, yellow when it's getting close, red when it's too close.\n\n**Your task:** fill in the blanks so it's green over 50 cm, yellow over 20 cm, and red closer than that.",
+      "hints": [
+        "Check the biggest distance first.",
+        "`else if` is only checked when the `if` before it was false.",
+        "The blanks are 50 and 20."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "Far away: green",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Getting close: yellow",
+          "pin": "LED_YELLOW",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Too close: red",
+          "pin": "LED_RED",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "The lights change as my hand gets closer"
+        }
+      ],
+      "success": "Green, yellow, red. Your code chooses between three paths: that's branching.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid showDistance(long cm) {\n  digitalWrite(LED_GREEN, LOW);\n  digitalWrite(LED_YELLOW, LOW);\n  digitalWrite(LED_RED, LOW);\n  if (cm > 50) {\n    digitalWrite(LED_GREEN, HIGH);   // plenty of room\n  } else if (cm > 20) {\n    digitalWrite(LED_YELLOW, HIGH);  // getting close\n  } else {\n    digitalWrite(LED_RED, HIGH);     // stop!\n  }\n}\n\nvoid loop() {\n  showDistance(measureCm());\n  delay(100);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 1740
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Beeping",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < 100) {\n    tone(BUZZER_PIN, 1000, 50);  // a short beep\n    delay(___);              // closer means a shorter gap\n  } else {\n    delay(100);\n  }\n}\n",
+      "text": "Real parking sensors beep faster as you get closer. The gap between beeps can be the distance times 10 milliseconds: 80 cm means 800 ms between beeps, 10 cm means 100 ms.\n\n**Your task:** fill in the blank so the gap gets shorter as something gets closer.",
+      "hints": [
+        "The gap should get smaller when `cm` gets smaller.",
+        "Multiply the distance by 10.",
+        "The blank is `cm * 10`."
+      ],
+      "checks": [
+        {
+          "type": "tone_seen",
+          "label": "It beeps",
+          "pin": "BUZZER_PIN",
+          "min_hz": 900,
+          "max_hz": 1100
+        },
+        {
+          "type": "confirm",
+          "label": "The beeps get faster as my hand gets closer"
+        }
+      ],
+      "success": "Beep... beep.. beep.beep! Sound helps drivers who can't look at a screen.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < 100) {\n    tone(BUZZER_PIN, 1000, 50);  // a short beep\n    delay(cm * 10);              // closer means a shorter gap\n  } else {\n    delay(100);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 1740
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "The whole parking sensor",
+      "support": "brief",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid showDistance(long cm) {\n  digitalWrite(LED_GREEN, LOW);\n  digitalWrite(LED_YELLOW, LOW);\n  digitalWrite(LED_RED, LOW);\n  if (cm > 50) {\n    digitalWrite(LED_GREEN, HIGH);   // plenty of room\n  } else if (cm > 20) {\n    digitalWrite(LED_YELLOW, HIGH);  // getting close\n  } else {\n    digitalWrite(LED_RED, HIGH);     // stop!\n  }\n}\n\nvoid loop() {\n  showDistance(measureCm());\n  delay(100);\n}\n",
+      "text": "**Goal:** put it all together: the lights show the distance *and* the buzzer beeps faster as something gets closer.",
+      "hints": [
+        "You already have `showDistance()`. Call it in `loop()` with the distance.",
+        "Copy the beeping code from the last step into `loop()`.",
+        "Measure once, then use `cm` for both the lights and the beeps."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The red light comes on up close",
+          "pin": "LED_RED",
+          "value": "HIGH"
+        },
+        {
+          "type": "tone_seen",
+          "label": "It beeps",
+          "pin": "BUZZER_PIN",
+          "min_hz": 900,
+          "max_hz": 1100
+        },
+        {
+          "type": "confirm",
+          "label": "Lights and beeps both change as I get closer"
+        }
+      ],
+      "success": "A real parking sensor! The ones in cars use the same ultrasonic sensors.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid showDistance(long cm) {\n  digitalWrite(LED_GREEN, LOW);\n  digitalWrite(LED_YELLOW, LOW);\n  digitalWrite(LED_RED, LOW);\n  if (cm > 50) {\n    digitalWrite(LED_GREEN, HIGH);   // plenty of room\n  } else if (cm > 20) {\n    digitalWrite(LED_YELLOW, HIGH);  // getting close\n  } else {\n    digitalWrite(LED_RED, HIGH);     // stop!\n  }\n}\n\nvoid loop() {\n  long cm = measureCm();\n  showDistance(cm);\n  if (cm > 0 && cm < 100) {\n    tone(BUZZER_PIN, 1000, 50);\n    delay(cm * 10);\n  } else {\n    delay(100);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 1740
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-algorithms",
+    "910-data",
+    "910-algorithms",
+    "910-testing"
+  ],
+  "outro": "Your parking sensor measures distance with sound, like a bat. You timed an echo with **pulseIn**, worked out centimetres, and made decisions with **if / else if**.",
+  "stretch": [
+    "Make the beeps a continuous tone when something is closer than 5 cm.",
+    "Smooth out jumpy readings: average the last 5 measurements.",
+    "Show a bar of # characters in the Serial Monitor, longer when something is closer."
+  ]
 }

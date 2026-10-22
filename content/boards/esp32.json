@@ -301,5 +301,9 @@
     "MATRIX_CS": "5",
     "RFID_SS": "5",
     "RFID_RST": "2"
-  }
+  },
+  "build_properties": [
+    "compiler.c.extra_flags=-DLED_BUILTIN=2",
+    "compiler.cpp.extra_flags=-DLED_BUILTIN=2"
+  ]
 }

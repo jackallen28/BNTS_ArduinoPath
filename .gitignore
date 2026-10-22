@@ -3,11 +3,14 @@
 /data/
 
 # Build output
-/circuitpath
-/CircuitPath.exe
+/arduinopath
+/ArduinoPath.exe
 /dist/
 
 # Node (dev-only test tooling)
 /node_modules/
 /test-results/
 /playwright-report/
+
+# Claude Code working copies
+/.claude/worktrees/

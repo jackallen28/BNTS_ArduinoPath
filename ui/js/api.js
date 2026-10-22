@@ -1,5 +1,5 @@
-// Talks to CircuitPath.exe, running on this laptop. Every write carries the
-// X-CircuitPath header, which it requires (it stops other websites sending
+// Talks to ArduinoPath.exe, running on this laptop. Every write carries the
+// X-ArduinoPath header, which it requires (it stops other websites sending
 // requests as a logged-in student).
 
 export class ApiError extends Error {
@@ -10,7 +10,7 @@ export class ApiError extends Error {
     this.retryAfter = body?.retry_after || 0;
   }
 
-  /** True when CircuitPath.exe couldn't be reached (it has closed). */
+  /** True when ArduinoPath.exe couldn't be reached (it has closed). */
   get offline() {
     return this.status === 0;
   }
@@ -27,7 +27,7 @@ export function onLoggedOut(fn) {
 export async function request(method, path, body, { raw = false, keepalive = false } = {}) {
   const headers = {};
   let payload;
-  if (method !== "GET") headers["X-CircuitPath"] = "1";
+  if (method !== "GET") headers["X-ArduinoPath"] = "1";
   if (body instanceof Blob || body instanceof ArrayBuffer) {
     headers["Content-Type"] = "application/octet-stream";
     payload = body;
@@ -39,7 +39,7 @@ export async function request(method, path, body, { raw = false, keepalive = fal
   try {
     res = await fetch(path, { method, headers, body: payload, credentials: "same-origin", keepalive });
   } catch {
-    throw new ApiError(0, { error: "offline", message: "CircuitPath has closed. Open CircuitPath again from the Start menu or your desktop." });
+    throw new ApiError(0, { error: "offline", message: "ArduinoPath has closed. Open ArduinoPath again from the Start menu or your desktop." });
   }
   if (raw && res.ok) return res;
   let data = null;
@@ -68,6 +68,14 @@ export const api = {
   login: (studentId) => request("POST", "/api/login", { student_id: studentId }),
   wipe: () => request("POST", "/api/wipe", { confirm: "WIPE" }),
   everyoneExportUrl: "/api/everyone/export",
+  tools: () => request("GET", "/api/tools"),
+  prepareTools: (family) => request("POST", "/api/tools/prepare", { family }),
+  compile: (code, board, variant) => request("POST", "/api/compile", { code, board, variant }),
+  upload: (code, board, variant, port) => request("POST", "/api/upload", { code, board, variant, port }),
+  job: (id) => request("GET", `/api/jobs/${encodeURIComponent(id)}`),
+  ports: () => request("GET", "/api/ports"),
+  serialWrite: (port, text) => request("POST", "/api/serial/write", { port, text }),
+  serialClose: (port) => request("POST", "/api/serial/close", { port }),
   logout: () => request("POST", "/api/logout"),
   me: () => request("GET", "/api/me"),
   saveSettings: (settings) => request("PUT", "/api/me/settings", settings),

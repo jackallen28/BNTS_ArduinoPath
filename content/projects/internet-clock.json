@@ -20,5 +20,104 @@
     "displays"
   ],
   "intro": "Get the exact time from the internet and show it on an OLED screen.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Join the WiFi",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n\nconst char* WIFI_NAME = \"your-wifi\";       // ask your teacher\nconst char* WIFI_PASSWORD = \"your-password\";\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.begin(WIFI_NAME, WIFI_PASSWORD);\n  Serial.print(\"Connecting\");\n  while (WiFi.status() != WL_CONNECTED) {\n    delay(500);\n    Serial.print(\".\");\n  }\n  Serial.println();\n  Serial.print(\"Connected! My address: \");\n  Serial.println(WiFi.localIP());\n}\n\nvoid loop() {\n}\n",
+      "text": "This time your board joins a WiFi network that has the internet. `WiFi.begin(name, password)` starts joining; the `while` loop waits until it's connected.\n\n**Your task:** type in the WiFi name and password (ask your teacher), then Upload. (In the simulator, any name works.)",
+      "hints": [
+        "The name and password go inside the quotes, exactly as written: capitals matter.",
+        "If the dots go on forever, the name or password is wrong, or the network blocks devices like yours.",
+        "ESP boards only use 2.4 GHz WiFi networks."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It connects",
+          "text": "Connected!"
+        },
+        {
+          "type": "confirm",
+          "label": "My board joined the WiFi"
+        }
+      ],
+      "success": "Your board is online.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n\nconst char* WIFI_NAME = \"your-wifi\";       // ask your teacher\nconst char* WIFI_PASSWORD = \"your-password\";\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.begin(WIFI_NAME, WIFI_PASSWORD);\n  Serial.print(\"Connecting\");\n  while (WiFi.status() != WL_CONNECTED) {\n    delay(500);\n    Serial.print(\".\");\n  }\n  Serial.println();\n  Serial.print(\"Connected! My address: \");\n  Serial.println(WiFi.localIP());\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 3000
+    },
+    {
+      "title": "Ask for the time",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n#include <time.h>\n\nconst char* WIFI_NAME = \"your-wifi\";       // ask your teacher\nconst char* WIFI_PASSWORD = \"your-password\";\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.begin(WIFI_NAME, WIFI_PASSWORD);\n  while (WiFi.status() != WL_CONNECTED) {\n    delay(500);\n  }\n  // Melbourne time, with daylight saving.\n  configTime(0, 0, \"pool.ntp.org\");\n  setenv(\"TZ\", \"AEST-10AEDT,M10.1.0,M4.1.0/3\", 1);\n  tzset();\n}\n\nvoid loop() {\n  time_t now = time(nullptr);   // seconds since 1970\n  struct tm t;\n  localtime_r(&now, &t);        // split into hours, minutes...\n  if (t.tm_year > 100) {        // the year counts from 1900, so the time has arrived\n    Serial.printf(\"%02d:%02d:%02d\\n\", t.tm_hour, ___, t.tm_sec);\n  } else {\n    Serial.println(\"Waiting for the time...\");\n  }\n  delay(1000);\n}\n",
+      "text": "**NTP** (Network Time Protocol) asks a time server for the exact time. `configTime` starts it. `TZ` sets the time zone: Melbourne is 10 hours ahead of world time, 11 in summer.\n\n`localtime_r` splits the time into hours (`tm_hour`), minutes (`tm_min`) and seconds (`tm_sec`).\n\n**Your task:** fill in the blank to print the minutes too.",
+      "hints": [
+        "Hours are `t.tm_hour`, seconds are `t.tm_sec`.",
+        "Minutes are `t.tm_min`.",
+        "The blank is `t.tm_min`."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It prints the time",
+          "pattern": "\\d\\d:\\d\\d:\\d\\d"
+        },
+        {
+          "type": "code_contains",
+          "label": "It prints the minutes",
+          "text": "t.tm_min"
+        },
+        {
+          "type": "confirm",
+          "label": "The time is right"
+        }
+      ],
+      "success": "The exact time, from the internet!",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <time.h>\n\nconst char* WIFI_NAME = \"your-wifi\";       // ask your teacher\nconst char* WIFI_PASSWORD = \"your-password\";\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.begin(WIFI_NAME, WIFI_PASSWORD);\n  while (WiFi.status() != WL_CONNECTED) {\n    delay(500);\n  }\n  // Melbourne time, with daylight saving.\n  configTime(0, 0, \"pool.ntp.org\");\n  setenv(\"TZ\", \"AEST-10AEDT,M10.1.0,M4.1.0/3\", 1);\n  tzset();\n}\n\nvoid loop() {\n  time_t now = time(nullptr);   // seconds since 1970\n  struct tm t;\n  localtime_r(&now, &t);        // split into hours, minutes...\n  if (t.tm_year > 100) {        // the year counts from 1900, so the time has arrived\n    Serial.printf(\"%02d:%02d:%02d\\n\", t.tm_hour, t.tm_min, t.tm_sec);\n  } else {\n    Serial.println(\"Waiting for the time...\");\n  }\n  delay(1000);\n}\n",
+      "sim_ms": 4000
+    },
+    {
+      "title": "The clock",
+      "support": "brief",
+      "text": "**Goal:** show the time in big numbers on the OLED, updating every second, like `14:05:09`. Show `Connecting...` while it joins the WiFi.",
+      "hints": [
+        "`snprintf(text, sizeof(text), \"%02d:%02d:%02d\", ...)` makes text with two digits each, like 09.",
+        "`setTextSize(2)` makes the numbers big.",
+        "Clear the screen, print, then `display.display()` every time."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "It shows Connecting...",
+          "text": "Connecting..."
+        },
+        {
+          "type": "code_contains",
+          "label": "It shows hours, minutes and seconds",
+          "text": "%02d:%02d:%02d"
+        },
+        {
+          "type": "confirm",
+          "label": "My clock shows the right time"
+        }
+      ],
+      "success": "An internet clock! It'll stay right to the second.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <time.h>\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 display(128, 64, &Wire, -1);\n\nconst char* WIFI_NAME = \"your-wifi\";       // ask your teacher\nconst char* WIFI_PASSWORD = \"your-password\";\n\nvoid setup() {\n  Serial.begin(115200);\n  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);\n  display.clearDisplay();\n  display.setTextColor(SSD1306_WHITE);\n  display.setTextSize(1);\n  display.setCursor(0, 0);\n  display.println(\"Connecting...\");\n  display.display();\n  WiFi.begin(WIFI_NAME, WIFI_PASSWORD);\n  while (WiFi.status() != WL_CONNECTED) {\n    delay(500);\n  }\n  // Melbourne time, with daylight saving.\n  configTime(0, 0, \"pool.ntp.org\");\n  setenv(\"TZ\", \"AEST-10AEDT,M10.1.0,M4.1.0/3\", 1);\n  tzset();\n}\n\nvoid loop() {\n  time_t now = time(nullptr);\n  struct tm t;\n  localtime_r(&now, &t);\n  char text[9];\n  snprintf(text, sizeof(text), \"%02d:%02d:%02d\", t.tm_hour, t.tm_min, t.tm_sec);\n  display.clearDisplay();\n  display.setTextSize(2);\n  display.setCursor(16, 24);\n  display.print(text);\n  display.display();\n  delay(200);\n}\n",
+      "sim_ms": 4000
+    }
+  ],
+  "curriculum": [
+    "910-networks",
+    "910-data",
+    "910-programming",
+    "78-hardware"
+  ],
+  "outro": "Your clock asks a **time server** on the internet for the exact time using **NTP**, then keeps counting by itself. Phones and computers set their clocks the same way.",
+  "stretch": [
+    "Show the date under the time (look at `tm_mday` and `tm_mon`).",
+    "Make a countdown to the end of the lesson.",
+    "Switch between 12-hour and 24-hour time with a button."
+  ]
 }

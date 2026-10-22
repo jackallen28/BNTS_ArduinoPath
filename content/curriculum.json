@@ -1,0 +1,21 @@
+{
+  "$schema": "schema/curriculum.schema.json",
+  "name": "Victorian Curriculum: Digital Technologies, Levels 7–10",
+  "note": "Projects link to these topics (their \"curriculum\" list). Each topic describes, in plain words, the content it relates to in the Victorian Curriculum F–10 Version 2.0. Put the official content description code in \"code\" (from the VCAA website) and it shows beside the topic in Settings > Curriculum.",
+  "topics": [
+    { "id": "78-hardware", "levels": "7–8", "strand": "Digital Systems and Security", "text": "How hardware components (such as sensors, actuators and microcontrollers) and software work together to make a digital system.", "code": "" },
+    { "id": "78-data-binary", "levels": "7–8", "strand": "Data, Information and Privacy", "text": "How data (numbers, text, sound and light) is represented in digital systems, including in binary.", "code": "" },
+    { "id": "78-define", "levels": "7–8", "strand": "Creating Digital Solutions", "text": "Defining and breaking down a problem into smaller parts, with design criteria.", "code": "" },
+    { "id": "78-algorithms", "levels": "7–8", "strand": "Creating Digital Solutions", "text": "Designing algorithms with sequence, decisions (branching) and repetition (iteration), including nested control structures, and representing them as flowcharts or pseudocode.", "code": "" },
+    { "id": "78-tracing", "levels": "7–8", "strand": "Creating Digital Solutions", "text": "Tracing algorithms to predict their output and find errors.", "code": "" },
+    { "id": "78-programming", "levels": "7–8", "strand": "Creating Digital Solutions", "text": "Implementing, modifying and debugging programs with control structures and functions in a general-purpose programming language (here, Arduino C++).", "code": "" },
+    { "id": "78-user-experience", "levels": "7–8", "strand": "Creating Digital Solutions", "text": "Designing how people interact with a digital system (the user experience).", "code": "" },
+    { "id": "78-evaluate", "levels": "7–8", "strand": "Creating Digital Solutions", "text": "Evaluating solutions against the design criteria.", "code": "" },
+    { "id": "910-networks", "levels": "9–10", "strand": "Digital Systems and Security", "text": "How networked digital systems (such as WiFi) send and receive data, and how they can be kept secure.", "code": "" },
+    { "id": "910-data", "levels": "9–10", "strand": "Data, Information and Privacy", "text": "Acquiring, storing and processing data from sensors, and checking it's accurate.", "code": "" },
+    { "id": "910-algorithms", "levels": "9–10", "strand": "Creating Digital Solutions", "text": "Designing algorithms with more complex decisions and repetition, and data structures such as arrays.", "code": "" },
+    { "id": "910-testing", "levels": "9–10", "strand": "Creating Digital Solutions", "text": "Validating algorithms and programs by tracing and testing them with test cases.", "code": "" },
+    { "id": "910-programming", "levels": "9–10", "strand": "Creating Digital Solutions", "text": "Implementing, modifying and debugging modular programs that use functions, libraries and data structures.", "code": "" },
+    { "id": "910-evaluate", "levels": "9–10", "strand": "Creating Digital Solutions", "text": "Evaluating solutions and their possible future impact, and how well they meet the needs of users.", "code": "" }
+  ]
+}

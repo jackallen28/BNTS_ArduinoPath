@@ -1,0 +1,468 @@
+{
+  "$schema": "schema/errors.schema.json",
+  "description": "The Coach's errors database. The first entry whose pattern matches (ignoring capitals) explains the clue. For a compile error the text matched is the first error and the notes after it (\"suggested alternative\"...); for an upload, the whole output. So specific entries come first and each kind ends with a catch-all. {1}, {2}... in the text are the pattern's (groups). Every compile entry has a real broken sketch (example) that CI compiles to check it maps here; upload entries have real upload output (example_output).",
+  "errors": [
+    {
+      "id": "misspelt-function",
+      "kind": "compile",
+      "pattern": "'(\\w+)' was not declared in this scope(?:; did you mean|[\\s\\S]*?suggested alternative:) '(\\w+)'",
+      "title": "A spelling clue: {1}",
+      "explain": "Arduino doesn't know the word {1}. It thinks you meant {2}. Capital letters matter in code: digitalwrite and digitalWrite are different words to the computer.",
+      "hints": [
+        "Look at the line with the clue and find {1}.",
+        "Check the spelling and the capital letters carefully.",
+        "Change {1} to {2}."
+      ],
+      "tech": "C++ names are case sensitive. GCC found no declaration of '{1}' in scope and suggests the closest known name, '{2}'.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalwrite(13, HIGH);\n}\n"
+    },
+    {
+      "id": "not-declared",
+      "kind": "compile",
+      "pattern": "'(\\w+)' was not declared in this scope",
+      "title": "Arduino doesn't know {1}",
+      "explain": "Your code uses {1}, but Arduino can't find where it was made. Maybe the spelling or capitals are different from where you made it, it was never made, or it was made inside another function, so this part of the code can't see it.",
+      "hints": [
+        "Find where you made {1} (for example int {1} = 5; or #define {1} 13). Is the spelling exactly the same, capitals too?",
+        "If you made {1} inside setup(), loop() can't see it. Move it to the top of your code, above setup().",
+        "If {1} is a pin name like LED_PIN, check the #define lines at the top of your code."
+      ],
+      "tech": "'{1}' has no declaration visible in this scope. Declare it before use: globals at file scope, locals inside the function that uses them.",
+      "example": "void setup() {\n  pinMode(trafficLightPin, OUTPUT);\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "missing-semicolon",
+      "kind": "compile",
+      "pattern": "expected (?:',' or )?';' before",
+      "title": "A missing semicolon (;)",
+      "explain": "Most lines of Arduino code end with a semicolon (;), like a full stop at the end of a sentence. The computer got a surprise because a line is missing its ; . The clue points at the line after the mistake, so look at the line just above it too.",
+      "hints": [
+        "Look at the line with the clue, and the line just above it.",
+        "Does each of those lines end with a ; ? (Lines ending in { or } don't need one.)",
+        "Add a ; at the end of the line, like this: digitalWrite(LED_PIN, HIGH);"
+      ],
+      "tech": "GCC reports the missing ';' at the next token, so the error usually lands on the line after the real mistake.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT)\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "missing-close-brace",
+      "kind": "compile",
+      "pattern": "expected '}' at end of input",
+      "title": "A missing curly bracket }",
+      "explain": "Every { needs a matching } to close it, like a box needs a lid. Your code has more { than }. The computer got to the end of your code and was still waiting for a }.",
+      "hints": [
+        "Count the { and } in your code. Is there one more { than } ?",
+        "Look at the end of setup(), loop() and any if or for. Each one needs a } at the end.",
+        "Add the missing } where that part of your code ends. Lining up your code neatly makes this easier to see."
+      ],
+      "tech": "The parser reached end of file inside an unclosed block. Unbalanced braces: one or more blocks are missing their closing '}'.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n"
+    },
+    {
+      "id": "extra-brace",
+      "kind": "compile",
+      "pattern": "expected (?:unqualified-id|declaration) before '}' token",
+      "title": "An extra curly bracket }",
+      "explain": "There's a } that doesn't close anything. It might be an extra one, or a { might be missing earlier.",
+      "hints": [
+        "Look at the line with the clue. Is this } closing something?",
+        "Count the { and } in your code. Is there one more } than { ?",
+        "Delete the extra }, or add the missing { where a block starts."
+      ],
+      "tech": "A '}' appeared at file scope, where only declarations are allowed: braces are unbalanced.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "code-outside-function",
+      "kind": "compile",
+      "pattern": "expected (?:unqualified-id|constructor, destructor, or type conversion) before",
+      "title": "Code outside a function",
+      "explain": "Instructions like digitalWrite(...) or if (...) must be inside a function, such as setup() or loop(). This line is outside all of them. (Making variables and #define lines can go at the top, outside functions.)",
+      "hints": [
+        "Find the line with the clue. Is it between the { and } of setup() or loop()?",
+        "Check the } above it. Did a function end too early?",
+        "Move the line inside setup() (to run once) or loop() (to run again and again)."
+      ],
+      "tech": "Statements are only valid inside a function body. At file scope GCC expects a declaration.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\ndigitalWrite(13, HIGH);\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "setup-missing",
+      "kind": "compile",
+      "pattern": "undefined reference to `setup'",
+      "title": "void setup() is missing",
+      "explain": "Every Arduino sketch needs a void setup() function. It runs once when the board starts. Arduino couldn't find yours. Maybe it was deleted, or its name is spelt differently (setup with a small s).",
+      "hints": [
+        "Look for void setup() near the top of your code.",
+        "Check the spelling: void setup() with a small s and ( ) after it.",
+        "If it's gone, add it back:\nvoid setup() {\n}"
+      ],
+      "tech": "The Arduino core's main() calls setup(); the linker found no definition of setup().",
+      "example": "void start() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "loop-missing",
+      "kind": "compile",
+      "pattern": "undefined reference to `loop'",
+      "title": "void loop() is missing",
+      "explain": "Every Arduino sketch needs a void loop() function. It runs again and again, forever. Arduino couldn't find yours. Maybe it was deleted, or its name is spelt differently.",
+      "hints": [
+        "Look for void loop() in your code.",
+        "Check the spelling: void loop() with a small l and ( ) after it.",
+        "If it's gone, add it back:\nvoid loop() {\n}"
+      ],
+      "tech": "The Arduino core's main() calls loop() repeatedly; the linker found no definition of loop().",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid Loop() {\n}\n"
+    },
+    {
+      "id": "library-not-found",
+      "kind": "compile",
+      "pattern": "fatal error: ([\\w./-]+): No such file or directory",
+      "title": "Arduino can't find {1}",
+      "explain": "The #include line asks for a library called {1}, but ArduinoPath doesn't have one with exactly that name. Library names are fussy: capitals, spaces and the .h at the end all matter.",
+      "hints": [
+        "Look at the #include line at the top of your code.",
+        "Check the name against the project's starter code, letter by letter.",
+        "Common ones: Servo.h, Adafruit_NeoPixel.h, DHT.h, Wire.h, Adafruit_SSD1306.h, LiquidCrystal_I2C.h, TM1637Display.h, Keypad.h, MFRC522.h."
+      ],
+      "tech": "The preprocessor couldn't resolve #include <{1}> against the installed libraries and the core.",
+      "example": "#include <Servoo.h>\n\nvoid setup() {\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "missing-close-paren",
+      "kind": "compile",
+      "pattern": "expected '\\)' before",
+      "title": "A missing round bracket )",
+      "explain": "Round brackets come in pairs: every ( needs a ). One of the lines is missing a ).",
+      "hints": [
+        "Look at the line with the clue and count the ( and ).",
+        "Things like if (...), for (...) and digitalWrite(...) each need a ) at the end of the brackets.",
+        "Add the missing ) before the ; or { ."
+      ],
+      "tech": "Unbalanced parentheses: GCC hit an unexpected token while parsing a parenthesised expression or argument list.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT;\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "stray-character",
+      "kind": "compile",
+      "pattern": "stray '\\\\?(\\d+|.)' in program",
+      "title": "A strange character in your code",
+      "explain": "Your code has a character Arduino can't read. This often happens when code is copied from a website or a document: fancy curly quotes “ ” or dashes – look normal but aren't. Arduino needs plain \" quotes and - dashes.",
+      "hints": [
+        "Look at the line with the clue for quotes, dashes or odd spaces.",
+        "Delete the quotes on that line and type them again on the keyboard.",
+        "If you pasted the code, try typing that line yourself."
+      ],
+      "tech": "A non-ASCII byte (often UTF-8 smart quotes, \\342\\200\\234) appeared outside a string literal or comment.",
+      "example": "void setup() {\n  Serial.begin(9600);\n  Serial.println(“Hello”);\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "unterminated-string",
+      "kind": "compile",
+      "pattern": "missing terminating \" character",
+      "title": "Some text is missing its closing \"",
+      "explain": "Text in code goes between two \" marks, like \"Hello\". One of your texts starts with \" but doesn't end with one.",
+      "hints": [
+        "Look at the line with the clue for a \" at the start of some text.",
+        "Is there a \" at the end of the text too?",
+        "Add the missing \", like this: Serial.println(\"Hello\");"
+      ],
+      "tech": "A string literal isn't closed before the end of the line.",
+      "example": "void setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello);\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "does-not-name-a-type",
+      "kind": "compile",
+      "pattern": "'(\\w+)' does not name a type",
+      "title": "Arduino doesn't know the type {1}",
+      "explain": "Arduino read {1} where it expected a type of variable (like int, float or String) or the start of a function. Maybe the type is misspelt (Int should be int), a library is missing its #include line, or an instruction is outside setup() and loop().",
+      "hints": [
+        "Look at the word {1} on the line with the clue.",
+        "Check the capitals: int, float, bool, char and void are all small letters; String has a capital S.",
+        "If {1} comes from a library (like Servo), check the #include line at the top. If it's an instruction, move it inside setup() or loop()."
+      ],
+      "tech": "At file scope GCC expected a declaration, and '{1}' isn't a known type: a typo, a missing #include, or a statement outside a function.",
+      "example": "Int count = 0;\n\nvoid setup() {\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "too-few-arguments",
+      "kind": "compile",
+      "pattern": "too few arguments to function '(.+?)'",
+      "title": "Something is missing from the brackets",
+      "explain": "A function needs a certain number of values in its brackets, separated by commas. This one is missing at least one. For example, digitalWrite needs two: the pin and HIGH or LOW.",
+      "hints": [
+        "Look at the line with the clue and find the function call.",
+        "How many values does it need? digitalWrite(pin, HIGH), pinMode(pin, OUTPUT), analogWrite(pin, 128), tone(pin, 440).",
+        "Add the missing value, with a comma between each one."
+      ],
+      "tech": "The call to {1} passes fewer arguments than its declaration requires.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13);\n}\n"
+    },
+    {
+      "id": "too-many-arguments",
+      "kind": "compile",
+      "pattern": "too many arguments to function '(.+?)'",
+      "title": "Too many things in the brackets",
+      "explain": "A function needs a certain number of values in its brackets. This one has too many. Check for an extra comma or value.",
+      "hints": [
+        "Look at the line with the clue and find the function call.",
+        "Count the values between the commas.",
+        "Remove the extra value or comma."
+      ],
+      "tech": "The call to {1} passes more arguments than its declaration accepts.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT, 1);\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "no-matching-function",
+      "kind": "compile",
+      "pattern": "no matching function for call to '(.+?)'",
+      "title": "The values in the brackets don't fit",
+      "explain": "The function {1} can't use the values you gave it. Maybe there are too many or too few, or one is the wrong kind (like text where a number should go).",
+      "hints": [
+        "Look at the line with the clue and the values in the brackets.",
+        "Compare it with the starter code or the cheat sheet.",
+        "Check each value is the right kind: a number, a pin name, or text in \" \"."
+      ],
+      "tech": "Overload resolution found no candidate for {1} with these argument types.",
+      "example": "#include <Servo.h>\nServo myServo;\n\nvoid setup() {\n  myServo.attach();\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "expected-primary-expression",
+      "kind": "compile",
+      "pattern": "expected primary-expression before",
+      "title": "Something is missing here",
+      "explain": "Arduino expected a value (like a number or a variable) but found something else, such as a bracket, a comma or a word like int in the wrong place.",
+      "hints": [
+        "Look at the line with the clue, near the bracket or comma it mentions.",
+        "Is there an empty space between two commas, or a missing value before a bracket?",
+        "Don't write int or void when you use a variable or call a function, only when you make one."
+      ],
+      "tech": "The parser expected an expression (literal, identifier, call...) at this token.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, );\n}\n"
+    },
+    {
+      "id": "assignment-not-comparison",
+      "kind": "compile",
+      "pattern": "suggest parentheses around assignment used as truth value",
+      "title": "= or == ?",
+      "explain": "In code, = means \"make it equal\" and == means \"is it equal?\". Inside an if, you almost always want ==. With one =, your if changes the variable instead of checking it.",
+      "hints": [
+        "Look at the if on the line with the clue.",
+        "Is there a single = between the brackets?",
+        "Change = to == , like this: if (buttonState == LOW)"
+      ],
+      "tech": "An assignment is used as a condition. Use == for comparison; wrap an intended assignment in extra parentheses.",
+      "example_output": "/tmp/sketch/sketch.ino:6:17: warning: suggest parentheses around assignment used as truth value [-Wparentheses]"
+    },
+    {
+      "id": "lvalue-required",
+      "kind": "compile",
+      "pattern": "lvalue required as (?:left operand of assignment|increment operand)",
+      "title": "This can't be changed",
+      "explain": "The left side of = must be a variable that can change. This line tries to change something that can't be, like a number, a #define pin name, or a sum. Did you mean == (is it equal?) instead of = ?",
+      "hints": [
+        "Look at the = on the line with the clue.",
+        "Is the thing on the left a variable you made, like int count?",
+        "If you wanted to check if two things are equal, use == ."
+      ],
+      "tech": "The left operand of the assignment isn't an lvalue (a literal, macro constant or expression result).",
+      "example": "#define LED_PIN 13\n\nvoid setup() {\n  LED_PIN = 12;\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "redefinition",
+      "kind": "compile",
+      "pattern": "(?:redefinition|redeclaration) of '(.+?)'",
+      "title": "{1} is made twice",
+      "explain": "Your code makes the same thing twice: {1}. A sketch can only have one of each variable or function with that name. Maybe you pasted a second void loop().",
+      "hints": [
+        "Search your code for {1}.",
+        "Is it made (with int, void, float...) in two places?",
+        "Join the two into one, or rename one of them."
+      ],
+      "tech": "Multiple definitions of {1} in the same scope.",
+      "example": "void setup() {\n}\n\nvoid loop() {\n}\n\nvoid loop() {\n}\n"
+    },
+    {
+      "id": "void-value",
+      "kind": "compile",
+      "pattern": "void value not ignored as it ought to be",
+      "title": "This function doesn't give back a value",
+      "explain": "Some functions do a job but don't give back an answer (their type is void). This line tries to store or use an answer from one of them.",
+      "hints": [
+        "Look at the function used on the line with the clue.",
+        "Functions like digitalWrite, pinMode and delay don't give back a value.",
+        "Call it on its own line, without = or using it in a sum."
+      ],
+      "tech": "The result of a function returning void is used in an expression.",
+      "example": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  int x = digitalWrite(13, HIGH);\n}\n"
+    },
+    {
+      "id": "return-value-in-void",
+      "kind": "compile",
+      "pattern": "return-statement with a value, in function returning 'void'",
+      "title": "A void function can't give back a value",
+      "explain": "This function is marked void, which means it doesn't give back an answer, but it has return with a value. Either change void to the type of the answer (like int), or just write return; on its own.",
+      "hints": [
+        "Look at the return line with the clue, and the function it's in.",
+        "Does the function need to give back an answer?",
+        "If yes, change void to int (or float, bool...). If no, write return; without a value."
+      ],
+      "tech": "A void function returns an expression.",
+      "example_output": "/tmp/sketch/sketch.ino:5:10: warning: return-statement with a value, in function returning 'void' [-fpermissive]"
+    },
+    {
+      "id": "conversion",
+      "kind": "compile",
+      "pattern": "(?:invalid conversion from|cannot convert) '(.+?)' to '(.+?)'",
+      "title": "The wrong kind of value",
+      "explain": "Arduino needs a {2} here, but got a {1}. For example, text in \" \" can't go where a number should be.",
+      "hints": [
+        "Look at the line with the clue for a value that doesn't fit.",
+        "Numbers don't have \" \" around them. Text does.",
+        "Check what kind of value the variable or function needs."
+      ],
+      "tech": "No implicit conversion from '{1}' to '{2}'.",
+      "example_output": "/tmp/sketch/sketch.ino:2:13: warning: invalid conversion from 'const char*' to 'int' [-fpermissive]"
+    },
+    {
+      "id": "jump-to-case",
+      "kind": "compile",
+      "pattern": "(?:jump to case label|crosses initialization of)",
+      "title": "A variable inside a switch case",
+      "explain": "Making a new variable inside a case of a switch confuses the computer. Put { } around that case's code, or make the variable before the switch.",
+      "hints": [
+        "Find the case with a line like int x = ...",
+        "Add { after the case ...: and } before its break;",
+        "Or move the variable above the switch."
+      ],
+      "tech": "Jumping to a later case label would bypass the initialisation of a variable declared in an earlier case; give the case its own block scope.",
+      "example_output": "/tmp/sketch/sketch.ino:9:10: warning: jump to case label [-fpermissive]"
+    },
+    {
+      "id": "sketch-too-big",
+      "kind": "compile",
+      "pattern": "(?:Sketch too big|text section exceeds available space|region `\\w+' overflowed|section `.+' will not fit)",
+      "title": "Your sketch is too big for this board",
+      "explain": "Your code (with its libraries) doesn't fit in this board's memory. An Uno or Nano has much less room than an ESP32.",
+      "hints": [
+        "Remove code you're not using, or libraries you don't need (#include lines).",
+        "Long texts use lots of memory. Use F(\"...\") around text in Serial.println, like Serial.println(F(\"Hello\"));",
+        "If you can, use a board with more memory, like a Mega or an ESP32."
+      ],
+      "tech": "The linked program exceeds the board's flash (or RAM) as reported by the size tool.",
+      "example_output": "Sketch too big; see https://support.arduino.cc/hc/en-us/articles/360013825179 for tips on reducing it.\ntext section exceeds available space in board"
+    },
+    {
+      "id": "overflow",
+      "kind": "compile",
+      "pattern": "(?:overflow in (?:implicit constant )?conversion|integer overflow in expression)",
+      "title": "This number is too big",
+      "explain": "On an Uno or Nano, an int can only hold numbers from -32768 to 32767. This number is bigger. Use long for big numbers (and unsigned long for millis() times).",
+      "hints": [
+        "Look at the number on the line with the clue.",
+        "Is it bigger than 32767?",
+        "Change int to long (or unsigned long) for that variable."
+      ],
+      "tech": "On AVR, int is 16 bits. The constant or expression overflows its type.",
+      "example_output": "/tmp/sketch/sketch.ino:1:15: warning: overflow in implicit constant conversion [-Woverflow]"
+    },
+    {
+      "id": "compile-other",
+      "kind": "compile",
+      "pattern": "[\\s\\S]",
+      "title": "A clue from the compiler",
+      "explain": "The compiler found something in your code it couldn't understand. Read its message carefully: it says which line, and what it was expecting. The mistake is often on that line or the one just above it.",
+      "hints": [
+        "Look at the line number in the message.",
+        "Check that line and the one above it for missing ; , ) or }.",
+        "Compare your code with the starter code or the goal. Undo your last change if you're stuck."
+      ],
+      "tech": "An error not in ArduinoPath's database. Read GCC's full message and the lines around it.",
+      "example_output": "/tmp/sketch/sketch.ino:3:9: error: something unusual happened"
+    },
+    {
+      "id": "port-not-found",
+      "kind": "upload",
+      "pattern": "(?:can't open device|could not open port|cannot find the file specified|no such file or directory|Port .* not found|No device found on)",
+      "title": "ArduinoPath can't find your board",
+      "explain": "Your board isn't on the port you picked. It might be unplugged, plugged in after you chose the port, or the USB cable might only charge (some cables can't carry data).",
+      "hints": [
+        "Check the USB cable is plugged in at both ends. A light on the board should be on.",
+        "Press the board's port button and pick the port again (unplug and plug in to see which one appears).",
+        "Try a different USB cable: some cables only charge. If no port ever appears, the laptop may need a driver for a clone board (ask your teacher)."
+      ],
+      "tech": "The serial port couldn't be opened: it doesn't exist (any more). Check the device is enumerated (Device Manager on Windows) and the right port is selected.",
+      "example_output": "avrdude: ser_open(): can't open device \"\\\\.\\COM7\": The system cannot find the file specified."
+    },
+    {
+      "id": "port-busy",
+      "kind": "upload",
+      "pattern": "(?:Access is denied|Permission denied|Resource busy|port is busy|being used by another|Could not exclusively lock port)",
+      "title": "Another program is using your board",
+      "explain": "Something else is talking to your board, so ArduinoPath can't upload. It might be the Arduino IDE, another Serial Monitor, or another ArduinoPath window.",
+      "hints": [
+        "Close the Arduino IDE and any other Serial Monitor.",
+        "Close other ArduinoPath windows that might be using the board.",
+        "Unplug the board, wait 5 seconds, plug it back in and try again."
+      ],
+      "tech": "The serial port is held open by another process (exclusive access on Windows).",
+      "example_output": "avrdude: ser_open(): can't set com-state for \"\\\\.\\COM4\": Access is denied."
+    },
+    {
+      "id": "avr-not-responding",
+      "kind": "upload",
+      "pattern": "(?:stk500_recv\\(\\): programmer is not responding|stk500_getsync\\(\\)|not in sync|stk500v2_ReceiveMessage\\(\\): timeout)",
+      "title": "The board didn't answer",
+      "explain": "ArduinoPath found the port but the board didn't answer. Usually the board setting doesn't match your board. Many Nano clones need the \"old bootloader\" setting.",
+      "hints": [
+        "Check the board in Settings matches the board in your hand (Uno, Nano or Mega).",
+        "Using a Nano? In Settings, choose \"Old bootloader (most Nano clones)\" and try again.",
+        "Unplug any wires from pins 0 and 1, check you picked the right port, then try again."
+      ],
+      "tech": "avrdude got no STK500 response from the bootloader: wrong board / bootloader baud (Nano old bootloader runs at 57600), wrong port, or something loading the RX/TX pins.",
+      "example_output": "avrdude: stk500_recv(): programmer is not responding\navrdude: stk500_getsync() attempt 1 of 10: not in sync: resp=0x00"
+    },
+    {
+      "id": "avr-wrong-chip",
+      "kind": "upload",
+      "pattern": "(?:Expected signature for|Device signature = .*probably|Yikes!  Invalid device signature)",
+      "title": "This is a different board",
+      "explain": "The board answered, but it's a different kind of board from the one in Settings (for example a Mega when Settings says Uno).",
+      "hints": [
+        "Look at the writing on the board's chip or the board itself.",
+        "Choose the matching board in Settings.",
+        "Upload again."
+      ],
+      "tech": "avrdude read a device signature that doesn't match the selected MCU.",
+      "example_output": "avrdude: Device signature = 0x1e9801 (probably m2560)\navrdude: Expected signature for ATmega328P is 1E 95 0F"
+    },
+    {
+      "id": "esp-not-connecting",
+      "kind": "upload",
+      "pattern": "(?:Failed to connect to ESP|Timed out waiting for packet header|Wrong boot mode detected|No serial data received)",
+      "title": "The ESP board didn't start uploading",
+      "explain": "Some ESP boards need a little help to start an upload. Holding the BOOT (or FLASH) button tells the board to get ready for new code.",
+      "hints": [
+        "Press Upload, then hold the BOOT (or FLASH) button on the board until you see \"Writing\" or a percentage, then let go.",
+        "Check the board in Settings matches your board (NodeMCU, D1 mini, ESP32...).",
+        "Try a different USB cable or port. Unplug any wires from the board's GPIO 0, 2 and 15 pins."
+      ],
+      "tech": "esptool couldn't sync with the ROM bootloader: auto-reset (DTR/RTS) didn't put the chip in download mode, or the wrong chip/port is selected.",
+      "example_output": "A fatal error occurred: Failed to connect to ESP32: Wrong boot mode detected (0x13)! The chip needs to be in download mode."
+    },
+    {
+      "id": "upload-other",
+      "kind": "upload",
+      "pattern": "[\\s\\S]",
+      "title": "The upload didn't work",
+      "explain": "Your code compiled, but it couldn't be sent to the board.",
+      "hints": [
+        "Check the board is plugged in, and the board and port in Settings are right.",
+        "Close other programs using the board, like the Arduino IDE.",
+        "Unplug the board, wait 5 seconds, plug it back in, and try again."
+      ],
+      "tech": "An upload error not in ArduinoPath's database. Read the uploader's full output.",
+      "example_output": "Failed uploading: uploading error: exit status 1"
+    }
+  ]
+}

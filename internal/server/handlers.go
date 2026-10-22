@@ -14,9 +14,9 @@ import (
 	"strings"
 	"time"
 
-	"circuitpath/internal/auth"
-	"circuitpath/internal/savefile"
-	"circuitpath/internal/store"
+	"arduinopath/internal/auth"
+	"arduinopath/internal/savefile"
+	"arduinopath/internal/store"
 )
 
 func (s *Server) handleInfo(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,7 @@ func (s *Server) handleInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
-		"app":     "CircuitPath",
+		"app":     "ArduinoPath",
 		"version": s.Version,
 		"school":  school,
 	})
@@ -43,11 +43,13 @@ func (s *Server) handleCatalogue(w http.ResponseWriter, r *http.Request) {
 		projects = append(projects, p.ProjectSummary)
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
-		"tiers":    c.Tiers,
-		"parts":    c.Parts,
-		"kit":      c.Kit,
-		"boards":   boards,
-		"projects": projects,
+		"tiers":      c.Tiers,
+		"parts":      c.Parts,
+		"kit":        c.Kit,
+		"boards":     boards,
+		"projects":   projects,
+		"errors":     c.Errors,
+		"curriculum": c.Curriculum,
 	})
 }
 
@@ -125,7 +127,7 @@ func (s *Server) handleCreateStudent(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, me)
 }
 
-// handleLogin opens a profile. There's no password: CircuitPath runs on the
+// handleLogin opens a profile. There's no password: ArduinoPath runs on the
 // student's own laptop, under their own Windows account.
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	var req struct {
@@ -289,16 +291,16 @@ func joinNames(names []string) string {
 
 var unsafeFileChars = regexp.MustCompile(`[^A-Za-z0-9-]+`)
 
-// saveFileName is <Name>_CircuitPath_<date>.circuit, with an ASCII fallback
+// saveFileName is <Name>_ArduinoPath_<date>.circuit, with an ASCII fallback
 // for browsers that need one.
 func saveFileName(names []string, now time.Time) (ascii, utf string) {
 	date := now.Format("2006-01-02")
-	utf = strings.Join(names, "-") + "_CircuitPath_" + date + ".circuit"
+	utf = strings.Join(names, "-") + "_ArduinoPath_" + date + ".circuit"
 	a := strings.Trim(unsafeFileChars.ReplaceAllString(strings.Join(names, "-"), "-"), "-")
 	if a == "" {
 		a = "My"
 	}
-	return a + "_CircuitPath_" + date + ".circuit", utf
+	return a + "_ArduinoPath_" + date + ".circuit", utf
 }
 
 // saveFile makes a student's .circuit file and its name.
@@ -376,7 +378,7 @@ func (s *Server) handleExportEveryone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	date := now.Format("2006-01-02")
-	attachment(w, "application/zip", "Everyone_CircuitPath_"+date+".zip", "Everyone_CircuitPath_"+date+".zip", buf.Len())
+	attachment(w, "application/zip", "Everyone_ArduinoPath_"+date+".zip", "Everyone_ArduinoPath_"+date+".zip", buf.Len())
 	w.Write(buf.Bytes())
 }
 
@@ -413,16 +415,16 @@ func (s *Server) handleImport(w http.ResponseWriter, r *http.Request, id int64) 
 	}
 	data, err := io.ReadAll(http.MaxBytesReader(w, r.Body, savefile.MaxFileBytes))
 	if err != nil {
-		writeError(w, http.StatusRequestEntityTooLarge, "too_big", "That file is too big to be a CircuitPath save file.")
+		writeError(w, http.StatusRequestEntityTooLarge, "too_big", "That file is too big to be an ArduinoPath save file.")
 		return
 	}
 	f, err := savefile.Read(data)
 	if errors.Is(err, savefile.ErrNewerVersion) {
-		writeError(w, http.StatusBadRequest, "newer_version", "This file was saved by a newer CircuitPath. Ask your teacher to update this one.")
+		writeError(w, http.StatusBadRequest, "newer_version", "This file was saved by a newer ArduinoPath. Ask your teacher to update this one.")
 		return
 	}
 	if err != nil {
-		writeError(w, http.StatusBadRequest, "not_save_file", "This file can't be opened. Pick a .circuit file saved by CircuitPath.")
+		writeError(w, http.StatusBadRequest, "not_save_file", "This file can't be opened. Pick a .circuit file saved by ArduinoPath.")
 		return
 	}
 	st, err := s.Store.GetStudent(r.Context(), id)

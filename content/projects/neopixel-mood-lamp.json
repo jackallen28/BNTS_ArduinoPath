@@ -9,7 +9,8 @@
   ],
   "parts": [
     {
-      "type": "neopixel-ring"
+      "type": "neopixel-ring",
+      "note": "12 pixels"
     },
     {
       "type": "potentiometer"
@@ -25,5 +26,148 @@
     "libraries"
   ],
   "intro": "Build a glowing lamp. Turn the knob to change the colour and press the button for light shows.",
-  "steps": []
+  "steps": [
+    {
+      "title": "One colour",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int PIXELS = 12;\nAdafruit_NeoPixel ring(PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nvoid setup() {\n  ring.begin();\n  ring.setBrightness(40);  // not too bright for your eyes\n}\n\nvoid loop() {\n  // Red, green, blue: each 0 to 255.\n  for (int i = 0; i < PIXELS; i++) {\n    ring.setPixelColor(i, ring.Color(0, 0, 255));\n  }\n  ring.show();\n}\n",
+      "text": "A NeoPixel ring is 12 tiny lights, each with a red, a green and a blue LED inside. Mixing the three makes any colour. `ring.Color(red, green, blue)` takes three numbers from 0 to 255.\n\nA `for` loop does the same thing for each pixel: `i` counts 0, 1, 2... up to 11.\n\n**Your task:** change the colour to green, then Run.",
+      "hints": [
+        "The three numbers are red, green, blue.",
+        "For green, only the middle number is big.",
+        "Use `ring.Color(0, 255, 0)`."
+      ],
+      "checks": [
+        {
+          "type": "neopixel_lit",
+          "label": "All 12 pixels light up",
+          "pin": "NEOPIXEL_PIN",
+          "count": 12
+        },
+        {
+          "type": "code_regex",
+          "label": "The colour is green",
+          "pattern": "Color\\(\\s*0\\s*,\\s*255\\s*,\\s*0\\s*\\)"
+        },
+        {
+          "type": "confirm",
+          "label": "The whole ring glows green"
+        }
+      ],
+      "success": "Green! Try mixing: red + green makes yellow, red + blue makes purple.",
+      "demo": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int PIXELS = 12;\nAdafruit_NeoPixel ring(PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nvoid setup() {\n  ring.begin();\n  ring.setBrightness(40);  // not too bright for your eyes\n}\n\nvoid loop() {\n  // Red, green, blue: each 0 to 255.\n  for (int i = 0; i < PIXELS; i++) {\n    ring.setPixelColor(i, ring.Color(0, 255, 0));\n  }\n  ring.show();\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Knob colour",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int PIXELS = 12;\nAdafruit_NeoPixel ring(PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nvoid setup() {\n  ring.begin();\n  ring.setBrightness(40);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  // Turn the knob into a colour around the rainbow (0 to 65535).\n  long hue = map(knob, 0, ANALOG_MAX, 0, ___);\n  for (int i = 0; i < PIXELS; i++) {\n    ring.setPixelColor(i, ring.ColorHSV(hue));\n  }\n  ring.show();\n  delay(20);\n}\n",
+      "text": "Now the potentiometer picks the colour. `ColorHSV(hue)` picks a colour around the rainbow, from 0 (red) through green and blue and back to red at 65535.\n\n**Your task:** fill in the blank so turning the knob goes all the way around the rainbow.",
+      "hints": [
+        "The rainbow goes from 0 up to 65535.",
+        "The blank is the top of the rainbow.",
+        "The blank is `65535`."
+      ],
+      "checks": [
+        {
+          "type": "neopixel_lit",
+          "label": "The ring lights up",
+          "pin": "NEOPIXEL_PIN",
+          "count": 12
+        },
+        {
+          "type": "uses_function",
+          "label": "You used ColorHSV",
+          "name": "ColorHSV"
+        },
+        {
+          "type": "confirm",
+          "label": "The colour changes as I turn the knob"
+        }
+      ],
+      "success": "A colour dial! Hue is the name for where a colour sits around the rainbow.",
+      "demo": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int PIXELS = 12;\nAdafruit_NeoPixel ring(PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nvoid setup() {\n  ring.begin();\n  ring.setBrightness(40);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  // Turn the knob into a colour around the rainbow (0 to 65535).\n  long hue = map(knob, 0, ANALOG_MAX, 0, 65535);\n  for (int i = 0; i < PIXELS; i++) {\n    ring.setPixelColor(i, ring.ColorHSV(hue));\n  }\n  ring.show();\n  delay(20);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "POT_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "set": {
+            "analog": {
+              "POT_PIN": "ANALOG_MAX"
+            }
+          }
+        }
+      ],
+      "sim_ms": 1000
+    },
+    {
+      "title": "Moods",
+      "support": "brief",
+      "text": "**Goal:** the button changes the lamp's mood: knob colour, then a turning rainbow, then off, then back to knob colour.",
+      "hints": [
+        "Keep a `mode` variable (0, 1 or 2) and add 1 on each new press. `% 3` makes it go back to 0 after 2.",
+        "Use `if (mode == 0)`, `else if (mode == 1)` and `else` to draw each mood.",
+        "For the rainbow, give each pixel a different hue: `rainbowStart + i * 65536L / PIXELS`."
+      ],
+      "checks": [
+        {
+          "type": "neopixel_lit",
+          "label": "It lights up",
+          "pin": "NEOPIXEL_PIN",
+          "count": 12
+        },
+        {
+          "type": "uses_function",
+          "label": "You read the button",
+          "name": "digitalRead"
+        },
+        {
+          "type": "confirm",
+          "label": "Each press changes the mood"
+        }
+      ],
+      "success": "A three-mood lamp! Changing between modes with one button is called a state machine.",
+      "demo": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int PIXELS = 12;\nAdafruit_NeoPixel ring(PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nint mode = 0;          // 0: knob colour, 1: rainbow, 2: off\nint lastButton = HIGH;\nlong rainbowStart = 0;\n\nvoid setup() {\n  ring.begin();\n  ring.setBrightness(40);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  int button = digitalRead(BUTTON_PIN);\n  if (button == LOW && lastButton == HIGH) {\n    mode = (mode + 1) % 3;  // 0, 1, 2, 0, 1, 2...\n    delay(50);\n  }\n  lastButton = button;\n\n  if (mode == 0) {\n    long hue = map(analogRead(POT_PIN), 0, ANALOG_MAX, 0, 65535);\n    for (int i = 0; i < PIXELS; i++) {\n      ring.setPixelColor(i, ring.ColorHSV(hue));\n    }\n  } else if (mode == 1) {\n    rainbowStart += 256;\n    for (int i = 0; i < PIXELS; i++) {\n      ring.setPixelColor(i, ring.ColorHSV(rainbowStart + i * 65536L / PIXELS));\n    }\n  } else {\n    ring.clear();\n  }\n  ring.show();\n  delay(20);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1200
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-data-binary",
+    "78-algorithms",
+    "910-algorithms"
+  ],
+  "outro": "Your mood lamp mixes colours from red, green and blue light, like every screen does. You used **for loops** to set each pixel, **map()** for the knob, and a **button** to change modes.",
+  "stretch": [
+    "Add a \"breathing\" mode that slowly fades the colour brighter and dimmer.",
+    "Make a mode where one pixel chases around the ring like a clock.",
+    "Use the potentiometer to set the brightness in every mode."
+  ]
 }

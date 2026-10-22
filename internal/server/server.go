@@ -1,4 +1,4 @@
-// Package server is CircuitPath's local web server: the web app's files and
+// Package server is ArduinoPath's local web server: the web app's files and
 // the JSON API for profiles, logins, autosave, progress, save files and the
 // WIPE page. It runs on the student's own laptop and only answers that
 // laptop (see Hosts).
@@ -21,15 +21,16 @@ import (
 	"sync"
 	"time"
 
-	"circuitpath/internal/auth"
-	"circuitpath/internal/content"
-	"circuitpath/internal/store"
+	"arduinopath/internal/auth"
+	"arduinopath/internal/content"
+	"arduinopath/internal/serialmon"
+	"arduinopath/internal/store"
 )
 
 const (
 	cookieName    = "cp_session"
 	maxJSONBytes  = 256 << 10
-	csrfHeader    = "X-CircuitPath"
+	csrfHeader    = "X-ArduinoPath"
 	defaultSchool = "Banyule Nillumbik Tech School"
 	sessionTTL    = 12 * time.Hour
 )
@@ -52,8 +53,13 @@ type Server struct {
 	// can't reach the server by pointing its own name at 127.0.0.1 (DNS
 	// rebinding). Empty: answer any host (tests).
 	Hosts []string
+	// Tools compiles and uploads to real boards (nil: not built in).
+	Tools BoardTools
+	// Serial is the Serial Monitor for real boards (nil: none).
+	Serial *serialmon.Manager
 
 	once   sync.Once
+	jobs   *jobQueue
 	static http.Handler
 }
 
@@ -63,6 +69,7 @@ func (s *Server) init() {
 			s.Log = slog.Default()
 		}
 		s.static = newStatic(s.UI, s.CacheStatic)
+		s.initJobs()
 	})
 }
 
@@ -86,6 +93,15 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("PUT /api/me/sketches/{project}", s.withStudent(s.handlePutSketch))
 	mux.HandleFunc("GET /api/me/export", s.withStudent(s.handleExport))
 	mux.HandleFunc("POST /api/me/import", s.withStudent(s.handleImport))
+	mux.HandleFunc("GET /api/tools", s.handleTools)
+	mux.HandleFunc("POST /api/tools/prepare", s.handlePrepareTools)
+	mux.HandleFunc("POST /api/compile", s.handleNewJob("compile"))
+	mux.HandleFunc("POST /api/upload", s.handleNewJob("upload"))
+	mux.HandleFunc("GET /api/jobs/{id}", s.handleJob)
+	mux.HandleFunc("GET /api/ports", s.handlePorts)
+	mux.HandleFunc("GET /api/serial", s.handleSerial)
+	mux.HandleFunc("POST /api/serial/write", s.handleSerialWrite)
+	mux.HandleFunc("POST /api/serial/close", s.handleSerialClose)
 	mux.HandleFunc("GET /api/everyone/export", s.handleExportEveryone)
 	mux.HandleFunc("POST /api/wipe", s.handleWipe)
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +121,7 @@ func (s *Server) middleware(next http.Handler) http.Handler {
 		h.Set("X-Frame-Options", "DENY")
 		h.Set("Cross-Origin-Opener-Policy", "same-origin")
 		if !s.hostAllowed(r.Host) {
-			http.Error(w, "CircuitPath only answers this computer.", http.StatusMisdirectedRequest)
+			http.Error(w, "ArduinoPath only answers this computer.", http.StatusMisdirectedRequest)
 			return
 		}
 		defer func() {
@@ -116,6 +132,14 @@ func (s *Server) middleware(next http.Handler) http.Handler {
 		}()
 		if strings.HasPrefix(r.URL.Path, "/api/") {
 			h.Set("Cache-Control", "no-store")
+			// Reads that open the hardware (the Serial Monitor resets an Uno)
+			// mustn't come from another website. EventSource can't add our
+			// header, so the browser's own Sec-Fetch-Site is the check.
+			hardware := r.URL.Path == "/api/serial" || r.URL.Path == "/api/ports"
+			if hardware && !notCrossSite(r) {
+				writeError(w, http.StatusForbidden, "cross_site", "That request came from another website.")
+				return
+			}
 			if r.Method != http.MethodGet && r.Method != http.MethodHead && !sameOrigin(r) {
 				writeError(w, http.StatusForbidden, "cross_site", "That request came from another website.")
 				return
@@ -146,9 +170,11 @@ func (s *Server) hostAllowed(hostport string) bool {
 // header (which a browser won't let another site add without CORS, and we
 // allow no CORS), and must not be marked cross-site by the browser.
 func sameOrigin(r *http.Request) bool {
-	if r.Header.Get(csrfHeader) != "1" {
-		return false
-	}
+	return r.Header.Get(csrfHeader) == "1" && notCrossSite(r)
+}
+
+// notCrossSite: the browser didn't mark the request as from another site.
+func notCrossSite(r *http.Request) bool {
 	site := r.Header.Get("Sec-Fetch-Site")
 	return site == "" || site == "same-origin" || site == "none"
 }

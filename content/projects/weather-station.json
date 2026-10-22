@@ -22,5 +22,217 @@
     "displays"
   ],
   "intro": "Read the temperature and humidity and show them on a little OLED screen.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Read the temperature",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <DHT.h>\n\nDHT sensor(DHT_PIN, DHT11);  // use DHT22 if yours is white\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.begin();\n}\n\nvoid loop() {\n  float temperature = sensor.readTemperature();\n  float humidity = sensor.readHumidity();\n  Serial.print(\"Temperature: \");\n  Serial.print(temperature);\n  Serial.print(\" C   Humidity: \");\n  Serial.print(humidity);\n  Serial.println(\" %\");\n  delay(2000);\n}\n",
+      "text": "The DHT sensor measures temperature (in °C) and humidity (how much water is in the air, in %). The **DHT** library talks to it for you.\n\nThese numbers have decimal points, so they're stored as `float`.\n\n**Your task:** Run the code and open the **Serial Monitor**. Breathe gently on the sensor and watch the humidity rise. (In the simulator, use the sliders.)",
+      "hints": [
+        "The DHT sensor is slow: it gives a new reading every 2 seconds.",
+        "If you see `nan` (not a number), check the sensor's wiring.",
+        "A blue DHT11 or a white DHT22? Change `DHT11` to match yours."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It shows the temperature",
+          "text": "Temperature: 22.50"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It shows the humidity",
+          "text": "Humidity: 40.00"
+        },
+        {
+          "type": "confirm",
+          "label": "The numbers change when I breathe on the sensor"
+        }
+      ],
+      "success": "Your board can feel the weather!",
+      "demo": "{{pins}}\n#include <DHT.h>\n\nDHT sensor(DHT_PIN, DHT11);  // use DHT22 if yours is white\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.begin();\n}\n\nvoid loop() {\n  float temperature = sensor.readTemperature();\n  float humidity = sensor.readHumidity();\n  Serial.print(\"Temperature: \");\n  Serial.print(temperature);\n  Serial.print(\" C   Humidity: \");\n  Serial.print(humidity);\n  Serial.println(\" %\");\n  delay(2000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 22.5,
+                "h": 40
+              }
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 26.0,
+                "h": 55
+              }
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Hello, screen",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.clearDisplay();\n  screen.setTextSize(2);\n  screen.setTextColor(SSD1306_WHITE);\n  screen.setCursor(0, 0);\n  screen.println(___);\n  screen.display();\n}\n\nvoid loop() {\n}\n",
+      "text": "One part at a time: now the OLED screen on its own. It has 128 × 64 tiny lights (pixels). You draw on it, then `display()` shows everything at once.\n\n**Your task:** put your own word on the screen instead of the blank, then Run.",
+      "hints": [
+        "Text goes inside quote marks.",
+        "Try `\"Hello!\"`.",
+        "The line can be `screen.println(\"Hello!\");`"
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "The screen shows your word",
+          "text": ""
+        },
+        {
+          "type": "uses_function",
+          "label": "You called display() to show it",
+          "name": "display"
+        },
+        {
+          "type": "confirm",
+          "label": "I can see my word on the screen"
+        }
+      ],
+      "success": "Your screen works. If it stays dark, check SDA and SCL are the right way round.",
+      "demo": "{{pins}}\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.clearDisplay();\n  screen.setTextSize(2);\n  screen.setTextColor(SSD1306_WHITE);\n  screen.setCursor(0, 0);\n  screen.println(\"Hello!\");\n  screen.display();\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 1000
+    },
+    {
+      "title": "Weather on the screen",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <DHT.h>\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\nDHT sensor(DHT_PIN, DHT11);\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.begin();\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.setTextColor(SSD1306_WHITE);\n}\n\nvoid loop() {\n  float temperature = sensor.readTemperature();\n  float humidity = sensor.readHumidity();\n\n  screen.clearDisplay();\n  screen.setTextSize(1);\n  screen.setCursor(0, 0);\n  screen.println(\"Weather station\");\n  screen.setTextSize(2);\n  screen.setCursor(0, 20);\n  screen.print(___, 1);\n  screen.println(\" C\");\n  screen.print(___, 0);\n  screen.println(\" %\");\n  screen.display();\n  delay(2000);\n}\n",
+      "text": "Join them: read the sensor and show the readings on the screen, every 2 seconds. `print(temperature, 1)` shows one number after the decimal point.\n\n**Your task:** fill in the blanks so the screen shows the temperature and humidity.",
+      "hints": [
+        "The blanks are the two variables that hold the readings.",
+        "Look at the lines that start with `float`.",
+        "The blanks are `temperature` and `humidity`."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "The screen shows the temperature",
+          "text": "22.5 C"
+        },
+        {
+          "type": "display_text",
+          "label": "The screen shows the humidity",
+          "text": "40 %"
+        },
+        {
+          "type": "confirm",
+          "label": "I can read the weather on the screen"
+        }
+      ],
+      "success": "A real weather station! Weather bureaus use sensors like this all over Australia.",
+      "demo": "{{pins}}\n#include <DHT.h>\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\nDHT sensor(DHT_PIN, DHT11);\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.begin();\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.setTextColor(SSD1306_WHITE);\n}\n\nvoid loop() {\n  float temperature = sensor.readTemperature();\n  float humidity = sensor.readHumidity();\n\n  screen.clearDisplay();\n  screen.setTextSize(1);\n  screen.setCursor(0, 0);\n  screen.println(\"Weather station\");\n  screen.setTextSize(2);\n  screen.setCursor(0, 20);\n  screen.print(temperature, 1);\n  screen.println(\" C\");\n  screen.print(humidity, 0);\n  screen.println(\" %\");\n  screen.display();\n  delay(2000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 22.5,
+                "h": 40
+              }
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 26.0,
+                "h": 55
+              }
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "How does it feel?",
+      "support": "brief",
+      "text": "**Goal:** under the readings, the screen says how it feels: \"Hot! Drink water.\" above 28 °C, \"Chilly: grab a jumper.\" below 15 °C, otherwise \"Just right.\". If the sensor isn't working (`isnan(temperature)`), say \"No sensor!\".",
+      "hints": [
+        "Use `if`, `else if` and `else` after you print the humidity.",
+        "Set the cursor to the bottom line first: `screen.setCursor(0, 56);`",
+        "Check for no sensor first: `if (isnan(temperature)) { ... }`."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "Hot weather is spotted",
+          "text": "Hot!"
+        },
+        {
+          "type": "display_text",
+          "label": "Comfortable weather too",
+          "text": "Just right."
+        },
+        {
+          "type": "code_contains",
+          "label": "It checks for a missing sensor",
+          "text": "isnan"
+        },
+        {
+          "type": "confirm",
+          "label": "The message changes when I warm the sensor"
+        }
+      ],
+      "success": "Your station turns data into advice. That's what good information systems do!",
+      "demo": "{{pins}}\n#include <DHT.h>\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\nDHT sensor(DHT_PIN, DHT11);\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.begin();\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.setTextColor(SSD1306_WHITE);\n}\n\nvoid loop() {\n  float temperature = sensor.readTemperature();\n  float humidity = sensor.readHumidity();\n\n  screen.clearDisplay();\n  screen.setTextSize(1);\n  screen.setCursor(0, 0);\n  screen.println(\"Weather station\");\n  screen.setTextSize(2);\n  screen.setCursor(0, 20);\n  screen.print(temperature, 1);\n  screen.println(\" C\");\n  screen.print(humidity, 0);\n  screen.println(\" %\");\n\n  // How does it feel?\n  screen.setTextSize(1);\n  screen.setCursor(0, 56);\n  if (isnan(temperature)) {\n    screen.print(\"No sensor!\");\n  } else if (temperature > 28) {\n    screen.print(\"Hot! Drink water.\");\n  } else if (temperature < 15) {\n    screen.print(\"Chilly: grab a jumper.\");\n  } else {\n    screen.print(\"Just right.\");\n  }\n  screen.display();\n  delay(2000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 22.5,
+                "h": 40
+              }
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 31.0,
+                "h": 60
+              }
+            }
+          }
+        }
+      ],
+      "sim_ms": 4500
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "910-data",
+    "910-programming",
+    "78-user-experience"
+  ],
+  "outro": "Your weather station reads a real sensor and shows the results on a screen. You used two **libraries**, worked with **float** numbers, and designed what people see.",
+  "stretch": [
+    "Keep track of the highest and lowest temperature since the board started, and show them too.",
+    "Show a little sun or cloud picture depending on the humidity. (Try drawCircle and fillRect.)",
+    "Draw a graph of the temperature across the screen, one dot every few seconds."
+  ]
 }

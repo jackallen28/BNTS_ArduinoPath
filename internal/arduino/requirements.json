@@ -1,5 +1,5 @@
 {
-  "_comment": "The exact Arduino tools CircuitPath uses for compiling, checked in CI on every board. Test a change with: go run ./cmd/circuitpath -setup-arduino -data /tmp/cp",
+  "_comment": "The exact Arduino tools ArduinoPath uses for compiling, checked in CI on every board. Test a change with: go run ./cmd/arduinopath -setup-arduino -data /tmp/cp",
   "arduino_cli": "1.5.1",
   "board_manager_urls": [
     "https://arduino.esp8266.com/stable/package_esp8266com_index.json",
