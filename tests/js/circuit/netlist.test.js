@@ -147,3 +147,20 @@ for (const project of projects()) {
     }
   });
 }
+
+test("wiring text is filled in for the board", async () => {
+  const { fillWiringText } = await import("../../../ui/js/circuit/wiring-text.js");
+  const t = "Wire {{pin:LED_RED}} to J6, {{VCC}} to the rail, the servo to {{5V}} on your {{board}}.";
+  assert.equal(fillWiringText(t, uno), "Wire pin 12 to J6, 5V to the rail, the servo to 5V on your Uno.");
+  assert.equal(fillWiringText(t, esp32), "Wire pin D25 to J6, 3V3 to the rail, the servo to VIN on your ESP32.");
+  assert.equal(fillWiringText("{{pin:SDA}}", nodemcu), "pin D2");
+  // Every project's wiring text fills in completely on every board it lists.
+  for (const project of projects()) {
+    for (const board of allBoards.filter((b) => supports(project, b))) {
+      for (const step of project.wiring_steps) {
+        const out = fillWiringText(step.text, board, pinOverrides(project.pins, board));
+        assert.ok(!out.includes("{{"), `${project.id} on ${board.id}: ${out}`);
+      }
+    }
+  }
+});
