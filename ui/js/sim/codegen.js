@@ -951,6 +951,17 @@ export function instantiate(program, R, natives) {
         const mk = maker(t);
         const h = compileFn(node.fn);
         const args = argValues(node.fn, node.args);
+        if (!h.g && args.every((a) => !a.g)) {
+          const afs = args.map((a) => a.f);
+          return S((f) => {
+            const o = mk(f);
+            const fr = new Array(h.slots);
+            fr[0] = o;
+            for (let i = 0; i < afs.length; i++) fr[i + 1] = afs[i](f);
+            h.enter(fr);
+            return o;
+          });
+        }
         return G_(function* (f) {
           const o = mk(f);
           const fr = new Array(h.slots);
@@ -1217,7 +1228,9 @@ export function instantiate(program, R, natives) {
     const line = fn.pos?.line ?? 0;
     const inits = fn.ctor && fn.initsChecked?.length ? fn.initsChecked.map((x) => ({ name: x.field.name, v: x.e ? expr(x.e) : null })) : null;
     if (!h.g) {
-      const bf = body.f;
+      // The checker said this can't wait; if a piece still came out as a
+      // generator, run it straight through.
+      const bf = body.g ? (fr) => runSync(body.f(fr)) : body.f;
       h.enter = (fr) => {
         R.us += C;
         if (inits) for (const it of inits) if (it.v) fr[0][it.name] = it.v.f(fr);

@@ -55,8 +55,9 @@ const isGenFn = (f) => typeof f === "function" && f.constructor && f.constructor
  * Checks a parsed unit.
  * @returns {{ errors: CompileError[], program?: object }}
  */
-export function check(unit, { T, board, natives }) {
+export function check(unit, { T, board, natives, macroNames = [] }) {
   const c = new Checker(T, board, natives);
+  c.macroNames = macroNames;
   return c.run(unit);
 }
 
@@ -966,7 +967,7 @@ class Checker {
           return { k: "selfmethod", name: e.name, st, pos: e.pos, type: { k: "method" } };
         }
       }
-      const names = [...scope.all(), ...this.typeTable.keys()];
+      const names = [...scope.all(), ...this.typeTable.keys(), ...(this.macroNames || [])];
       const s = suggest(e.name, names);
       this.fail(e.pos, `'${e.name}' was not declared in this scope${s ? `; did you mean '${s}'?` : ""}`);
     }

@@ -33,6 +33,7 @@ export function utf8(cp) {
 /** gcc's way of naming a stray byte: '\342' for bytes over 127. */
 function strayName(ch) {
   const cp = ch.codePointAt(0);
+  if (cp < 32 || cp === 127) return "\\" + cp.toString(8);
   if (cp < 128) return ch;
   return "\\" + utf8(cp)[0].toString(8);
 }
@@ -131,13 +132,13 @@ export function lex(src, file = "") {
     }
     if (c === '"') {
       const r = readQuoted('"');
-      if (r.bad) { push("bad", "", sl, sc, sp, { msg: 'missing terminating " character' }); continue; }
+      if (r.bad) { skipLine(); push("bad", "", sl, sc, sp, { msg: 'missing terminating " character' }); continue; }
       push("str", r.bytes, sl, sc, sp);
       continue;
     }
     if (c === "'") {
       const r = readQuoted("'");
-      if (r.bad) { push("bad", "", sl, sc, sp, { msg: "missing terminating ' character" }); continue; }
+      if (r.bad) { skipLine(); push("bad", "", sl, sc, sp, { msg: "missing terminating ' character" }); continue; }
       if (r.bytes.length === 0) { push("bad", "", sl, sc, sp, { msg: "empty character constant" }); continue; }
       // Multi-character constants are ints (gcc warns); one byte is a char.
       let v = 0;
@@ -165,6 +166,10 @@ export function lex(src, file = "") {
   if (sys) { eof.sys = true; eof.file = file; }
   toks.push(eof);
   return toks;
+
+  function skipLine() {
+    while (i < n && src[i] !== "\n") adv();
+  }
 
   // Reads a "..." or '...' literal starting at i. Returns { bytes } or { bad }.
   function readQuoted(q) {

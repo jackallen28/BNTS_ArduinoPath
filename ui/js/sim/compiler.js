@@ -25,7 +25,7 @@ let natives = null;
 export function compile(source, board) {
   natives ||= allNatives();
   try {
-    const { tokens } = preprocess(String(source ?? ""), {
+    const { tokens, macros } = preprocess(String(source ?? ""), {
       header: headerLookup(board),
       defines: boardDefines(board),
       prelude: "Arduino.h",
@@ -33,7 +33,7 @@ export function compile(source, board) {
     const unit = parse(tokens, { typeNames: new Set(["String", "callback"]) });
     if (unit.errors.length) return fail(unit.errors);
     const T = makeTypes(board);
-    const res = check(unit, { T, board, natives });
+    const res = check(unit, { T, board, natives, macroNames: [...macros.keys()].filter((m) => !m.startsWith("_")) });
     if (res.unsupported) return unsupported(res.unsupported);
     if (res.errors.length) return fail(res.errors);
     res.program.natives = natives;
