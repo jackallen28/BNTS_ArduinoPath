@@ -1,16 +1,16 @@
-# CircuitPath on a Mac
+# ArduinoPath on a Mac
 
-`CircuitPath.app` is the same as the Windows app: it runs on the student's own Mac, with no
+`ArduinoPath.app` is the same as the Windows app: it runs on the student's own Mac, with no
 server, no teacher page and no internet needed. One app works on both Intel and Apple Silicon
 (M1, M2, M3...) Macs, on macOS 11 Big Sur or newer.
 
 ## Getting it
 
-- **A release:** on GitHub, open **Releases** and download `CircuitPath-macOS.zip`.
+- **A release:** on GitHub, open **Releases** and download `ArduinoPath-macOS.zip`.
 - **The newest build:** open **Actions > CI**, pick the latest run, and download
-  **CircuitPath-macOS** at the bottom of the page.
+  **ArduinoPath-macOS** at the bottom of the page.
 
-Open the zip (Safari usually does this by itself) and drag **CircuitPath** into **Applications**.
+Open the zip (Safari usually does this by itself) and drag **ArduinoPath** into **Applications**.
 If the Mac won't let you (no admin rights), put it in your own **Applications** folder in your home
 folder, or anywhere else: it works from any folder.
 
@@ -18,31 +18,31 @@ folder, or anywhere else: it works from any folder.
 
 The app isn't notarised by Apple yet, so the first time it's opened macOS stops it. Do this once:
 
-- **macOS 15 Sequoia or newer:** double-click CircuitPath and press **Done** on the message. Open
-  **System Settings > Privacy & Security**, scroll down to *"CircuitPath" was blocked to protect
+- **macOS 15 Sequoia or newer:** double-click ArduinoPath and press **Done** on the message. Open
+  **System Settings > Privacy & Security**, scroll down to *"ArduinoPath" was blocked to protect
   your Mac*, press **Open Anyway**, and type your Mac login password. Then press **Open**.
-- **macOS 14 Sonoma or older:** hold **Control** and click CircuitPath, choose **Open**, then
+- **macOS 14 Sonoma or older:** hold **Control** and click ArduinoPath, choose **Open**, then
   press **Open** again.
-- **Or in Terminal** (any version): `xattr -dr com.apple.quarantine /Applications/CircuitPath.app`
+- **Or in Terminal** (any version): `xattr -dr com.apple.quarantine /Applications/ArduinoPath.app`
 
 After that it opens with a normal double-click. If the school manages its Macs (with Jamf or
 similar) and there's no Open Anyway button, IT has to allow it.
 
 ## What happens when you open it
 
-CircuitPath opens in **Chrome** (or Edge) as its own window, at the same welcome screen as on
-Windows: pick your name, or **I'm new here**. There's no Dock icon for CircuitPath itself: it
+ArduinoPath opens in **Chrome** (or Edge) as its own window, at the same welcome screen as on
+Windows: pick your name, or **I'm new here**. There's no Dock icon for ArduinoPath itself: it
 runs quietly in the background and closes itself about 20 minutes after the window is closed.
 Opening the app again while it's running just opens another window.
 
 **Use Chrome or Edge.** Safari can't upload to boards (it has no Web Serial). If neither is
-installed, CircuitPath opens in the default browser and the simulator still works.
+installed, ArduinoPath opens in the default browser and the simulator still works.
 
 ## Where the work is kept
 
-In `~/Library/Application Support/CircuitPath` (in Finder: **Go > Go to Folder...** and paste
-it): `circuitpath.db` holds every profile on this Mac with their code and progress, and
-`circuitpath.log` says what happened. It belongs to the Mac account that opened it.
+In `~/Library/Application Support/ArduinoPath` (in Finder: **Go > Go to Folder...** and paste
+it): `arduinopath.db` holds every profile on this Mac with their code and progress, and
+`arduinopath.log` says what happened. It belongs to the Mac account that opened it.
 Save files (`.circuit`) move between Macs and Windows laptops both ways.
 
 The **WIPE page** works the same as on Windows (see [windows-app.md](windows-app.md#the-wipe-page)).
@@ -50,7 +50,7 @@ The **WIPE page** works the same as on Windows (see [windows-app.md](windows-app
 ## Good to know
 
 - Most clone boards (CH340 chips) work without installing a driver on recent macOS.
-- To stop CircuitPath straight away: close its window, then in **Activity Monitor** quit
-  **CircuitPath**. It's fine to leave it: it closes itself.
+- To stop ArduinoPath straight away: close its window, then in **Activity Monitor** quit
+  **ArduinoPath**. It's fine to leave it: it closes itself.
 - Notarising the app (an Apple Developer account, about A$150 a year) would remove the
   "could not verify" step.

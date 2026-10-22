@@ -5,11 +5,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"strings"
 	"testing"
 	"time"
 
-	"circuitpath/internal/store"
+	"arduinopath/internal/store"
 )
 
 func sample() File {
@@ -69,7 +70,7 @@ func makeZip(t *testing.T, files map[string]string) []byte {
 }
 
 func TestRejectsBadFiles(t *testing.T) {
-	manifest := `{"format":"circuitpath-save","version":1}`
+	manifest := `{"format":"arduinopath-save","version":1}`
 	cases := map[string][]byte{
 		"not a zip":      []byte("hello"),
 		"no manifest":    makeZip(t, map[string]string{"profile.json": `{}`}),
@@ -86,7 +87,7 @@ func TestRejectsBadFiles(t *testing.T) {
 			t.Errorf("%s: accepted", name)
 		}
 	}
-	if _, err := Read(makeZip(t, map[string]string{"manifest.json": `{"format":"circuitpath-save","version":99}`})); !errors.Is(err, ErrNewerVersion) {
+	if _, err := Read(makeZip(t, map[string]string{"manifest.json": `{"format":"arduinopath-save","version":99}`})); !errors.Is(err, ErrNewerVersion) {
 		t.Errorf("newer version: %v", err)
 	}
 	// Unknown extra files (from a newer version) are ignored.
@@ -132,5 +133,32 @@ func TestFutureTimesAreClamped(t *testing.T) {
 	}
 	if f.Sketches[0].UpdatedAt > time.Now().UnixMilli() {
 		t.Fatal("a save time in the future was kept")
+	}
+}
+
+// Save files from CircuitPath (the app's old name) still open.
+func TestOldNameStillOpens(t *testing.T) {
+	var buf bytes.Buffer
+	if err := Write(&buf, sample()); err != nil {
+		t.Fatal(err)
+	}
+	z, _ := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	files := map[string]string{}
+	for _, zf := range z.File {
+		r, _ := zf.Open()
+		data, _ := io.ReadAll(r)
+		r.Close()
+		files[zf.Name] = string(data)
+	}
+	files["manifest.json"] = strings.Replace(files["manifest.json"], Format, OldFormat, 1)
+	if !strings.Contains(files["manifest.json"], `"circuitpath-save"`) {
+		t.Fatalf("manifest %s", files["manifest.json"])
+	}
+	f, err := Read(makeZip(t, files))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.Profile.School != "Eltham High" {
+		t.Fatalf("read %+v", f.Profile)
 	}
 }

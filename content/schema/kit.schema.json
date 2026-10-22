@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "kit.schema.json",
-  "title": "CircuitPath class kit",
+  "title": "ArduinoPath class kit",
   "description": "What one kit in the class has, so the picker can say \"needs a part not in your kit\".",
   "type": "object",
   "additionalProperties": false,

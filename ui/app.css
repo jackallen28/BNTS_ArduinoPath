@@ -439,3 +439,35 @@
   background: #fff;
 }
 .wipe a.btn { display: inline-flex; width: fit-content; align-items: center; gap: 6px; text-decoration: none; color: inherit; }
+
+/* ---------- Serial Monitor (a Vista console window) ---------- */
+.console { display: flex; flex-direction: column; min-height: 0; border: 1px solid #8e9aa6; border-radius: 4px; background: linear-gradient(180deg, #f4f7fa, #dfe6ed); }
+.console-head { display: flex; align-items: center; gap: 8px; padding: 3px 6px 0; }
+.console-head .tabs { display: flex; gap: 2px; margin-right: auto; }
+.console-head .tab { padding: 3px 10px; border: 1px solid #a7b4c1; border-bottom: 0; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #fbfcfd, #e3e9ef); font: inherit; font-size: var(--font-size-small); cursor: pointer; }
+.console-head .tab[aria-selected="true"] { background: #0c0c0c; color: #e6e6e6; border-color: #3a3a3a; }
+.console-status { font-size: var(--font-size-small); color: var(--text-muted); }
+.console-status.good { color: var(--good); }
+.console-status.warn { color: var(--warn); }
+.console-opt { display: inline-flex; align-items: center; gap: 3px; font-size: var(--font-size-small); }
+.console-pane { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.console-pane[hidden] { display: none; }
+.console-out { flex: 1; min-height: 80px; margin: 0; padding: 6px 8px; overflow: auto; background: #0c0c0c; color: #d9d9d9; font-size: 12px; line-height: 1.35; white-space: pre-wrap; word-break: break-all; border-top: 1px solid #3a3a3a; }
+.console-out.output { color: #c8d3dc; }
+.console-bar { display: flex; gap: 6px; padding: 5px 6px; background: linear-gradient(180deg, #eef2f6, #d9e1e8); }
+.console-in { flex: 1; min-width: 0; }
+.plot-canvas { flex: 1; min-height: 80px; width: 100%; background: #0c0c0c; }
+.plot-legend { display: flex; flex-wrap: wrap; gap: 10px; padding: 3px 8px; background: #161616; color: #ccc; font-size: 11px; }
+.plot-key { display: inline-flex; align-items: center; gap: 4px; }
+.plot-swatch { width: 10px; height: 3px; border-radius: 2px; }
+
+/* ---------- Settings > Curriculum ---------- */
+.curriculum { display: grid; grid-template-columns: 220px 1fr; gap: 12px; min-height: 260px; }
+.curriculum-list { display: flex; flex-direction: column; gap: 2px; max-height: 360px; overflow: auto; border: 1px solid #c9d6e3; border-radius: 3px; background: #fff; padding: 3px; }
+.curriculum-item { padding: 4px 8px; border: 1px solid transparent; border-radius: 3px; background: none; font: inherit; text-align: left; cursor: pointer; }
+.curriculum-item:hover { border-color: var(--select-border); background: var(--select-fill); }
+.curriculum-item[aria-current="true"] { border-color: var(--select-border); background: var(--select-fill); font-weight: 600; }
+.curriculum-detail h3 { margin: 0 0 4px; }
+.curriculum-strand h4 { margin: 10px 0 4px; color: var(--bnts-purple); }
+.curriculum-strand ul { margin: 0; padding-left: 18px; }
+@media (max-width: 760px) { .curriculum { grid-template-columns: 1fr; } }

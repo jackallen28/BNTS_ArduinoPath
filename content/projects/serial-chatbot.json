@@ -15,5 +15,144 @@
     "if / else"
   ],
   "intro": "No wiring needed! Write a chatbot that talks to you in the Serial Monitor.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Say hello",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "void setup() {\n  Serial.begin(9600);\n  Serial.println(___);\n}\n\nvoid loop() {\n}\n",
+      "text": "The board can talk to your laptop over the USB cable. That's called **serial**.\n\n- `Serial.begin(9600);` starts talking, at 9600 bits each second.\n- `Serial.println(\"...\");` sends a line of text. Text always goes inside `\" \"`.\n\n**Your task:** fill in the blank with a hello message of your own, then press **Run** and look at the **Serial Monitor**.",
+      "hints": [
+        "Text goes inside quote marks.",
+        "Try `\"Hello!\"`",
+        "The line can be `Serial.println(\"Hello! I'm your Arduino.\");`"
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "The Serial Monitor shows your message",
+          "pattern": "\\S"
+        },
+        {
+          "type": "uses_function",
+          "label": "You used Serial.println",
+          "name": "Serial.println"
+        }
+      ],
+      "success": "Your board said hello! Serial is how you'll find out what your code is doing.",
+      "demo": "void setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello! I'm your Arduino.\");\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 1000
+    },
+    {
+      "title": "Count",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "int count = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello! I'm your Arduino.\");\n}\n\nvoid loop() {\n  count = count + ___;\n  Serial.println(count);\n  delay(1000);\n}\n",
+      "text": "A **variable** is a named box that holds a value. `int count = 0;` makes a box called `count` holding 0.\n\n**Your task:** fill in the blank so the board counts 1, 2, 3... one number each second.",
+      "hints": [
+        "How much bigger should the number get each time?",
+        "Add 1 each time.",
+        "The line is `count = count + 1;`"
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It counts 1, 2, 3",
+          "pattern": "(^|\\n)1\\r?\\n2\\r?\\n3\\r?\\n"
+        }
+      ],
+      "success": "Counting! `count = count + 1` is so common it has a shortcut: `count++`.",
+      "demo": "int count = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello! I'm your Arduino.\");\n}\n\nvoid loop() {\n  count = count + 1;\n  Serial.println(count);\n  delay(1000);\n}\n",
+      "sim_ms": 3500
+    },
+    {
+      "title": "Listen",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "void setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello! Type something and press Enter.\");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String message = Serial.readStringUntil('\\n');\n    message.trim();  // tidy up spaces at the ends\n    Serial.print(\"You said: \");\n    // Now print the message on the same line.\n\n  }\n}\n",
+      "text": "Now the board listens. `Serial.available()` says how many letters are waiting. `Serial.readStringUntil('\\n')` reads them up to the end of the line (when you press Enter), into a **String**.\n\n**Your task:** finish the code so the board repeats what you type, like `You said: hello`. Type in the Serial Monitor's box and press Enter.",
+      "hints": [
+        "`Serial.print` stays on the same line; `Serial.println` ends the line.",
+        "Print the `message` variable, without quote marks.",
+        "Add `Serial.println(message);`"
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "The board repeats what you typed",
+          "text": "You said: hi"
+        }
+      ],
+      "success": "Your board is listening! In the simulator, the Serial Monitor typed \"hi\" to test it.",
+      "demo": "void setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello! Type something and press Enter.\");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String message = Serial.readStringUntil('\\n');\n    message.trim();\n    Serial.print(\"You said: \");\n    Serial.println(message);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 800,
+          "serial": "hi\n"
+        }
+      ],
+      "sim_ms": 2000
+    },
+    {
+      "title": "ChatBot",
+      "support": "brief",
+      "text": "**Goal:** a chatbot. When you type `hello` it says hello back. `how are you` and `joke` get their own answers. Anything else gets \"I don't understand that yet\".\n\nUse `if`, `else if` and `else` to choose an answer. `message.toLowerCase();` makes HELLO and Hello the same as hello.",
+      "hints": [
+        "Compare Strings with `==`, like `if (message == \"hello\")`.",
+        "Chain the questions: `if (...) { } else if (...) { } else { }`.",
+        "Use **Watch the goal** to see one way to do it."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It answers hello",
+          "pattern": "(?i)(hi|hello)[^\\n]*\\n[\\s\\S]*"
+        },
+        {
+          "type": "serial_regex",
+          "label": "It tells a joke",
+          "pattern": "\\?"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It says when it doesn't understand",
+          "text": "understand"
+        },
+        {
+          "type": "code_contains",
+          "label": "You used else if",
+          "text": "else if"
+        }
+      ],
+      "success": "You built a chatbot with no AI at all: just your own rules. Add more answers to make it smarter!",
+      "demo": "void setup() {\n  Serial.begin(9600);\n  Serial.println(\"Hello! I'm ChatBot. Say hello, or ask me for a joke.\");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    String message = Serial.readStringUntil('\\n');\n    message.trim();\n    message.toLowerCase();\n\n    if (message == \"hello\" || message == \"hi\") {\n      Serial.println(\"Hi there! Nice to meet you.\");\n    } else if (message == \"how are you\") {\n      Serial.println(\"I'm feeling electric!\");\n    } else if (message == \"joke\") {\n      Serial.println(\"Why did the LED go to school? To get brighter!\");\n    } else {\n      Serial.println(\"I don't understand that yet. Try: hello, how are you, joke\");\n    }\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 500,
+          "serial": "hello\n"
+        },
+        {
+          "at_ms": 1000,
+          "serial": "joke\n"
+        },
+        {
+          "at_ms": 1500,
+          "serial": "banana\n"
+        }
+      ],
+      "sim_ms": 2500
+    }
+  ],
+  "curriculum": [
+    "78-algorithms",
+    "78-programming",
+    "78-user-experience",
+    "78-tracing"
+  ],
+  "outro": "You built a chatbot from scratch. It uses **Serial** to talk, a **String** to remember what you typed, and **if / else if** to choose an answer. (And no AI!)",
+  "stretch": [
+    "Ask for the person's name, remember it in a String, and use it in later answers.",
+    "Make a guess-the-number game: the board picks a random number and says \"higher\" or \"lower\".",
+    "Answer \"time\" with how many seconds the board has been on (`millis() / 1000`)."
+  ]
 }

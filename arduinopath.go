@@ -1,13 +1,13 @@
-// Package circuitpath holds the web app and content that are built into the
-// program, so CircuitPath.exe is just one file.
-package circuitpath
+// Package arduinopath holds the web app and content that are built into the
+// program, so ArduinoPath.exe is just one file.
+package arduinopath
 
 import (
 	"embed"
 	"io/fs"
 )
 
-// Version is set at build time: go build -ldflags "-X circuitpath.Version=1.2.3".
+// Version is set at build time: go build -ldflags "-X arduinopath.Version=1.2.3".
 var Version = "dev"
 
 //go:embed ui

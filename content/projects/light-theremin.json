@@ -25,5 +25,202 @@
     "tone"
   ],
   "intro": "Wave your hand over a light sensor to play music, like a real theremin.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Read the light",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int light = analogRead(LDR_PIN);\n  Serial.println(light);\n  delay(200);\n}\n",
+      "text": "A light sensor (LDR) changes how easily electricity flows when light shines on it. `analogRead(LDR_PIN)` turns that into a number: bigger means brighter.\n\n**Your task:** Run the code and open the **Serial Monitor**. Cover the sensor with your hand and watch the number drop. (In the simulator, drag the light slider.)",
+      "hints": [
+        "The Serial Monitor is under your code.",
+        "In the simulator, the slider next to the light sensor changes the light.",
+        "Try the Serial Plotter tab to see it as a graph!"
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "Bright light gives a big number",
+          "pattern": "(^|\\n)[5-9]\\d\\d\\r?\\n"
+        },
+        {
+          "type": "serial_regex",
+          "label": "Dark gives a small number",
+          "pattern": "(^|\\n)\\d{1,3}\\r?\\n"
+        },
+        {
+          "type": "confirm",
+          "label": "The number changes when I cover the sensor"
+        }
+      ],
+      "success": "Your board can see light! Analog inputs give a whole range of numbers, not just on and off.",
+      "demo": "{{pins}}\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int light = analogRead(LDR_PIN);\n  Serial.println(light);\n  delay(200);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "LDR_PIN": 800
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "analog": {
+              "LDR_PIN": 150
+            }
+          }
+        }
+      ],
+      "sim_ms": 2000
+    },
+    {
+      "title": "Test the buzzer",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  tone(BUZZER_PIN, ___);  // the note A (440 Hz)\n  delay(500);\n  noTone(BUZZER_PIN);\n  delay(500);\n}\n",
+      "text": "One part at a time: now the buzzer on its own. `tone(BUZZER_PIN, 440);` plays a note at 440 vibrations each second (440 Hz, the note A). `noTone` stops it.\n\n**Your task:** fill in the blank to play the note A, then Run.",
+      "hints": [
+        "The note A is 440 Hz.",
+        "Put 440 in the blank.",
+        "The line is `tone(BUZZER_PIN, 440);`"
+      ],
+      "checks": [
+        {
+          "type": "tone_seen",
+          "label": "The buzzer plays A (440 Hz)",
+          "pin": "BUZZER_PIN",
+          "min_hz": 430,
+          "max_hz": 450
+        },
+        {
+          "type": "confirm",
+          "label": "I heard a beep every second"
+        }
+      ],
+      "success": "Beep! Higher numbers make higher notes. Try 880: it's the same note, one octave up.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  tone(BUZZER_PIN, 440);  // the note A\n  delay(500);\n  noTone(BUZZER_PIN);\n  delay(500);\n}\n",
+      "sim_ms": 2000
+    },
+    {
+      "title": "Light becomes sound",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  int light = analogRead(___);\n  // Turn the light reading (0 to ANALOG_MAX) into a pitch (200 to 2000 Hz).\n  int pitch = map(light, 0, ANALOG_MAX, 200, 2000);\n  tone(BUZZER_PIN, ___);\n  delay(20);\n}\n",
+      "text": "Now join them: more light, higher note. `map()` turns a number from one range into another. Here it turns 0 to `ANALOG_MAX` (the sensor) into 200 to 2000 (the pitch).\n\n**Your task:** fill in the blanks so the pitch follows the light.",
+      "hints": [
+        "Read the light sensor's pin, then play the pitch you worked out.",
+        "The first blank is `LDR_PIN`, the second is a variable.",
+        "The blanks are `LDR_PIN` and `pitch`."
+      ],
+      "checks": [
+        {
+          "type": "tone_seen",
+          "label": "Bright light plays a high note",
+          "pin": "BUZZER_PIN",
+          "min_hz": 1200,
+          "max_hz": 2000
+        },
+        {
+          "type": "tone_seen",
+          "label": "Shadow plays a low note",
+          "pin": "BUZZER_PIN",
+          "min_hz": 200,
+          "max_hz": 600
+        },
+        {
+          "type": "uses_function",
+          "label": "You used map()",
+          "name": "map"
+        },
+        {
+          "type": "confirm",
+          "label": "The note changes when I wave my hand over the sensor"
+        }
+      ],
+      "success": "You built an instrument! The real theremin works by sensing your hand, too.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  int light = analogRead(LDR_PIN);\n  // Turn the light reading (0 to ANALOG_MAX) into a pitch (200 to 2000 Hz).\n  int pitch = map(light, 0, ANALOG_MAX, 200, 2000);\n  tone(BUZZER_PIN, pitch);\n  delay(20);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "LDR_PIN": "ANALOG_MAX"
+            }
+          }
+        },
+        {
+          "at_ms": 800,
+          "set": {
+            "analog": {
+              "LDR_PIN": 50
+            }
+          }
+        }
+      ],
+      "sim_ms": 1600
+    },
+    {
+      "title": "Hush in the dark",
+      "support": "brief",
+      "text": "**Goal:** when the sensor is fully covered (very dark), the theremin goes quiet. Otherwise it plays like before.",
+      "hints": [
+        "Use an `if` to check whether `light` is very small.",
+        "Very dark could be less than `ANALOG_MAX / 10`.",
+        "Inside the `if`, use `noTone(BUZZER_PIN);`. Put the old tone code in the `else`."
+      ],
+      "checks": [
+        {
+          "type": "code_contains",
+          "label": "You used noTone",
+          "text": "noTone"
+        },
+        {
+          "type": "tone_seen",
+          "label": "It still plays in the light",
+          "pin": "BUZZER_PIN",
+          "min_hz": 200,
+          "max_hz": 2000
+        },
+        {
+          "type": "confirm",
+          "label": "It goes quiet when I cover the sensor"
+        }
+      ],
+      "success": "Now you can play notes and rests. That's music!",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  int light = analogRead(LDR_PIN);\n  if (light < ANALOG_MAX / 10) {\n    noTone(BUZZER_PIN);  // very dark: silence\n  } else {\n    int pitch = map(light, 0, ANALOG_MAX, 200, 2000);\n    tone(BUZZER_PIN, pitch);\n  }\n  delay(20);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "LDR_PIN": 700
+            }
+          }
+        },
+        {
+          "at_ms": 800,
+          "set": {
+            "analog": {
+              "LDR_PIN": 0
+            }
+          }
+        }
+      ],
+      "sim_ms": 1600
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-data-binary",
+    "78-programming",
+    "910-data"
+  ],
+  "outro": "Your theremin turns light into sound. You read an **analog** sensor, used **map()** to change one range of numbers into another, and played notes with **tone()**.",
+  "stretch": [
+    "Play only real musical notes: pick the closest note from an array of frequencies.",
+    "Add a button that switches between two instruments (a high range and a low range).",
+    "Make the sound wobble (vibrato) by changing the pitch up and down a little, very quickly."
+  ]
 }

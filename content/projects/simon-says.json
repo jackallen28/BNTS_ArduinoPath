@@ -31,5 +31,137 @@
     "loops"
   ],
   "intro": "Watch the pattern of lights and sounds, then copy it. It gets longer every round.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Lights and notes",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    flash(i);\n  }\n  delay(1000);\n}\n",
+      "text": "Four colours, each with its own light and note. Instead of writing everything four times, we keep the pins and notes in **arrays**: numbered lists. `LEDS[0]` is the first one (red), `LEDS[3]` the last (blue).\n\nThe `flash(colour)` function lights one colour and plays its note.\n\n**Your task:** Run it. Then change the notes to make your own tune.",
+      "hints": [
+        "Arrays start counting at 0, not 1.",
+        "Change the numbers in `NOTES` and Run again.",
+        "Bigger numbers are higher notes."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "Red flashes",
+          "pin": "LED_RED",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Blue flashes",
+          "pin": "LED_BLUE",
+          "value": "HIGH"
+        },
+        {
+          "type": "tone_seen",
+          "label": "Notes play",
+          "pin": "BUZZER_PIN",
+          "min_hz": 100,
+          "max_hz": 4000
+        },
+        {
+          "type": "confirm",
+          "label": "All four lights flash, each with a note"
+        }
+      ],
+      "success": "Four colours, one function. That's the power of arrays.",
+      "demo": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    flash(i);\n  }\n  delay(1000);\n}\n",
+      "sim_ms": 2500
+    },
+    {
+      "title": "Press a colour",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    if (digitalRead(___) == LOW) {\n      flash(___);\n    }\n  }\n}\n",
+      "text": "Now each button flashes its own colour. One `for` loop checks all four buttons.\n\n**Your task:** fill in the blanks.",
+      "hints": [
+        "Use the array of buttons, with `i` to choose which one.",
+        "Flash the same colour number as the button.",
+        "The blanks are `BUTTONS[i]` and `i`."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The green button flashes green",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "Each button flashes its own colour"
+        }
+      ],
+      "success": "Every button works, with one loop.",
+      "demo": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    if (digitalRead(BUTTONS[i]) == LOW) {\n      flash(i);\n    }\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_GREEN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 700,
+          "set": {
+            "digital": {
+              "BUTTON_GREEN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "Simon Says",
+      "support": "brief",
+      "text": "**Goal:** the full game. Each round, Simon adds a random colour to the pattern and plays the whole pattern. You copy it with the buttons. Get it right and the next round starts (print `Round 2`, `Round 3`...). Get it wrong and it's game over.",
+      "hints": [
+        "Keep the pattern in an array (`int pattern[100];`) and how long it is in `length`.",
+        "A function that waits for any button and returns which colour was pressed makes copying easy.",
+        "Use **Watch the goal**, then build it one function at a time."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "The game starts round 1",
+          "text": "Round 1"
+        },
+        {
+          "type": "code_regex",
+          "label": "The pattern is an array",
+          "pattern": "\\w+\\s*\\[\\s*\\d+\\s*\\]\\s*;"
+        },
+        {
+          "type": "uses_function",
+          "label": "Colours are random",
+          "name": "random"
+        },
+        {
+          "type": "confirm",
+          "label": "I played a few rounds"
+        }
+      ],
+      "success": "Simon Says! Your game remembers a growing list, just like you do.",
+      "demo": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nint pattern[100];\nint length = 0;\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\n// Waits for a press and returns its colour (0 to 3).\nint waitForPress() {\n  while (true) {\n    for (int i = 0; i < 4; i++) {\n      if (digitalRead(BUTTONS[i]) == LOW) {\n        flash(i);\n        while (digitalRead(BUTTONS[i]) == LOW) { }  // wait for release\n        return i;\n      }\n    }\n  }\n}\n\nvoid gameOver() {\n  Serial.print(\"Game over! You reached round \");\n  Serial.println(length);\n  tone(BUZZER_PIN, 150, 800);\n  delay(2000);\n  length = 0;\n}\n\nvoid loop() {\n  // Simon adds a colour and shows the whole pattern.\n  pattern[length] = random(0, 4);\n  length++;\n  Serial.print(\"Round \");\n  Serial.println(length);\n  delay(500);\n  for (int i = 0; i < length; i++) {\n    flash(pattern[i]);\n  }\n  // Now you copy it.\n  for (int i = 0; i < length; i++) {\n    if (waitForPress() != pattern[i]) {\n      gameOver();\n      return;\n    }\n  }\n}\n",
+      "sim_ms": 2000
+    }
+  ],
+  "curriculum": [
+    "78-algorithms",
+    "910-algorithms",
+    "910-programming",
+    "910-testing"
+  ],
+  "outro": "You built Simon Says with **arrays**: lists of pins, notes and the growing pattern. Arrays and **for loops** let one piece of code handle all four colours.",
+  "stretch": [
+    "Make it speed up as the pattern gets longer.",
+    "Keep a high score and print it after each game.",
+    "Play a victory tune after every 5 rounds."
+  ]
 }

@@ -8,7 +8,7 @@ import { appWindow, tool, separator, spacer } from "../widgets/window.js";
 import { saveMyWork } from "../dialogs/settings.js";
 import { state, board, tier, projectSuits, missingFromKit, partsSummary, partName } from "../state.js";
 
-const FILTER_KEY = "circuitpath.picker.filter";
+const FILTER_KEY = "arduinopath.picker.filter";
 
 export function pickerScreen(root, { openSettings, logOut, openProject }) {
   let filter = loadFilter();
@@ -102,6 +102,14 @@ export function pickerScreen(root, { openSettings, logOut, openProject }) {
       h("span", { class: "card-go pill" }, started ? "Keep going" : "Start"));
   }
 
+  // "an ESP32 board", "an Arduino (Uno, Nano or Mega)", "a NodeMCU"...
+  function boardNeed(key) {
+    const words = { all: "any board", avr: "an Arduino (Uno, Nano or Mega)", esp: "an ESP board", esp8266: "an ESP8266 board", esp32: "an ESP32 board" };
+    if (words[key]) return words[key];
+    const name = state.catalogue.boards.find((x) => x.id === key)?.short ?? key;
+    return (/^[AEIO]/i.test(name) ? "an " : "a ") + name;
+  }
+
   function projectCard(p, b, anyDone) {
     const t = tier(p.tier);
     const suits = projectSuits(p, b);
@@ -109,8 +117,7 @@ export function pickerScreen(root, { openSettings, logOut, openProject }) {
     const prog = progress.get(p.id);
     const notes = [];
     if (!suits) {
-      const needsEsp = p.boards.includes("esp") || p.boards.every((k) => k === "esp8266" || k === "esp32");
-      notes.push(h("span", { class: "card-note warn" }, icon("warn"), needsEsp ? "Needs an ESP board" : `Needs a ${p.boards.map((id) => state.catalogue.boards.find((x) => x.id === id)?.short ?? id).join(" or ")}`));
+      notes.push(h("span", { class: "card-note warn" }, icon("warn"), `Needs ${p.boards.map(boardNeed).join(" or ")}`));
     } else {
       notes.push(h("span", { class: "card-note good" }, icon("check"), `Works with your ${b?.short ?? "board"}`));
     }
@@ -159,8 +166,8 @@ export function pickerScreen(root, { openSettings, logOut, openProject }) {
   }
 
   const onWork = () => loadProgress();
-  window.addEventListener("circuitpath:work-changed", onWork);
+  window.addEventListener("arduinopath:work-changed", onWork);
   render();
   loadProgress();
-  return () => window.removeEventListener("circuitpath:work-changed", onWork);
+  return () => window.removeEventListener("arduinopath:work-changed", onWork);
 }

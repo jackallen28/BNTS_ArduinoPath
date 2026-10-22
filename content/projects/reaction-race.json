@@ -31,5 +31,186 @@
     "game state"
   ],
   "intro": "A game for 2 players. Wait for the light, then race to press your button first!",
-  "steps": []
+  "steps": [
+    {
+      "title": "Test both buttons",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(BUTTON_PIN, INPUT_PULLUP);   // player 1\n  pinMode(BUTTON2_PIN, INPUT_PULLUP);  // player 2\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    Serial.println(\"Player 1\");\n  }\n  if (digitalRead(BUTTON2_PIN) == LOW) {\n    Serial.println(\"Player 2\");\n  }\n  delay(100);\n}\n",
+      "text": "Two players, two buttons. First check both work.\n\n**Your task:** Run, open the **Serial Monitor**, and press each button.",
+      "hints": [
+        "In the simulator, click each button on the breadboard.",
+        "Hold a button and you'll see its name over and over.",
+        "If nothing shows, check each button's wires."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "Player 1's button works",
+          "text": "Player 1"
+        },
+        {
+          "type": "serial_contains",
+          "label": "Player 2's button works",
+          "text": "Player 2"
+        },
+        {
+          "type": "confirm",
+          "label": "Both buttons show up"
+        }
+      ],
+      "success": "Both buttons work.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(BUTTON_PIN, INPUT_PULLUP);   // player 1\n  pinMode(BUTTON2_PIN, INPUT_PULLUP);  // player 2\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    Serial.println(\"Player 1\");\n  }\n  if (digitalRead(BUTTON2_PIN) == LOW) {\n    Serial.println(\"Player 2\");\n  }\n  delay(100);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        },
+        {
+          "at_ms": 800,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "How fast are you?",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  Serial.println(\"Get ready...\");\n  delay(random(2000, 5000));      // a surprise wait\n  digitalWrite(LED_GREEN, HIGH);  // GO!\n  tone(BUZZER_PIN, 1000, 100);\n  unsigned long start = millis();\n\n  while (digitalRead(BUTTON_PIN) == HIGH) {\n    // wait for the press\n  }\n  unsigned long reaction = ___;\n  digitalWrite(LED_GREEN, LOW);\n  Serial.print(\"Reaction: \");\n  Serial.print(reaction);\n  Serial.println(\" ms\");\n  delay(3000);\n}\n",
+      "text": "`millis()` counts milliseconds since the board started, like a stopwatch that never stops. Take the time when the light comes on, and again when the button is pressed: the difference is your reaction time.\n\n**Your task:** fill in the blank to work out the reaction time.",
+      "hints": [
+        "The reaction time is the time now, take away the time the light came on.",
+        "The time now is `millis()`. The start time is in `start`.",
+        "The blank is `millis() - start`."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It prints your reaction time",
+          "pattern": "Reaction: \\d+ ms"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The GO light comes on",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw my reaction time"
+        }
+      ],
+      "success": "Most people react in about 200 to 300 milliseconds. How fast are you?",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  Serial.println(\"Get ready...\");\n  delay(random(2000, 5000));      // a surprise wait\n  digitalWrite(LED_GREEN, HIGH);  // GO!\n  tone(BUZZER_PIN, 1000, 100);\n  unsigned long start = millis();\n\n  while (digitalRead(BUTTON_PIN) == HIGH) {\n    // wait for the press\n  }\n  unsigned long reaction = millis() - start;\n  digitalWrite(LED_GREEN, LOW);\n  Serial.print(\"Reaction: \");\n  Serial.print(reaction);\n  Serial.println(\" ms\");\n  delay(3000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 6000,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 6200,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 7000
+    },
+    {
+      "title": "Race!",
+      "support": "brief",
+      "text": "**Goal:** a two-player race. After a surprise wait, the GO light comes on. The first player to press wins: their light comes on and the Serial Monitor says `Player 1 wins!` or `Player 2 wins!`. Pressing before GO is a false start: print `Too soon!`.",
+      "hints": [
+        "A `while (true)` loop can keep checking both buttons until one is pressed. `return` leaves `loop()` so the next round starts.",
+        "A function `winner(player, lightPin)` saves writing the winning code twice.",
+        "Check for a false start straight after the wait, before turning the GO light on."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "A winner is announced",
+          "text": "wins!"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The winner's light comes on",
+          "pin": "LED_YELLOW",
+          "value": "HIGH"
+        },
+        {
+          "type": "code_contains",
+          "label": "False starts are caught",
+          "text": "Too soon"
+        },
+        {
+          "type": "confirm",
+          "label": "The fastest player wins"
+        }
+      ],
+      "success": "Game on! Get a friend and see who's fastest.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_GREEN, OUTPUT);   // the GO light\n  pinMode(LED_RED, OUTPUT);     // player 1's light\n  pinMode(LED_YELLOW, OUTPUT);  // player 2's light\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  pinMode(BUTTON2_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid winner(int player, int lightPin) {\n  digitalWrite(LED_GREEN, LOW);\n  digitalWrite(lightPin, HIGH);\n  tone(BUZZER_PIN, 1500, 400);\n  Serial.print(\"Player \");\n  Serial.print(player);\n  Serial.println(\" wins!\");\n  delay(3000);\n  digitalWrite(lightPin, LOW);\n}\n\nvoid loop() {\n  Serial.println(\"Get ready...\");\n  delay(random(2000, 5000));\n  // Pressing before the light is a false start.\n  if (digitalRead(BUTTON_PIN) == LOW || digitalRead(BUTTON2_PIN) == LOW) {\n    Serial.println(\"Too soon! Try again.\");\n    tone(BUZZER_PIN, 200, 500);\n    delay(2000);\n    return;\n  }\n  digitalWrite(LED_GREEN, HIGH);\n  tone(BUZZER_PIN, 1000, 100);\n  while (true) {\n    if (digitalRead(BUTTON_PIN) == LOW) {\n      winner(1, LED_RED);\n      return;\n    }\n    if (digitalRead(BUTTON2_PIN) == LOW) {\n      winner(2, LED_YELLOW);\n      return;\n    }\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 6000,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 6200,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 7000
+    }
+  ],
+  "curriculum": [
+    "78-algorithms",
+    "78-programming",
+    "910-testing",
+    "78-user-experience"
+  ],
+  "outro": "Your reaction game times people to the millisecond with **millis()**, picks a **random** wait so nobody can cheat, and decides a winner with **if / else**.",
+  "stretch": [
+    "Keep score over 5 rounds and announce the champion.",
+    "Print the winner's reaction time in milliseconds.",
+    "Add a third player with another button and LED."
+  ]
 }

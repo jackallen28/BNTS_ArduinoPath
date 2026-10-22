@@ -25,5 +25,238 @@
     "INPUT_PULLUP"
   ],
   "intro": "Press a button to turn a light on and off. Then make it remember what it was doing.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Test the LED",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  digitalWrite(LED_PIN, ___);  // turn it on\n}\n\nvoid loop() {\n  // Nothing to do here yet.\n}\n",
+      "text": "One part at a time! First let's check the LED works on its own: turn it on and leave it on.\n\n**Your task:** fill in the blank so the LED turns on, then press **Run**.",
+      "hints": [
+        "`HIGH` means on and `LOW` means off.",
+        "Use `HIGH` to turn the LED on.",
+        "The line is `digitalWrite(LED_PIN, HIGH);`"
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The LED turns on",
+          "pin": "LED_PIN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the LED light up"
+        }
+      ],
+      "success": "The LED works. Now let's check the button.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  digitalWrite(LED_PIN, HIGH);\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 1000
+    },
+    {
+      "title": "Read the button",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int buttonState = digitalRead(BUTTON_PIN);\n  Serial.println(buttonState);\n  delay(200);\n}\n",
+      "text": "`digitalRead(BUTTON_PIN)` asks: is the button's pin HIGH (1) or LOW (0)?\n\nWith `INPUT_PULLUP`, the board gently pulls the pin up to HIGH. Pressing the button connects it to GND, so a **pressed button reads 0** and a released one reads **1**. It seems backwards, but it saves a resistor!\n\n**Your task:** Run this code, open the **Serial Monitor**, and press the button. Watch the numbers change.",
+      "hints": [
+        "In the simulator, click and hold the button on the breadboard.",
+        "The Serial Monitor is under the code. 1 means not pressed, 0 means pressed.",
+        "Hold the button down for a moment so you see a few 0s."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "The Serial Monitor shows 1 (not pressed)",
+          "pattern": "(^|\\n)1\\r?\\n"
+        },
+        {
+          "type": "serial_regex",
+          "label": "The Serial Monitor shows 0 (pressed)",
+          "pattern": "(^|\\n)0\\r?\\n"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw 0 when I pressed the button"
+        }
+      ],
+      "success": "The board can feel the button! Reading inputs like this is how every game controller and keyboard works.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int buttonState = digitalRead(BUTTON_PIN);\n  Serial.println(buttonState);\n  delay(200);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Button controls the light",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == ___) {\n    digitalWrite(LED_PIN, HIGH);  // pressed: light on\n  } else {\n    digitalWrite(LED_PIN, ___);   // not pressed: light off\n  }\n}\n",
+      "text": "Now join the two parts: when the button is pressed, the light comes on.\n\nAn `if` asks a question. `==` means \"is it equal to?\" (two equals signs: one `=` would change the value instead).\n\n**Your task:** fill in the blanks so the LED is on while the button is held down.",
+      "hints": [
+        "A pressed button reads `LOW` (remember the 0 in the Serial Monitor?).",
+        "The first blank is `LOW`. What turns the LED off?",
+        "The blanks are `LOW` and `LOW`."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The light comes on when you press",
+          "pin": "LED_PIN",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The light goes off when you let go",
+          "pin": "LED_PIN",
+          "value": "LOW"
+        },
+        {
+          "type": "code_contains",
+          "label": "Your if uses == to compare",
+          "text": "=="
+        },
+        {
+          "type": "confirm",
+          "label": "The light is on only while I hold the button"
+        }
+      ],
+      "success": "Your code decides what to do. That's an algorithm with a decision in it.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    digitalWrite(LED_PIN, HIGH);  // pressed: light on\n  } else {\n    digitalWrite(LED_PIN, LOW);   // not pressed: light off\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Remember on and off",
+      "support": "brief",
+      "text": "**Goal:** press once and the light stays on. Press again and it turns off.\n\nYour code needs to remember whether the light is on (a `bool` variable), and to notice the moment the button goes *down*, not the whole time it's held.",
+      "hints": [
+        "Make a variable above `setup()`: `bool lightOn = false;`. `lightOn = !lightOn;` flips it.",
+        "Remember the button's last reading in another variable. A new press is when it was `HIGH` last time and is `LOW` now.",
+        "Look at the goal with **Watch the goal**, then compare it with your code line by line."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The first press turns the light on",
+          "pin": "LED_PIN",
+          "value": "HIGH",
+          "times": 2
+        },
+        {
+          "type": "pin_seen",
+          "label": "The next press turns it off",
+          "pin": "LED_PIN",
+          "value": "LOW",
+          "times": 1
+        },
+        {
+          "type": "uses_function",
+          "label": "You read the button",
+          "name": "digitalRead"
+        },
+        {
+          "type": "confirm",
+          "label": "Press: on. Press again: off."
+        }
+      ],
+      "success": "Your night light remembers! Keeping track of what's going on is called keeping state.",
+      "demo": "{{pins}}\nbool lightOn = false;\nint lastButton = HIGH;\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n}\n\nvoid loop() {\n  int button = digitalRead(BUTTON_PIN);\n  // Just pressed: it was up last time and it's down now.\n  if (button == LOW && lastButton == HIGH) {\n    lightOn = !lightOn;\n    digitalWrite(LED_PIN, lightOn ? HIGH : LOW);\n    delay(50);  // let the button settle\n  }\n  lastButton = button;\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 700,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        },
+        {
+          "at_ms": 1500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 1700,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 2700,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 3500
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-algorithms",
+    "78-programming",
+    "78-tracing"
+  ],
+  "outro": "Your night light listens to a button and remembers what it's doing. You used **digitalRead**, **if / else** and a **variable** to remember the light's state.",
+  "stretch": [
+    "Make the light turn itself off 10 seconds after it was turned on. (Use `millis()`.)",
+    "Make a long press do something different from a short press.",
+    "Count how many times the button has been pressed and print it to the Serial Monitor."
+  ]
 }

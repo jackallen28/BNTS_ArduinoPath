@@ -1,4 +1,4 @@
-# CircuitPath v1: how the pieces fit
+# ArduinoPath v1: how the pieces fit
 
 The brief is [CLAUDE.md](../CLAUDE.md). This page is the contract between the parts of the app:
 the board files, the circuit format in projects, the simulator engine, the circuit renderer, the
@@ -16,7 +16,7 @@ Change it when a contract changes.
                 student code ──────────────────────►│  Web Worker)   circuit/ (renderer: SVG)    │
                      │                              │ checks.js ◄── trace                        │
                      ▼                              └───────┬────────────────────────────────────┘
-          CircuitPath.exe / .app (Go)  ◄── /api/compile, /api/upload, /api/ports, /api/serial ──┘
+          ArduinoPath.exe / .app (Go)  ◄── /api/compile, /api/upload, /api/ports, /api/serial ──┘
           arduino-cli + board tools (built in) ──► USB ──► the real board
 ```
 
@@ -220,7 +220,7 @@ echo gives `pulse` = cm × 58 µs).
 ## 8. Real boards (Go: `/api/...`)
 
 The board tools (arduino-cli, the AVR, ESP8266 and ESP32 cores and every library, pinned in
-`internal/arduino/requirements.json`) are **built into** CircuitPath.exe / CircuitPath.app and
+`internal/arduino/requirements.json`) are **built into** ArduinoPath.exe / ArduinoPath.app and
 unpacked to the data folder the first time a family is used (with a progress bar).
 
 | API | |

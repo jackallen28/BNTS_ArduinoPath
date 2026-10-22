@@ -124,7 +124,7 @@ func (s *Store) migrate(ctx context.Context) error {
 		return err
 	}
 	if v > SchemaVersion {
-		return fmt.Errorf("the database is from a newer CircuitPath (schema %d, this server knows %d); update the server", v, SchemaVersion)
+		return fmt.Errorf("the database is from a newer ArduinoPath (schema %d, this server knows %d); update the server", v, SchemaVersion)
 	}
 	for ; v < SchemaVersion; v++ {
 		tx, err := s.db.BeginTx(ctx, nil)

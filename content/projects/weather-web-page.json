@@ -19,5 +19,164 @@
     "sensors"
   ],
   "intro": "Show the temperature and humidity on a web page anyone in the room can open.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Read the sensor",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <DHT.h>\n\nDHT dht(DHT_PIN, DHT11);  // use DHT22 if you have the white one\n\nvoid setup() {\n  Serial.begin(115200);\n  dht.begin();\n}\n\nvoid loop() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  if (isnan(t) || isnan(h)) {\n    Serial.println(\"No reading. Check the wires.\");\n  } else {\n    Serial.print(\"Temperature: \");\n    Serial.print(t);\n    Serial.print(\" C  Humidity: \");\n    Serial.print(h);\n    Serial.println(\" %\");\n  }\n  delay(2000);\n}\n",
+      "text": "The DHT sensor measures temperature and humidity (how much water is in the air). It's slow: read it every 2 seconds at most.\n\n**Your task:** Run, open the **Serial Monitor**, then breathe on the sensor and watch the numbers change.",
+      "hints": [
+        "`isnan` means \"is not a number\": the reading failed.",
+        "In the simulator, drag the temperature and humidity sliders.",
+        "If you see \"No reading\", check the data wire and the 3.3V and GND wires."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It prints the temperature",
+          "pattern": "Temperature: \\d"
+        },
+        {
+          "type": "confirm",
+          "label": "The numbers change when I breathe on it"
+        }
+      ],
+      "success": "Your sensor works.",
+      "demo": "{{pins}}\n#include <DHT.h>\n\nDHT dht(DHT_PIN, DHT11);  // use DHT22 if you have the white one\n\nvoid setup() {\n  Serial.begin(115200);\n  dht.begin();\n}\n\nvoid loop() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  if (isnan(t) || isnan(h)) {\n    Serial.println(\"No reading. Check the wires.\");\n  } else {\n    Serial.print(\"Temperature: \");\n    Serial.print(t);\n    Serial.print(\" C  Humidity: \");\n    Serial.print(h);\n    Serial.println(\" %\");\n  }\n  delay(2000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 23.5,
+                "h": 48
+              }
+            }
+          }
+        }
+      ],
+      "sim_ms": 2500
+    },
+    {
+      "title": "The weather page",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n#include <DHT.h>\n\nDHT dht(DHT_PIN, DHT11);  // use DHT22 if you have the white one\n\nWebServer server(80);\n\nvoid homePage() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  String page = \"<!DOCTYPE html><html><head>\";\n  page += \"<meta name=\\\"viewport\\\" content=\\\"width=device-width\\\">\";\n  page += \"</head><body style=\\\"font-family: sans-serif; text-align: center\\\">\";\n  page += \"<h1>Weather</h1>\";\n  page += \"<p style=\\\"font-size: 2em\\\">\" + String(___, 1) + \" &deg;C</p>\";\n  page += \"<p style=\\\"font-size: 2em\\\">\" + String(___, 0) + \" % humidity</p>\";\n  page += \"</body></html>\";\n  server.send(200, \"text/html\", page);\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  dht.begin();\n  WiFi.softAP(\"ArduinoPath-Weather\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "text": "Now the board builds a web page with the readings. The page is a **String**, built up piece by piece with `+=`. `String(t, 1)` turns the temperature into text with 1 decimal place.\n\nYour board makes its **own WiFi network** (a hotspot). On your phone, open WiFi settings, join the network with your board's name, then open **192.168.4.1** in the browser. In the simulator, use the **phone panel**.\n\n**Your task:** fill in the blanks to add the readings to the page.",
+      "hints": [
+        "The temperature is in `t`.",
+        "The humidity is in `h`.",
+        "The blanks are `t` and `h`."
+      ],
+      "checks": [
+        {
+          "type": "code_contains",
+          "label": "The page shows the temperature",
+          "text": "String(t, 1)"
+        },
+        {
+          "type": "code_contains",
+          "label": "The page shows the humidity",
+          "text": "String(h, 0)"
+        },
+        {
+          "type": "uses_function",
+          "label": "It sends the page",
+          "name": "send"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the weather on a phone (or the phone panel)"
+        }
+      ],
+      "success": "Anyone who joins your board's WiFi can check the weather.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n#include <DHT.h>\n\nDHT dht(DHT_PIN, DHT11);  // use DHT22 if you have the white one\n\nWebServer server(80);\n\nvoid homePage() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  String page = \"<!DOCTYPE html><html><head>\";\n  page += \"<meta name=\\\"viewport\\\" content=\\\"width=device-width\\\">\";\n  page += \"</head><body style=\\\"font-family: sans-serif; text-align: center\\\">\";\n  page += \"<h1>Weather</h1>\";\n  page += \"<p style=\\\"font-size: 2em\\\">\" + String(t, 1) + \" &deg;C</p>\";\n  page += \"<p style=\\\"font-size: 2em\\\">\" + String(h, 0) + \" % humidity</p>\";\n  page += \"</body></html>\";\n  server.send(200, \"text/html\", page);\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  dht.begin();\n  WiFi.softAP(\"ArduinoPath-Weather\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 23.5,
+                "h": 48
+              }
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "http": {
+            "method": "GET",
+            "path": "/",
+            "query": {}
+          }
+        }
+      ],
+      "sim_ms": 1000
+    },
+    {
+      "title": "Your own design",
+      "support": "brief",
+      "text": "**Goal:** make the page your own: a title with your name, the temperature in a big coloured box, and a line that says `Hot!` above 25 °C, `Cold!` below 15 °C, or `Just right` otherwise.",
+      "hints": [
+        "Use `if`, `else if` and `else` to choose the message.",
+        "Add the message to `page` before the closing `</body></html>`.",
+        "CSS like `background: orange; padding: 20px` makes a coloured box."
+      ],
+      "checks": [
+        {
+          "type": "code_contains",
+          "label": "It says when it's hot",
+          "text": "Hot!"
+        },
+        {
+          "type": "code_contains",
+          "label": "It says when it's cold",
+          "text": "Cold!"
+        },
+        {
+          "type": "confirm",
+          "label": "My page has my design"
+        }
+      ],
+      "success": "A weather web page designed by you.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n#include <DHT.h>\n\nDHT dht(DHT_PIN, DHT11);  // use DHT22 if you have the white one\n\nWebServer server(80);\n\nvoid homePage() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  String page = \"<!DOCTYPE html><html><head>\";\n  page += \"<meta name=\\\"viewport\\\" content=\\\"width=device-width\\\">\";\n  page += \"</head><body style=\\\"font-family: sans-serif; text-align: center\\\">\";\n  page += \"<h1>Sam's Weather</h1>\";\n  page += \"<p style=\\\"font-size: 3em; background: orange; padding: 20px\\\">\" + String(t, 1) + \" &deg;C</p>\";\n  page += \"<p style=\\\"font-size: 2em\\\">\" + String(h, 0) + \" % humidity</p>\";\n  if (t > 25) {\n    page += \"<p>Hot!</p>\";\n  } else if (t < 15) {\n    page += \"<p>Cold!</p>\";\n  } else {\n    page += \"<p>Just right</p>\";\n  }\n  page += \"</body></html>\";\n  server.send(200, \"text/html\", page);\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  dht.begin();\n  WiFi.softAP(\"ArduinoPath-Weather\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "dht": {
+              "DHT_PIN": {
+                "t": 23.5,
+                "h": 48
+              }
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "http": {
+            "method": "GET",
+            "path": "/",
+            "query": {}
+          }
+        }
+      ],
+      "sim_ms": 1000
+    }
+  ],
+  "curriculum": [
+    "910-networks",
+    "910-data",
+    "910-programming",
+    "78-user-experience"
+  ],
+  "outro": "Your weather station is on the web! The board reads the **DHT** sensor and builds a fresh **HTML** page with the numbers every time someone asks for it.",
+  "stretch": [
+    "Make the page refresh itself every 5 seconds (look up the meta refresh tag).",
+    "Show the highest temperature since the board started.",
+    "Change the page's background colour when it's hot."
+  ]
 }

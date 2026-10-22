@@ -36,7 +36,7 @@ test("a student's whole first lesson, then the WIPE page", async ({ page }) => {
 
   // A brand-new laptop goes straight to making a profile.
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Welcome to CircuitPath!" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Welcome to ArduinoPath!" })).toBeVisible();
   await shoot(page, "01-welcome-first");
   await fillProfile(page, { names: ["mia", "Leo"], school: "Eltham High School", screenshots: true });
 
@@ -52,7 +52,8 @@ test("a student's whole first lesson, then the WIPE page", async ({ page }) => {
   const cards = page.locator(".project-grid > .card");
   await expect(cards.first()).toHaveClass(/freeplay-card/);
   await expect(page.locator(".project-card", { hasText: "Phone-controlled LED" })).toContainText("Works with your NodeMCU");
-  await expect(page.locator(".project-card", { hasText: "Keypad Safe" })).toContainText("Needs a Uno or Mega");
+  await expect(page.locator(".project-card", { hasText: "Keypad Safe" })).toContainText("Needs a Uno or a Mega");
+  await expect(page.locator(".project-card", { hasText: "Joystick Snake" })).toContainText("Needs an Arduino (Uno, Nano or Mega) or an ESP32 board");
   await expect(page.locator(".statusbar")).toContainText("Help: Advanced");
   await shoot(page, "04-picker");
   await page.locator(".nav-item", { hasText: "WiFi & IoT" }).click();
@@ -79,7 +80,7 @@ test("a student's whole first lesson, then the WIPE page", async ({ page }) => {
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Save my work" }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toMatch(/^Mia-Leo_CircuitPath_\d{4}-\d{2}-\d{2}\.circuit$/);
+  expect(download.suggestedFilename()).toMatch(/^Mia-Leo_ArduinoPath_\d{4}-\d{2}-\d{2}\.circuit$/);
   const saved = await download.path();
   await page.keyboard.press("Escape");
 
@@ -119,7 +120,7 @@ test("a student's whole first lesson, then the WIPE page", async ({ page }) => {
   await expect(wipeButton).toBeDisabled();
   const everyonePromise = page.waitForEvent("download");
   await page.getByRole("link", { name: /Save everyone's work/ }).click();
-  expect((await everyonePromise).suggestedFilename()).toMatch(/^Everyone_CircuitPath_\d{4}-\d{2}-\d{2}\.zip$/);
+  expect((await everyonePromise).suggestedFilename()).toMatch(/^Everyone_ArduinoPath_\d{4}-\d{2}-\d{2}\.zip$/);
   await page.getByLabel("2. Type WIPE in capital letters").fill("wipe");
   await expect(wipeButton).toBeDisabled();
   await page.getByLabel("2. Type WIPE in capital letters").fill("WIPE");
@@ -127,7 +128,7 @@ test("a student's whole first lesson, then the WIPE page", async ({ page }) => {
   await wipeButton.click();
   await expect(page.getByText("This laptop is wiped.")).toBeVisible();
   await page.getByRole("button", { name: "OK" }).click();
-  await expect(page.getByRole("heading", { name: "Welcome to CircuitPath!" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Welcome to ArduinoPath!" })).toBeVisible();
 
   expect(problems).toEqual([]);
 });

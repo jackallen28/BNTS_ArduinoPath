@@ -30,5 +30,184 @@
     "comparing IDs"
   ],
   "intro": "Tap the right card to open the door. The wrong card gets a red light.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Read a card",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <SPI.h>\n#include <MFRC522.h>\n\nMFRC522 reader(RFID_SS, RFID_RST);\n\n// The card's ID as text, like DEADBEEF.\nString cardId() {\n  String id = \"\";\n  for (byte i = 0; i < reader.uid.size; i++) {\n    if (reader.uid.uidByte[i] < 0x10) id += \"0\";\n    id += String(reader.uid.uidByte[i], HEX);\n  }\n  id.toUpperCase();\n  return id;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();\n  reader.PCD_Init();\n  Serial.println(\"Hold a card on the reader...\");\n}\n\nvoid loop() {\n  if (reader.PICC_IsNewCardPresent() && reader.PICC_ReadCardSerial()) {\n    Serial.print(\"Card: \");\n    Serial.println(cardId());\n    reader.PICC_HaltA();\n  }\n}\n",
+      "text": "RFID cards have a tiny chip and an aerial inside. The reader powers the chip with radio waves, and the chip answers with its ID.\n\n**Your task:** Run, open the **Serial Monitor**, and hold a card or tag on the reader. Write down its ID: you'll need it!",
+      "hints": [
+        "Hold the card flat, right on the reader, for a second.",
+        "In the simulator, click the card next to the reader.",
+        "Each card has its own ID."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It reads the card's ID",
+          "text": "Card: DEADBEEF"
+        },
+        {
+          "type": "confirm",
+          "label": "I wrote down my card's ID"
+        }
+      ],
+      "success": "Your reader works. Every card has its own ID, like a name tag.",
+      "demo": "{{pins}}\n#include <SPI.h>\n#include <MFRC522.h>\n\nMFRC522 reader(RFID_SS, RFID_RST);\n\n// The card's ID as text, like DEADBEEF.\nString cardId() {\n  String id = \"\";\n  for (byte i = 0; i < reader.uid.size; i++) {\n    if (reader.uid.uidByte[i] < 0x10) id += \"0\";\n    id += String(reader.uid.uidByte[i], HEX);\n  }\n  id.toUpperCase();\n  return id;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();\n  reader.PCD_Init();\n  Serial.println(\"Hold a card on the reader...\");\n}\n\nvoid loop() {\n  if (reader.PICC_IsNewCardPresent() && reader.PICC_ReadCardSerial()) {\n    Serial.print(\"Card: \");\n    Serial.println(cardId());\n    reader.PICC_HaltA();\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "card": [
+            222,
+            173,
+            190,
+            239
+          ]
+        }
+      ],
+      "sim_ms": 800
+    },
+    {
+      "title": "Open for the right card",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Servo.h>\n#include <SPI.h>\n#include <MFRC522.h>\n\nMFRC522 reader(RFID_SS, RFID_RST);\n\nconst String ALLOWED = \"DEADBEEF\";  // change this to your card's ID\nServo latch;\n\n// The card's ID as text, like DEADBEEF.\nString cardId() {\n  String id = \"\";\n  for (byte i = 0; i < reader.uid.size; i++) {\n    if (reader.uid.uidByte[i] < 0x10) id += \"0\";\n    id += String(reader.uid.uidByte[i], HEX);\n  }\n  id.toUpperCase();\n  return id;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();\n  reader.PCD_Init();\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n  latch.attach(SERVO_PIN);\n  latch.write(0);\n}\n\nvoid loop() {\n  if (!reader.PICC_IsNewCardPresent() || !reader.PICC_ReadCardSerial()) return;\n  String id = cardId();\n  reader.PICC_HaltA();\n  if (id == ___) {\n    Serial.println(\"Welcome!\");\n    digitalWrite(LED_GREEN, HIGH);\n    latch.write(90);    // open\n    delay(3000);\n    latch.write(0);     // close again\n    digitalWrite(LED_GREEN, LOW);\n  } else {\n    Serial.println(\"Access denied\");\n    digitalWrite(LED_RED, HIGH);\n    delay(1000);\n    digitalWrite(LED_RED, LOW);\n  }\n}\n",
+      "text": "Now the door: the right card turns the green light on and opens the latch for 3 seconds. Any other card gets the red light.\n\n**Your task:** put your card's ID in `ALLOWED`, and fill in the blank.",
+      "hints": [
+        "Compare the card's ID with the allowed one.",
+        "The allowed ID is in the constant `ALLOWED`.",
+        "The blank is `ALLOWED`."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "The right card is welcomed",
+          "text": "Welcome!"
+        },
+        {
+          "type": "servo_angle",
+          "label": "The latch opens",
+          "pin": "SERVO_PIN",
+          "angle": 90,
+          "tolerance": 3
+        },
+        {
+          "type": "serial_contains",
+          "label": "Other cards are refused",
+          "text": "Access denied"
+        },
+        {
+          "type": "confirm",
+          "label": "My card opens the door; another doesn't"
+        }
+      ],
+      "success": "A card-operated door! Only your card works.",
+      "demo": "{{pins}}\n#include <Servo.h>\n#include <SPI.h>\n#include <MFRC522.h>\n\nMFRC522 reader(RFID_SS, RFID_RST);\n\nconst String ALLOWED = \"DEADBEEF\";  // change this to your card's ID\nServo latch;\n\n// The card's ID as text, like DEADBEEF.\nString cardId() {\n  String id = \"\";\n  for (byte i = 0; i < reader.uid.size; i++) {\n    if (reader.uid.uidByte[i] < 0x10) id += \"0\";\n    id += String(reader.uid.uidByte[i], HEX);\n  }\n  id.toUpperCase();\n  return id;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();\n  reader.PCD_Init();\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n  latch.attach(SERVO_PIN);\n  latch.write(0);\n}\n\nvoid loop() {\n  if (!reader.PICC_IsNewCardPresent() || !reader.PICC_ReadCardSerial()) return;\n  String id = cardId();\n  reader.PICC_HaltA();\n  if (id == ALLOWED) {\n    Serial.println(\"Welcome!\");\n    digitalWrite(LED_GREEN, HIGH);\n    latch.write(90);    // open\n    delay(3000);\n    latch.write(0);     // close again\n    digitalWrite(LED_GREEN, LOW);\n  } else {\n    Serial.println(\"Access denied\");\n    digitalWrite(LED_RED, HIGH);\n    delay(1000);\n    digitalWrite(LED_RED, LOW);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "card": [
+            222,
+            173,
+            190,
+            239
+          ]
+        },
+        {
+          "at_ms": 4000,
+          "card": [
+            17,
+            34,
+            51,
+            68
+          ]
+        }
+      ],
+      "sim_ms": 5500
+    },
+    {
+      "title": "Many cards and a log",
+      "support": "brief",
+      "text": "**Goal:** allow a **list** of 3 cards (use an array), and keep a log: every tap prints a visit number, the card's ID, and `Welcome!` or `Access denied`.",
+      "hints": [
+        "`const String ALLOWED[3] = { \"...\", \"...\", \"...\" };` makes a list.",
+        "Use a `for` loop to check the card against each one in the list.",
+        "Count visits in a variable and print it first."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "Visits are logged",
+          "pattern": "#1 card DEADBEEF: Welcome!"
+        },
+        {
+          "type": "serial_contains",
+          "label": "Unknown cards are refused",
+          "text": "Access denied"
+        },
+        {
+          "type": "code_regex",
+          "label": "The allowed cards are a list",
+          "pattern": "ALLOWED\\s*\\["
+        },
+        {
+          "type": "confirm",
+          "label": "The log shows each tap"
+        }
+      ],
+      "success": "A door with an access list and a log: just like a real building's security system.",
+      "demo": "{{pins}}\n#include <Servo.h>\n#include <SPI.h>\n#include <MFRC522.h>\n\nMFRC522 reader(RFID_SS, RFID_RST);\n\nconst int CARDS = 3;\nconst String ALLOWED[CARDS] = { \"DEADBEEF\", \"12345678\", \"CAFEF00D\" };\nint visits = 0;\nServo latch;\n\n// The card's ID as text, like DEADBEEF.\nString cardId() {\n  String id = \"\";\n  for (byte i = 0; i < reader.uid.size; i++) {\n    if (reader.uid.uidByte[i] < 0x10) id += \"0\";\n    id += String(reader.uid.uidByte[i], HEX);\n  }\n  id.toUpperCase();\n  return id;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();\n  reader.PCD_Init();\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(LED_RED, OUTPUT);\n  latch.attach(SERVO_PIN);\n  latch.write(0);\n}\n\nvoid loop() {\n  if (!reader.PICC_IsNewCardPresent() || !reader.PICC_ReadCardSerial()) return;\n  String id = cardId();\n  reader.PICC_HaltA();\n  bool ok = false;\n  for (int i = 0; i < CARDS; i++) {\n    if (id == ALLOWED[i]) ok = true;\n  }\n  visits++;\n  Serial.print(\"#\");\n  Serial.print(visits);\n  Serial.print(\" card \");\n  Serial.print(id);\n  Serial.print(\": \");\n  if (ok) {\n    Serial.println(\"Welcome!\");\n    digitalWrite(LED_GREEN, HIGH);\n    latch.write(90);    // open\n    delay(3000);\n    latch.write(0);     // close again\n    digitalWrite(LED_GREEN, LOW);\n  } else {\n    Serial.println(\"Access denied\");\n    digitalWrite(LED_RED, HIGH);\n    delay(1000);\n    digitalWrite(LED_RED, LOW);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "card": [
+            222,
+            173,
+            190,
+            239
+          ]
+        },
+        {
+          "at_ms": 4000,
+          "card": [
+            17,
+            34,
+            51,
+            68
+          ]
+        }
+      ],
+      "sim_ms": 5500
+    }
+  ],
+  "pins": {
+    "avr": {
+      "LED_GREEN": "A1",
+      "LED_RED": "A2",
+      "SERVO_PIN": "6"
+    },
+    "esp8266": {
+      "LED_GREEN": "D1",
+      "LED_RED": "D2",
+      "SERVO_PIN": "D4"
+    },
+    "esp32-c3": {
+      "LED_GREEN": "20",
+      "LED_RED": "21",
+      "SERVO_PIN": "3"
+    }
+  },
+  "curriculum": [
+    "78-hardware",
+    "910-networks",
+    "910-algorithms",
+    "910-evaluate"
+  ],
+  "outro": "Your door reads cards with **RFID**, checks them against a **list** of allowed cards, and keeps a log. That's how school, office and transport cards work.",
+  "stretch": [
+    "Add a \"master card\" that adds new cards to the allowed list.",
+    "Show the time each card was used (seconds since start) in the log.",
+    "Make a buzzer give a short beep for yes and a long one for no."
+  ]
 }

@@ -22,5 +22,146 @@
     "HTML"
   ],
   "intro": "Make your own web page that turns an LED on and off from your phone.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Make a hotspot",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.softAP(\"ArduinoPath-Sam\", \"circuit123\");  // name, password (8+ letters)\n  Serial.print(\"Join my WiFi, then open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n}\n",
+      "text": "Your board can make its own WiFi network, just like a phone's hotspot. `WiFi.softAP(name, password)` starts it. The password needs at least 8 letters.\n\n**Your task:** change the name to your own (like `ArduinoPath-Alex`), then Run or Upload. Look for it in your phone's WiFi list.",
+      "hints": [
+        "Change `Sam` to your name, inside the quotes.",
+        "Keep the password 8 letters or longer, or the hotspot won't start.",
+        "The Serial Monitor shows the address to open: 192.168.4.1."
+      ],
+      "checks": [
+        {
+          "type": "uses_function",
+          "label": "It starts a hotspot",
+          "name": "softAP"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It shows the address",
+          "text": "192.168.4.1"
+        },
+        {
+          "type": "confirm",
+          "label": "I can see my hotspot on a phone"
+        }
+      ],
+      "success": "Your board has its own WiFi network!",
+      "demo": "{{pins}}\n#include <WiFi.h>\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.softAP(\"ArduinoPath-Sam\", \"circuit123\");  // name, password (8+ letters)\n  Serial.print(\"Join my WiFi, then open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Hello, web page",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n\nWebServer server(80);  // web pages use port 80\n\nvoid homePage() {\n  server.send(200, \"text/html\", \"<h1>Hello from my board!</h1>\");\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.softAP(\"ArduinoPath-Sam\", \"circuit123\");\n  server.on(\"/\", homePage);  // \"/\" is the home page\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();  // answer anyone asking for a page\n}\n",
+      "text": "A **web server** answers when a browser asks for a page. `server.on(\"/\", homePage)` says: when someone asks for the home page, run `homePage()`. It sends back **HTML**, the language of web pages.\n\nYour board makes its **own WiFi network** (a hotspot). On your phone, open WiFi settings, join the network with your board's name, then open **192.168.4.1** in the browser. In the simulator, use the **phone panel**.\n\n**Your task:** change the message on the page, then Run and open the page.",
+      "hints": [
+        "Change the words between `<h1>` and `</h1>`.",
+        "`server.handleClient()` must run in `loop()`, or the page never loads.",
+        "On a phone, you must join the board's WiFi first."
+      ],
+      "checks": [
+        {
+          "type": "uses_function",
+          "label": "It answers with a page",
+          "name": "send"
+        },
+        {
+          "type": "uses_function",
+          "label": "It listens in the loop",
+          "name": "handleClient"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw my page on a phone (or the phone panel)"
+        }
+      ],
+      "success": "You made a web page, served by your own board.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n\nWebServer server(80);  // web pages use port 80\n\nvoid homePage() {\n  server.send(200, \"text/html\", \"<h1>Hello from my board!</h1>\");\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.softAP(\"ArduinoPath-Sam\", \"circuit123\");\n  server.on(\"/\", homePage);  // \"/\" is the home page\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();  // answer anyone asking for a page\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "http": {
+            "method": "GET",
+            "path": "/",
+            "query": {}
+          }
+        }
+      ],
+      "sim_ms": 800
+    },
+    {
+      "title": "ON and OFF buttons",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n\nWebServer server(80);\n\nconst char PAGE[] = R\"(\n<!DOCTYPE html>\n<html>\n<head><meta name=\"viewport\" content=\"width=device-width\"></head>\n<body style=\"font-family: sans-serif; text-align: center\">\n  <h1>My LED</h1>\n  <p><a href=\"/on\"><button style=\"font-size: 2em\">ON</button></a></p>\n  <p><a href=\"/off\"><button style=\"font-size: 2em\">OFF</button></a></p>\n</body>\n</html>\n)\";\n\nvoid homePage() {\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid turnOn() {\n  digitalWrite(LED_PIN, HIGH);\n  Serial.println(\"LED on\");\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid turnOff() {\n  digitalWrite(LED_PIN, LOW);\n  Serial.println(\"LED off\");\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  Serial.begin(115200);\n  WiFi.softAP(\"ArduinoPath-Sam\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.on(\"/on\", ___);\n  server.on(\"___\", turnOff);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "text": "Now the page has two buttons. Tapping **ON** asks for the page **/on**, which runs `turnOn()`.\n\n**Your task:** fill in the blanks so the buttons work.",
+      "hints": [
+        "Each page address needs a function to run.",
+        "`/on` runs `turnOn`. The other button's address is in the HTML.",
+        "The blanks are `turnOn` and `/off`."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "ON turns the LED on",
+          "pin": "LED_PIN",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "OFF turns it off",
+          "pin": "LED_PIN",
+          "value": "LOW"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It says what happened",
+          "text": "LED off"
+        },
+        {
+          "type": "confirm",
+          "label": "My phone turns the LED on and off"
+        }
+      ],
+      "success": "You're controlling real hardware from your phone!",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n\nWebServer server(80);\n\nconst char PAGE[] = R\"(\n<!DOCTYPE html>\n<html>\n<head><meta name=\"viewport\" content=\"width=device-width\"></head>\n<body style=\"font-family: sans-serif; text-align: center\">\n  <h1>My LED</h1>\n  <p><a href=\"/on\"><button style=\"font-size: 2em\">ON</button></a></p>\n  <p><a href=\"/off\"><button style=\"font-size: 2em\">OFF</button></a></p>\n</body>\n</html>\n)\";\n\nvoid homePage() {\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid turnOn() {\n  digitalWrite(LED_PIN, HIGH);\n  Serial.println(\"LED on\");\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid turnOff() {\n  digitalWrite(LED_PIN, LOW);\n  Serial.println(\"LED off\");\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setup() {\n  pinMode(LED_PIN, OUTPUT);\n  Serial.begin(115200);\n  WiFi.softAP(\"ArduinoPath-Sam\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.on(\"/on\", turnOn);\n  server.on(\"/off\", turnOff);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "http": {
+            "method": "GET",
+            "path": "/on",
+            "query": {}
+          }
+        },
+        {
+          "at_ms": 600,
+          "http": {
+            "method": "GET",
+            "path": "/off",
+            "query": {}
+          }
+        }
+      ],
+      "sim_ms": 1000
+    }
+  ],
+  "curriculum": [
+    "910-networks",
+    "910-programming",
+    "78-user-experience",
+    "910-testing"
+  ],
+  "outro": "Your board is a **web server**: your phone asks for a page, the board sends back **HTML**, and links like **/on** run your code. That's how smart lights and smart plugs work.",
+  "stretch": [
+    "Add a Blink button that makes the LED flash 5 times.",
+    "Show whether the LED is on or off on the page.",
+    "Add a second LED with its own buttons."
+  ]
 }

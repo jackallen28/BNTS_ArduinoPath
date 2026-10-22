@@ -1,10 +1,10 @@
-# CircuitPath
+# ArduinoPath
 
 A step-by-step Arduino and ESP coding tutor for secondary students, made for the
 Banyule Nillumbik Tech School (BNTS).
 
-- **One app on each student laptop: `CircuitPath.exe` (Windows) or `CircuitPath.app` (Mac).**
-  Double-click it and CircuitPath opens in Edge or Chrome. Nothing to install, no admin rights,
+- **One app on each student laptop: `ArduinoPath.exe` (Windows) or `ArduinoPath.app` (Mac).**
+  Double-click it and ArduinoPath opens in Edge or Chrome. Nothing to install, no admin rights,
   no server, no internet needed.
 - **Welcome screen like PiPath:** students pick their name, or make a profile with their first
   name(s) and school. Work saves on the laptop by itself.
@@ -25,8 +25,8 @@ WIPE page, the Vista look, and welcome → setup → project picker. The full br
 
 Download from the latest release (or from a CI run's downloads):
 
-- **Windows:** `CircuitPath.exe`, then double-click it. See [docs/windows-app.md](docs/windows-app.md).
-- **Mac:** `CircuitPath-macOS.zip`, then drag CircuitPath into Applications. See
+- **Windows:** `ArduinoPath.exe`, then double-click it. See [docs/windows-app.md](docs/windows-app.md).
+- **Mac:** `ArduinoPath-macOS.zip`, then drag ArduinoPath into Applications. See
   [docs/mac-app.md](docs/mac-app.md).
 
 The guides say what to expect, where the work is kept, and what to do if Windows or macOS blocks
@@ -37,7 +37,7 @@ it the first time.
 You need Go 1.24+. Node 22 is only needed to run the JavaScript and browser tests.
 
 ```
-go run ./cmd/circuitpath -dev            # then open http://localhost:8080
+go run ./cmd/arduinopath -dev            # then open http://localhost:8080
 go test ./...                            # Go tests
 npm ci && npm test                       # JavaScript tests
 npm run e2e                              # GUI smoke test (Playwright)
@@ -46,14 +46,14 @@ npm run e2e                              # GUI smoke test (Playwright)
 Build the Windows app (from any computer):
 
 ```
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-H windowsgui -s -w -X circuitpath.Version=0.2.0" -o dist/CircuitPath.exe ./cmd/circuitpath
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-H windowsgui -s -w -X arduinopath.Version=0.2.0" -o dist/ArduinoPath.exe ./cmd/arduinopath
 ```
 
 Build the Mac app (from any computer; sign it on a Mac with `codesign --force --deep -s -`):
 
 ```
-for a in amd64 arm64; do CGO_ENABLED=0 GOOS=darwin GOARCH=$a go build -trimpath -ldflags "-s -w" -o dist/circuitpath-$a ./cmd/circuitpath; done
-go run ./tools/macapp -version 0.3.0 -amd64 dist/circuitpath-amd64 -arm64 dist/circuitpath-arm64 -out dist
+for a in amd64 arm64; do CGO_ENABLED=0 GOOS=darwin GOARCH=$a go build -trimpath -ldflags "-s -w" -o dist/arduinopath-$a ./cmd/arduinopath; done
+go run ./tools/macapp -version 0.3.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
 ```
 
 See [docs/development.md](docs/development.md) for how it fits together. To publish a release,

@@ -11,12 +11,12 @@ import (
 )
 
 // On macOS, double-clicking an app that is still running only brings it to
-// the front; it doesn't start it again. So CircuitPath.app starts the server
+// the front; it doesn't start it again. So ArduinoPath.app starts the server
 // as a separate background process, opens the window, and quits straight
 // away. Double-clicking it again then finds the running server and just
 // opens another window, as on Windows.
 
-const serverEnv = "CIRCUITPATH_SERVER"
+const serverEnv = "ARDUINOPATH_SERVER"
 
 // startsInBackground reports whether this launch should hand the server to a
 // background process (always on a Mac, except with -dev or in that process).
@@ -51,7 +51,7 @@ func launchInBackground(cfg config, log *slog.Logger) error {
 		case <-stopped:
 			return errStartFailed
 		case <-deadline:
-			return errors.New("CircuitPath took too long to start")
+			return errors.New("ArduinoPath took too long to start")
 		case <-time.After(200 * time.Millisecond):
 		}
 	}

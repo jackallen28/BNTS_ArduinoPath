@@ -5,7 +5,7 @@
   "tier": "wifi-iot",
   "order": 21,
   "boards": [
-    "esp"
+    "esp32"
   ],
   "board_count": 2,
   "parts": [
@@ -36,5 +36,140 @@
     "events"
   ],
   "intro": "Send messages between two boards with no router. Press a button and your friend's board buzzes.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Your board's address",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  delay(100);\n  Serial.print(\"My MAC address is \");\n  Serial.println(WiFi.macAddress());\n}\n\nvoid loop() {\n}\n",
+      "text": "Every WiFi chip has its own **MAC address**: six numbers, like a name tag, written in hexadecimal (`3C:71:BF:4A:12:F0`).\n\n**Your task:** Upload to both boards and write down each board's MAC address.",
+      "hints": [
+        "Open the Serial Monitor after uploading.",
+        "If nothing shows, press the board's EN (reset) button.",
+        "Each board's address is different."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It shows the MAC address",
+          "pattern": "([0-9A-F]{2}:){5}[0-9A-F]{2}"
+        },
+        {
+          "type": "confirm",
+          "label": "I wrote down both addresses"
+        }
+      ],
+      "success": "Every board has its own address. ESP-NOW uses it to send messages.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  delay(100);\n  Serial.print(\"My MAC address is \");\n  Serial.println(WiFi.macAddress());\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Send a message",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n#include <esp_now.h>\n\nuint8_t EVERYONE[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };  // broadcast\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  WiFi.mode(WIFI_STA);\n  if (esp_now_init() != ESP_OK) {\n    Serial.println(\"ESP-NOW didn't start\");\n    return;\n  }\n  esp_now_peer_info_t peer = {};\n  memcpy(peer.peer_addr, EVERYONE, 6);\n  esp_now_add_peer(&peer);\n  Serial.println(\"Ready!\");\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    const char message[] = \"buzz\";\n    esp_now_send(___, (const uint8_t*)message, sizeof(message));\n    Serial.println(\"Sent!\");\n    delay(300);  // one message per press\n  }\n}\n",
+      "text": "ESP-NOW sends short messages straight to other boards, with no router. Sending to `FF:FF:FF:FF:FF:FF` **broadcasts**: every board nearby hears it.\n\n**Your task:** fill in the blank to send the message when the button is pressed. Upload to both boards.",
+      "hints": [
+        "Who should get the message? Everyone.",
+        "The broadcast address is in `EVERYONE`.",
+        "The blank is `EVERYONE`."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It sends when you press",
+          "text": "Sent!"
+        },
+        {
+          "type": "uses_function",
+          "label": "It sends with ESP-NOW",
+          "name": "esp_now_send"
+        },
+        {
+          "type": "confirm",
+          "label": "Sent! appears when I press"
+        }
+      ],
+      "success": "Your board is sending. Next, make the other board listen.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <esp_now.h>\n\nuint8_t EVERYONE[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };  // broadcast\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  WiFi.mode(WIFI_STA);\n  if (esp_now_init() != ESP_OK) {\n    Serial.println(\"ESP-NOW didn't start\");\n    return;\n  }\n  esp_now_peer_info_t peer = {};\n  memcpy(peer.peer_addr, EVERYONE, 6);\n  esp_now_add_peer(&peer);\n  Serial.println(\"Ready!\");\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    const char message[] = \"buzz\";\n    esp_now_send(EVERYONE, (const uint8_t*)message, sizeof(message));\n    Serial.println(\"Sent!\");\n    delay(300);  // one message per press\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 450,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 800
+    },
+    {
+      "title": "Buzz your friend",
+      "support": "brief",
+      "text": "**Goal:** both boards run the same code. Pressing your button makes your friend's board light its LED and beep (and theirs does the same to yours).",
+      "hints": [
+        "`esp_now_register_recv_cb(received);` tells ESP-NOW which function to run when a message arrives.",
+        "Don't beep inside the receive function: set a `volatile bool` and beep in `loop()`.",
+        "The receive function needs exactly these inputs: `(const esp_now_recv_info_t* info, const uint8_t* data, int length)`."
+      ],
+      "checks": [
+        {
+          "type": "uses_function",
+          "label": "It listens for messages",
+          "name": "esp_now_register_recv_cb"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It sends",
+          "text": "Sent!"
+        },
+        {
+          "type": "confirm",
+          "label": "My friend's board buzzes when I press"
+        }
+      ],
+      "success": "You built a wireless messenger with no router at all!",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <esp_now.h>\n\nuint8_t EVERYONE[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };\nvolatile bool gotMessage = false;\n\n// ESP-NOW runs this when a message arrives. Keep it short:\n// just remember it, and do the beeping in loop().\nvoid received(const esp_now_recv_info_t* info, const uint8_t* data, int length) {\n  gotMessage = true;\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  WiFi.mode(WIFI_STA);\n  if (esp_now_init() != ESP_OK) {\n    Serial.println(\"ESP-NOW didn't start\");\n    return;\n  }\n  esp_now_peer_info_t peer = {};\n  memcpy(peer.peer_addr, EVERYONE, 6);\n  esp_now_add_peer(&peer);\n  esp_now_register_recv_cb(received);\n  Serial.println(\"Ready!\");\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    const char message[] = \"buzz\";\n    esp_now_send(EVERYONE, (const uint8_t*)message, sizeof(message));\n    Serial.println(\"Sent!\");\n    delay(300);\n  }\n  if (gotMessage) {\n    gotMessage = false;\n    Serial.println(\"Message!\");\n    digitalWrite(LED_PIN, HIGH);\n    tone(BUZZER_PIN, 880, 200);\n    delay(200);\n    digitalWrite(LED_PIN, LOW);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 450,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 800
+    }
+  ],
+  "curriculum": [
+    "910-networks",
+    "910-data",
+    "910-programming",
+    "910-testing"
+  ],
+  "outro": "Your boards talk directly to each other with **ESP-NOW**: no router, no internet. Every board has a **MAC address**, a name for its WiFi chip, and messages are **broadcast** to every board nearby.",
+  "stretch": [
+    "Send how many times you've pressed, and show it on your friend's Serial Monitor.",
+    "Send Morse code: short and long presses make short and long beeps.",
+    "Give each board a name, and show who sent each message."
+  ]
 }

@@ -25,5 +25,168 @@
     "sequences"
   ],
   "intro": "Make an LED blink, then add two more and run them like real traffic lights.",
-  "steps": []
+  "steps": [
+    {
+      "title": "Blink the red LED",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  // Get the red LED's pin ready to send power out.\n  pinMode(LED_RED, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_RED, HIGH);  // on\n  delay(1000);                  // wait 1 second\n  digitalWrite(LED_RED, ___);   // off\n  delay(1000);                  // wait 1 second\n}\n",
+      "text": "Let's make the red LED blink: on for one second, off for one second, again and again.\n\n- `pinMode(LED_RED, OUTPUT);` tells the board the red LED's pin will send power **out**.\n- `digitalWrite(LED_RED, HIGH);` turns the LED **on**. `LOW` turns it **off**.\n- `delay(1000);` waits 1000 milliseconds (1 second).\n\nThe `#define` lines at the top give each pin a name, so `LED_RED` means the pin your red LED is plugged into.\n\n**Your task:** fill in the blank (`___`) so the LED turns off, then press **Run**.",
+      "hints": [
+        "The blank needs the opposite of `HIGH`.",
+        "The opposite of `HIGH` is `LOW`.",
+        "Change the line to `digitalWrite(LED_RED, LOW);`"
+      ],
+      "checks": [
+        {
+          "type": "compiles",
+          "label": "Your code has no clues (errors)"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The red LED turns on",
+          "pin": "LED_RED",
+          "value": "HIGH",
+          "times": 2
+        },
+        {
+          "type": "pin_seen",
+          "label": "The red LED turns off",
+          "pin": "LED_RED",
+          "value": "LOW",
+          "times": 2
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the red LED blink"
+        }
+      ],
+      "success": "Your first blink! Every light, screen and robot starts with code like this.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_RED, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_RED, HIGH);\n  delay(1000);\n  digitalWrite(LED_RED, LOW);\n  delay(1000);\n}\n",
+      "sim_ms": 4500
+    },
+    {
+      "title": "Faster!",
+      "support": "guided",
+      "text": "The number in `delay()` is how long to wait, in milliseconds. 1000 milliseconds is one second.\n\n**Your task:** make the LED blink much faster: change **both** delays to `200`.",
+      "hints": [
+        "There are two `delay(1000);` lines.",
+        "A smaller number means a shorter wait.",
+        "Change both lines to `delay(200);`"
+      ],
+      "checks": [
+        {
+          "type": "code_regex",
+          "label": "Both delays are shorter than half a second",
+          "pattern": "delay\\(\\s*([1-9]\\d?|[1-4]\\d\\d)\\s*\\)[\\s\\S]*delay\\(\\s*([1-9]\\d?|[1-4]\\d\\d)\\s*\\)"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The red LED blinks quickly",
+          "pin": "LED_RED",
+          "value": "HIGH",
+          "times": 6
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the red LED blink faster"
+        }
+      ],
+      "success": "Speedy! Try other numbers too. How fast can it blink before it just looks dim?",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_RED, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_RED, HIGH);\n  delay(200);\n  digitalWrite(LED_RED, LOW);\n  delay(200);\n}\n",
+      "sim_ms": 3000
+    },
+    {
+      "title": "Three lights",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(LED_RED, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(___, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_RED, HIGH);\n  delay(500);\n  digitalWrite(LED_RED, LOW);\n\n  digitalWrite(LED_YELLOW, HIGH);\n  delay(500);\n  digitalWrite(LED_YELLOW, LOW);\n\n  // Now the green LED: on, wait, off.\n\n}\n",
+      "text": "Now let's use all three LEDs. Each one needs its own `pinMode` in `setup()`, then `loop()` can turn them on and off in turn.\n\n**Your task:** finish the code so the red, yellow and green LEDs light up one after another (each for half a second).",
+      "hints": [
+        "The green LED needs `pinMode` too: what's its name in the `#define` lines?",
+        "Copy the three yellow lines and change `LED_YELLOW` to `LED_GREEN`.",
+        "Add these lines in loop():\n```\ndigitalWrite(LED_GREEN, HIGH);\ndelay(500);\ndigitalWrite(LED_GREEN, LOW);\n```"
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The red LED lights up",
+          "pin": "LED_RED",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The yellow LED lights up",
+          "pin": "LED_YELLOW",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The green LED lights up",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw all three LEDs light up in turn"
+        }
+      ],
+      "success": "Three LEDs in a row! That's called a sequence: steps that happen one after another, in order.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_RED, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(LED_GREEN, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_RED, HIGH);\n  delay(500);\n  digitalWrite(LED_RED, LOW);\n\n  digitalWrite(LED_YELLOW, HIGH);\n  delay(500);\n  digitalWrite(LED_YELLOW, LOW);\n\n  digitalWrite(LED_GREEN, HIGH);\n  delay(500);\n  digitalWrite(LED_GREEN, LOW);\n}\n",
+      "sim_ms": 3500
+    },
+    {
+      "title": "Traffic lights",
+      "support": "brief",
+      "text": "**Goal:** real traffic lights. Green for 3 seconds, yellow for 1 second, then red for 3 seconds, over and over. Only one light is on at a time.",
+      "hints": [
+        "Start with green, because cars go first. Then yellow, then red.",
+        "Each light is three lines: on, wait, off. Only the `delay` numbers change.",
+        "Green: `delay(3000)`, yellow: `delay(1000)`, red: `delay(3000)`."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "Green lights up",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Yellow lights up",
+          "pin": "LED_YELLOW",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Red lights up",
+          "pin": "LED_RED",
+          "value": "HIGH"
+        },
+        {
+          "type": "code_regex",
+          "label": "Green and red stay on for 3 seconds",
+          "pattern": "delay\\(\\s*3000\\s*\\)[\\s\\S]*delay\\(\\s*3000\\s*\\)"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw green, yellow, red, again and again"
+        }
+      ],
+      "success": "Traffic lights, done! Real traffic lights use the same idea, with sensors to know when cars are waiting.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_RED, OUTPUT);\n  pinMode(LED_YELLOW, OUTPUT);\n  pinMode(LED_GREEN, OUTPUT);\n}\n\nvoid loop() {\n  // Green: go\n  digitalWrite(LED_GREEN, HIGH);\n  delay(3000);\n  digitalWrite(LED_GREEN, LOW);\n\n  // Yellow: get ready to stop\n  digitalWrite(LED_YELLOW, HIGH);\n  delay(1000);\n  digitalWrite(LED_YELLOW, LOW);\n\n  // Red: stop\n  digitalWrite(LED_RED, HIGH);\n  delay(3000);\n  digitalWrite(LED_RED, LOW);\n}\n",
+      "sim_ms": 8000
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-algorithms",
+    "78-programming"
+  ],
+  "outro": "You made real traffic lights! You used **pinMode**, **digitalWrite** and **delay** to control the timing of lights, just like the lights at an intersection.",
+  "stretch": [
+    "Night mode: make the yellow light flash on and off, the way some traffic lights do late at night.",
+    "Before the light turns red, make the yellow LED flash 3 times. (Try a for loop.)",
+    "Print the light's colour to the Serial Monitor each time it changes, like \"GREEN\", \"YELLOW\", \"RED\"."
+  ]
 }

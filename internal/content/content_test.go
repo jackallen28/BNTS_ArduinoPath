@@ -53,6 +53,16 @@ func schemaFiles(t *testing.T) fstest.MapFS {
 		t.Fatal(err)
 	}
 	m["boards/uno.json"] = &fstest.MapFile{Data: uno}
+	errs, err := os.ReadFile("../../content/errors.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m["errors.json"] = &fstest.MapFile{Data: errs}
+	cur, err := os.ReadFile("../../content/curriculum.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m["curriculum.json"] = &fstest.MapFile{Data: cur}
 	return m
 }
 
@@ -91,5 +101,40 @@ func TestBrokenFilesAreReportedNotFatal(t *testing.T) {
 	}
 	if len(problems) != len(cases) {
 		t.Errorf("problems = %v", problems)
+	}
+}
+
+func TestErrorsDatabase(t *testing.T) {
+	c, problems := Load(os.DirFS("../../content"))
+	if len(problems) > 0 {
+		t.Fatal(problems)
+	}
+	if len(c.Errors) < 20 {
+		t.Fatalf("only %d errors", len(c.Errors))
+	}
+	last := map[string]string{}
+	for _, e := range c.Errors {
+		last[e.Kind] = e.ID
+		if e.Example == "" && e.ExampleOutput == "" {
+			t.Errorf("%s has no example", e.ID)
+		}
+		if e.ExampleOutput != "" {
+			got, _ := MatchError(c.Errors, e.Kind, e.ExampleOutput)
+			if got == nil || got.ID != e.ID {
+				t.Errorf("%s's example output maps to %v", e.ID, got)
+			}
+		}
+	}
+	// Each kind ends with a catch-all that matches anything.
+	for kind, id := range last {
+		got, _ := MatchError(c.Errors, kind, "zzz an unknown message zzz")
+		if got == nil || got.ID != id {
+			t.Errorf("an unknown %s message maps to %v, want the catch-all %s", kind, got, id)
+		}
+	}
+	// Groups fill in the text.
+	e, groups := MatchError(c.Errors, "compile", "'digitalwrite' was not declared in this scope\nsuggested alternative: 'digitalWrite'")
+	if e == nil || e.ID != "misspelt-function" || len(groups) != 2 || groups[1] != "digitalWrite" {
+		t.Fatalf("misspelt = %v %v", e, groups)
 	}
 }

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "curriculum.schema.json",
+  "title": "ArduinoPath curriculum topics",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "topics"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "note": { "type": "string" },
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "levels", "strand", "text"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "levels": { "type": "string", "minLength": 1, "maxLength": 10 },
+          "strand": { "type": "string", "minLength": 1, "maxLength": 60 },
+          "text": { "$ref": "common.schema.json#/$defs/text" },
+          "code": { "description": "The official content description code, if you'd like it shown.", "type": "string", "maxLength": 20 }
+        }
+      }
+    }
+  }
+}

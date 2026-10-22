@@ -1,5 +1,5 @@
 // Settings: how much help, which board, nudges; Save my work / Open my
-// work; About. Students can open it from every screen.
+// work; Curriculum; About. Students can open it from every screen.
 
 import { api, request } from "../api.js";
 import { h, icon, joinNames, download } from "../dom.js";
@@ -43,14 +43,18 @@ export function boardOptions() {
   }));
 }
 
-/** Opens Settings on a tab ("me", "work" or "about"). Resolves when closed. */
-export function openSettings({ tab = "me", onSaved = () => {} } = {}) {
+/**
+ * Opens Settings on a tab ("me", "work", "curriculum" or "about"). Opened
+ * from a project, Curriculum starts on that project. Resolves when closed.
+ */
+export function openSettings({ tab = "me", onSaved = () => {}, projectId = null } = {}) {
   const settings = { ...state.me.settings };
   let dlg;
 
   const tabs = [
     { id: "me", label: "Help and board", render: renderMe },
     { id: "work", label: "My work", render: renderWork },
+    { id: "curriculum", label: "Curriculum", render: () => curriculumContent(projectId) },
     { id: "about", label: "About", render: () => aboutContent() },
   ];
   const panel = h("div", { class: "tab-panel", role: "tabpanel" });
@@ -103,7 +107,7 @@ export function openSettings({ tab = "me", onSaved = () => {} } = {}) {
     return h("div", {},
       h("fieldset", { class: "groupbox" },
         h("legend", { text: "Save my work" }),
-        h("p", { text: "Download all your projects as a .circuit file, to keep or take home. You can open it again on any CircuitPath." }),
+        h("p", { text: "Download all your projects as a .circuit file, to keep or take home. You can open it again on any ArduinoPath." }),
         h("button", { class: "pill", type: "button", onclick: saveMyWork }, icon("save"), "Save my work")),
       h("fieldset", { class: "groupbox" },
         h("legend", { text: "Open my work" }),
@@ -137,14 +141,14 @@ export function openSettings({ tab = "me", onSaved = () => {} } = {}) {
   return dlg.result;
 }
 
-/** Save my work: downloads <Name>_CircuitPath_<date>.circuit. */
+/** Save my work: downloads <Name>_ArduinoPath_<date>.circuit. */
 export async function saveMyWork() {
   try {
     const res = await request("GET", api.exportUrl, undefined, { raw: true });
     const cd = res.headers.get("Content-Disposition") || "";
     const utf = /filename\*=UTF-8''([^;]+)/.exec(cd);
     const ascii = /filename="([^"]+)"/.exec(cd);
-    const name = utf ? decodeURIComponent(utf[1]) : ascii ? ascii[1] : "My_CircuitPath.circuit";
+    const name = utf ? decodeURIComponent(utf[1]) : ascii ? ascii[1] : "My_ArduinoPath.circuit";
     download(await res.blob(), name);
   } catch (err) {
     if (err.code !== "logged_out") messageBox({ kind: "error", instruction: "Your work couldn't be saved to a file.", text: err.message });
@@ -199,10 +203,49 @@ async function openMyWork(input) {
     if (done.added) parts.push(`${done.added} project${done.added === 1 ? "" : "s"} added`);
     if (done.replaced) parts.push(`${done.replaced} replaced`);
     messageBox({ instruction: "Your work is open.", text: parts.length ? `${parts.join(", ")}.` : "Nothing needed changing." });
-    window.dispatchEvent(new CustomEvent("circuitpath:work-changed"));
+    window.dispatchEvent(new CustomEvent("arduinopath:work-changed"));
   } catch (err) {
     messageBox({ kind: "error", instruction: "That file can't be opened.", text: err.message });
   }
+}
+
+/**
+ * Settings > Curriculum: each project and the Victorian Curriculum Digital
+ * Technologies (Levels 7–10) topics it links to. Starts on projectId.
+ */
+function curriculumContent(projectId) {
+  const cur = state.catalogue.curriculum ?? { topics: [] };
+  const topic = (id) => cur.topics.find((t) => t.id === id);
+  const projects = state.catalogue.projects.filter((p) => p.curriculum?.length);
+  const list = h("div", { class: "curriculum-list" });
+  const detail = h("div", { class: "curriculum-detail", "aria-live": "polite" });
+  function show(p) {
+    list.querySelectorAll(".curriculum-item").forEach((b) => b.setAttribute("aria-current", String(b.dataset.id === p.id)));
+    const byStrand = new Map();
+    for (const id of p.curriculum) {
+      const t = topic(id);
+      if (!t) continue;
+      const key = `Levels ${t.levels}: ${t.strand}`;
+      if (!byStrand.has(key)) byStrand.set(key, []);
+      byStrand.get(key).push(t);
+    }
+    detail.replaceChildren(
+      h("h3", { text: p.title }),
+      h("p", { class: "muted", text: p.intro }),
+      [...byStrand].map(([strand, topics]) => h("div", { class: "curriculum-strand" },
+        h("h4", { text: strand }),
+        h("ul", {}, topics.map((t) => h("li", {}, t.code ? h("span", { class: "chip", text: t.code }) : null, " ", t.text))))));
+  }
+  for (const p of projects) {
+    list.append(h("button", { class: "curriculum-item", type: "button", dataset: { id: p.id }, onclick: () => show(p) }, p.title));
+  }
+  if (projects.length === 0) {
+    return h("div", {}, h("p", { text: "Curriculum links appear here as projects are added." }));
+  }
+  show(projects.find((p) => p.id === projectId) ?? projects[0]);
+  return h("div", {},
+    h("p", { class: "small muted", text: cur.name }),
+    h("div", { class: "curriculum" }, list, detail));
 }
 
 function projectTitle(id) {
