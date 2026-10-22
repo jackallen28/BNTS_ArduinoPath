@@ -28,6 +28,80 @@
     "displays"
   ],
   "intro": "Press a button to roll the dice and show the number on a 4-digit display.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "disp",
+        "type": "tm1637",
+        "label": "4-digit display",
+        "offboard": {
+          "x": 360,
+          "y": 40
+        },
+        "step": 1
+      },
+      {
+        "id": "b1",
+        "type": "button",
+        "label": "button",
+        "at": "F8",
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:disp:clk",
+        "to": "pin:TM1637_CLK",
+        "step": 1
+      },
+      {
+        "from": "part:disp:dio",
+        "to": "pin:TM1637_DIO",
+        "step": 1
+      },
+      {
+        "from": "part:disp:vcc",
+        "to": "BP21",
+        "step": 1
+      },
+      {
+        "from": "part:disp:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_PIN",
+        "to": "J8",
+        "step": 2
+      },
+      {
+        "from": "A10",
+        "to": "BN9",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The 4-digit display",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the display's four pins with wires: CLK to {{pin:TM1637_CLK}}, DIO to {{pin:TM1637_DIO}}, VCC to the red (+) rail and GND to the blue (−) rail."
+    },
+    {
+      "title": "The button",
+      "text": "Press the button into the middle of the breadboard so it sits across the gap: its legs go in F8, F10, E8 and E10. Add a wire from {{pin:BUTTON_PIN}} to J8, and a black wire from A10 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    }
+  ],
   "steps": [
     {
       "title": "Test the display",

@@ -35,6 +35,207 @@
     "else if"
   ],
   "intro": "Measure distance with sound waves, then beep faster and light up as something gets closer.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "sonar",
+        "type": "hc-sr04",
+        "label": "distance sensor",
+        "at": "J20",
+        "step": 1
+      },
+      {
+        "id": "div1",
+        "type": "resistor-10k",
+        "label": "10kΩ",
+        "at": "E22",
+        "rotate": 270,
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "id": "div2",
+        "type": "resistor-10k",
+        "label": "10kΩ",
+        "at": "D22",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green LED",
+        "at": "H2",
+        "step": 2
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E2",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "yellow",
+        "type": "led",
+        "color": "yellow",
+        "label": "yellow LED",
+        "at": "H6",
+        "step": 3
+      },
+      {
+        "id": "r-yellow",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E6",
+        "rotate": 270,
+        "step": 3
+      },
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H10",
+        "step": 4
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E10",
+        "rotate": 270,
+        "step": 4
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 5
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "F20",
+        "to": "BP17",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "F20",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "pin:TRIG_PIN",
+        "to": "G21",
+        "step": 1
+      },
+      {
+        "from": "pin:ECHO_PIN",
+        "to": "H22",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "F23",
+        "to": "BN20",
+        "step": 1
+      },
+      {
+        "from": "pin:ECHO_PIN",
+        "to": "C22",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "A26",
+        "to": "BN22",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J3",
+        "step": 2
+      },
+      {
+        "from": "A2",
+        "to": "BN2",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_YELLOW",
+        "to": "J7",
+        "step": 3
+      },
+      {
+        "from": "A6",
+        "to": "BN5",
+        "step": 3
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J11",
+        "step": 4
+      },
+      {
+        "from": "A10",
+        "to": "BN9",
+        "step": 4
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 5
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 5
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The distance sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the distance sensor's four pins into J20 to J23, facing out from the breadboard. Wire {{pin:TRIG_PIN}} to G21 (Trig) and a black wire from F23 (Gnd) to the blue (−) rail. The sensor needs 5V: on a 5V board a red wire goes from F20 to the red (+) rail, and Echo goes straight to {{pin:ECHO_PIN}} from H22. ⚠ On an ESP board, the red wire goes from F20 to {{5V}}, and Echo's 5V would hurt the pin, so it goes through two 10kΩ resistors that halve it: one from G22 across the gap to E22, one from D22 to D26, a black wire from A26 to the blue (−) rail, and a wire from C22 to {{pin:ECHO_PIN}}."
+    },
+    {
+      "title": "The green LED",
+      "text": "Push the green LED into holes H2 and H3, with the long leg (+) in H3. Put a 220Ω resistor from G2 across the gap to E2. Add a wire from {{pin:LED_GREEN}} to J3, and a black wire from A2 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The yellow LED",
+      "text": "Push the yellow LED into holes H6 and H7, with the long leg (+) in H7. Put a 220Ω resistor from G6 across the gap to E6. Add a wire from {{pin:LED_YELLOW}} to J7, and a black wire from A6 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The red LED",
+      "text": "Push the red LED into holes H10 and H11, with the long leg (+) in H11. Put a 220Ω resistor from G10 across the gap to E10. Add a wire from {{pin:LED_RED}} to J11, and a black wire from A10 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
   "steps": [
     {
       "title": "Measure the distance",

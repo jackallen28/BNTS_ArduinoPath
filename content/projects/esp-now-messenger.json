@@ -36,6 +36,100 @@
     "events"
   ],
   "intro": "Send messages between two boards with no router. Press a button and your friend's board buzzes.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "b1",
+        "type": "button",
+        "label": "button",
+        "at": "F4",
+        "step": 1
+      },
+      {
+        "id": "led",
+        "type": "led",
+        "color": "green",
+        "label": "LED",
+        "at": "H12",
+        "step": 2
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E12",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_PIN",
+        "to": "J4",
+        "step": 1
+      },
+      {
+        "from": "A6",
+        "to": "BN5",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J13",
+        "step": 2
+      },
+      {
+        "from": "A12",
+        "to": "BN10",
+        "step": 2
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 3
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The button",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. You and a friend each build this circuit on your own ESP32. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Press the button into the middle of the breadboard so it sits across the gap: its legs go in F4, F6, E4 and E6. Add a wire from {{pin:BUTTON_PIN}} to J4, and a black wire from A6 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The LED",
+      "text": "Push the LED into holes H12 and H13, with the long leg (+) in H13. Put a 220Ω resistor from G12 across the gap to E12. Add a wire from {{pin:LED_PIN}} to J13, and a black wire from A12 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
   "steps": [
     {
       "title": "Your board's address",

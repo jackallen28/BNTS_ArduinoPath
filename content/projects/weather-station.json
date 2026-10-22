@@ -22,6 +22,85 @@
     "displays"
   ],
   "intro": "Read the temperature and humidity and show them on a little OLED screen.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "dht",
+        "type": "dht",
+        "label": "DHT sensor",
+        "at": "J8",
+        "step": 1
+      },
+      {
+        "id": "oled",
+        "type": "oled",
+        "label": "OLED screen",
+        "offboard": {
+          "x": 350,
+          "y": 60
+        },
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:DHT_PIN",
+        "to": "G8",
+        "step": 1
+      },
+      {
+        "from": "F9",
+        "to": "BP8",
+        "step": 1
+      },
+      {
+        "from": "F10",
+        "to": "BN9",
+        "step": 1
+      },
+      {
+        "from": "part:oled:gnd",
+        "to": "BN21",
+        "step": 2
+      },
+      {
+        "from": "part:oled:vcc",
+        "to": "BP21",
+        "step": 2
+      },
+      {
+        "from": "part:oled:scl",
+        "to": "pin:SCL",
+        "step": 2
+      },
+      {
+        "from": "part:oled:sda",
+        "to": "pin:SDA",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The temperature sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the DHT sensor's three pins into J8, J9 and J10: S (data) in J8, + in J9, − in J10. Add a wire from {{pin:DHT_PIN}} to G8, a red wire from F9 to the red (+) rail, and a black wire from F10 to the blue (−) rail."
+    },
+    {
+      "title": "The OLED screen",
+      "text": "Connect the OLED screen's four pins with wires: GND to the blue (−) rail, VCC to the red (+) rail, SCL to {{pin:SCL}} and SDA to {{pin:SDA}}. SCL and SDA are the board's I2C pins: lots of screens and sensors can share them."
+    }
+  ],
   "steps": [
     {
       "title": "Read the temperature",

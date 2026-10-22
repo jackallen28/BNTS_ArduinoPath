@@ -30,6 +30,166 @@
     "comparing IDs"
   ],
   "intro": "Tap the right card to open the door. The wrong card gets a red light.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "rfid",
+        "type": "rfid-rc522",
+        "label": "RFID reader",
+        "offboard": {
+          "x": 350,
+          "y": -60
+        },
+        "step": 1
+      },
+      {
+        "id": "servo",
+        "type": "servo",
+        "label": "servo lock",
+        "offboard": {
+          "x": 110,
+          "y": -115
+        },
+        "step": 2
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green LED",
+        "at": "H4",
+        "step": 3
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E4",
+        "rotate": 270,
+        "step": 3
+      },
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H10",
+        "step": 3
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E10",
+        "rotate": 270,
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:vcc",
+        "to": "board:3V3",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:sda",
+        "to": "pin:RFID_SS",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:rst",
+        "to": "pin:RFID_RST",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:sck",
+        "to": "pin:SCK",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:mosi",
+        "to": "pin:MOSI",
+        "step": 1
+      },
+      {
+        "from": "part:rfid:miso",
+        "to": "pin:MISO",
+        "step": 1
+      },
+      {
+        "from": "part:servo:signal",
+        "to": "pin:SERVO_PIN",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "BP17",
+        "when": "5v",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 2
+      },
+      {
+        "from": "part:servo:gnd",
+        "to": "BN18",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J5",
+        "step": 3
+      },
+      {
+        "from": "A4",
+        "to": "BN4",
+        "step": 3
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J11",
+        "step": 3
+      },
+      {
+        "from": "A10",
+        "to": "BN9",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The RFID reader",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the RFID reader with seven wires (IRQ stays empty). ⚠ Its 3.3V pin must go to {{3V3}} on your board, never to 5V. GND goes to the blue (−) rail, SDA to {{pin:RFID_SS}}, RST to {{pin:RFID_RST}}, and the three SPI pins go to the board's SPI pins: SCK to {{pin:SCK}}, MOSI to {{pin:MOSI}} and MISO to {{pin:MISO}}."
+    },
+    {
+      "title": "The servo lock",
+      "text": "Plug three wires into the servo's plug: brown (or black) to the blue (−) rail, orange (or yellow) to {{pin:SERVO_PIN}}, and red to power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    },
+    {
+      "title": "The green and red LEDs",
+      "text": "Push the green LED into holes H4 and H5, with the long leg (+) in H5. Put a 220Ω resistor from G4 across the gap to E4. Add a wire from {{pin:LED_GREEN}} to J5, and a black wire from A4 to the blue (−) rail at the bottom. Push the red LED into holes H10 and H11, with the long leg (+) in H11. Put a 220Ω resistor from G10 across the gap to E10. Add a wire from {{pin:LED_RED}} to J11, and a black wire from A10 to the blue (−) rail at the bottom."
+    }
+  ],
   "steps": [
     {
       "title": "Read a card",

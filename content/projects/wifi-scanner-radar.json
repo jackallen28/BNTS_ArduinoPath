@@ -19,6 +19,59 @@
     "sorting"
   ],
   "intro": "Find the WiFi networks around you and show how strong each one is.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "oled",
+        "type": "oled",
+        "label": "OLED screen",
+        "offboard": {
+          "x": 350,
+          "y": 60
+        },
+        "step": 1
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:oled:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "part:oled:vcc",
+        "to": "BP21",
+        "step": 1
+      },
+      {
+        "from": "part:oled:scl",
+        "to": "pin:SCL",
+        "step": 1
+      },
+      {
+        "from": "part:oled:sda",
+        "to": "pin:SDA",
+        "step": 1
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The OLED screen",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the OLED screen's four pins with wires: GND to the blue (−) rail, VCC to the red (+) rail, SCL to {{pin:SCL}} and SDA to {{pin:SDA}}. SCL and SDA are the board's I2C pins: lots of screens and sensors can share them."
+    }
+  ],
   "steps": [
     {
       "title": "Scan the airwaves",

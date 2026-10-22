@@ -1,0 +1,107 @@
+{
+  "type": "oled",
+  "title": "OLED screen 0.96\" (SSD1306, I2C)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
+  "behaviour": "oled",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "gnd",
+      "name": "GND"
+    },
+    {
+      "id": "vcc",
+      "name": "VCC (3.3V or 5V)"
+    },
+    {
+      "id": "scl",
+      "name": "SCL (I2C clock)"
+    },
+    {
+      "id": "sda",
+      "name": "SDA (I2C data)"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      3,
+      0
+    ]
+  ],
+  "options": {
+    "address": 60,
+    "height": 64,
+    "width": 128
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 108,
+    "height": 117,
+    "connectors": {
+      "gnd": {
+        "x": 39,
+        "y": 0
+      },
+      "scl": {
+        "x": 59,
+        "y": 0
+      },
+      "sda": {
+        "x": 69,
+        "y": 0
+      },
+      "vcc": {
+        "x": 49,
+        "y": 0
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 100,
+    "height": 50,
+    "connectors": {
+      "gnd": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      },
+      "scl": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      },
+      "sda": {
+        "x": 1,
+        "y": 40,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      }
+    }
+  },
+  "sim": {
+    "screen": {
+      "x": 11,
+      "y": 44.5,
+      "w": 86,
+      "h": 42
+    }
+  }
+}

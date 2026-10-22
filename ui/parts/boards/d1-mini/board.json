@@ -1,0 +1,174 @@
+{
+  "id": "d1-mini",
+  "title": "WeMos D1 Mini",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/WeMos-D1-mini-male-headers-above_fixed.fzp",
+    "title": "WeMos D1 Mini",
+    "breadboard": "svg/core/breadboard/WeMos-D1-mini-male-headers-above_breadboard.svg",
+    "schematic": "svg/core/schematic/WeMos-D1-mini_schematic.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "unit": "0.01in",
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 100.79,
+    "height": 134.65,
+    "pins": {
+      "A0": {
+        "x": 5.39,
+        "y": 38.61,
+        "exit": "left"
+      },
+      "D0": {
+        "x": 5.39,
+        "y": 48.61,
+        "exit": "left"
+      },
+      "D1": {
+        "x": 95.39,
+        "y": 48.61,
+        "exit": "right"
+      },
+      "D2": {
+        "x": 95.39,
+        "y": 58.61,
+        "exit": "right"
+      },
+      "D3": {
+        "x": 95.39,
+        "y": 68.61,
+        "exit": "right"
+      },
+      "D4": {
+        "x": 95.39,
+        "y": 78.61,
+        "exit": "right"
+      },
+      "D5": {
+        "x": 5.39,
+        "y": 58.61,
+        "exit": "left"
+      },
+      "D6": {
+        "x": 5.39,
+        "y": 68.61,
+        "exit": "left"
+      },
+      "D7": {
+        "x": 5.39,
+        "y": 78.61,
+        "exit": "left"
+      },
+      "D8": {
+        "x": 5.39,
+        "y": 88.61,
+        "exit": "left"
+      }
+    },
+    "power": {
+      "3V3": [
+        {
+          "x": 5.39,
+          "y": 98.61,
+          "exit": "left"
+        }
+      ],
+      "5V": [
+        {
+          "x": 95.39,
+          "y": 98.61,
+          "exit": "right"
+        }
+      ],
+      "GND": [
+        {
+          "x": 95.39,
+          "y": 88.61,
+          "exit": "right"
+        }
+      ]
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 130,
+    "height": 110,
+    "pins": {
+      "A0": {
+        "x": 0,
+        "y": 30,
+        "exit": "left"
+      },
+      "D0": {
+        "x": 0,
+        "y": 40,
+        "exit": "left"
+      },
+      "D1": {
+        "x": 130,
+        "y": 40,
+        "exit": "right"
+      },
+      "D2": {
+        "x": 130,
+        "y": 50,
+        "exit": "right"
+      },
+      "D3": {
+        "x": 130,
+        "y": 60,
+        "exit": "right"
+      },
+      "D4": {
+        "x": 130,
+        "y": 70,
+        "exit": "right"
+      },
+      "D5": {
+        "x": 0,
+        "y": 50,
+        "exit": "left"
+      },
+      "D6": {
+        "x": 0,
+        "y": 60,
+        "exit": "left"
+      },
+      "D7": {
+        "x": 0,
+        "y": 70,
+        "exit": "left"
+      },
+      "D8": {
+        "x": 0,
+        "y": 80,
+        "exit": "left"
+      }
+    },
+    "power": {
+      "3V3": [
+        {
+          "x": 0,
+          "y": 90,
+          "exit": "left"
+        }
+      ],
+      "5V": [
+        {
+          "x": 130,
+          "y": 90,
+          "exit": "right"
+        }
+      ],
+      "GND": [
+        {
+          "x": 130,
+          "y": 80,
+          "exit": "right"
+        }
+      ]
+    }
+  }
+}

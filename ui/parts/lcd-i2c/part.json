@@ -1,0 +1,90 @@
+{
+  "type": "lcd-i2c",
+  "title": "16×2 LCD screen with I2C backpack",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
+  "behaviour": "lcd",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "gnd",
+      "name": "GND"
+    },
+    {
+      "id": "vcc",
+      "name": "VCC (5V)"
+    },
+    {
+      "id": "sda",
+      "name": "SDA (I2C data)"
+    },
+    {
+      "id": "scl",
+      "name": "SCL (I2C clock)"
+    }
+  ],
+  "footprint": null,
+  "options": {
+    "address": 39,
+    "cols": 16,
+    "rows": 2
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 350,
+    "height": 142,
+    "connectors": {
+      "gnd": {
+        "x": 0,
+        "y": 55
+      },
+      "scl": {
+        "x": 0,
+        "y": 85
+      },
+      "sda": {
+        "x": 0,
+        "y": 75
+      },
+      "vcc": {
+        "x": 0,
+        "y": 65
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 110,
+    "height": 50,
+    "connectors": {
+      "gnd": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      },
+      "scl": {
+        "x": 1,
+        "y": 40,
+        "dir": "left"
+      },
+      "sda": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      }
+    }
+  },
+  "sim": {
+    "screen": {
+      "x": 66,
+      "y": 36,
+      "w": 252,
+      "h": 70
+    }
+  }
+}

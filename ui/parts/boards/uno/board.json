@@ -1,0 +1,308 @@
+{
+  "id": "uno",
+  "title": "Arduino Uno (Rev3)",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/arduino_Uno_Rev3(fix).fzp",
+    "title": "Arduino Uno (Rev3)",
+    "breadboard": "svg/core/breadboard/arduino_Uno_Rev3_breadboard.svg",
+    "schematic": "svg/core/schematic/arduino_Uno_Rev3(fix)_schematic.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "unit": "0.01in",
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 294.96,
+    "height": 210,
+    "pins": {
+      "0": {
+        "x": 274.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "1": {
+        "x": 264.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "10": {
+        "x": 168.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "11": {
+        "x": 158.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "12": {
+        "x": 148.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "13": {
+        "x": 138.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "2": {
+        "x": 254.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "3": {
+        "x": 244.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "4": {
+        "x": 234.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "5": {
+        "x": 224.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "6": {
+        "x": 214.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "7": {
+        "x": 204.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "8": {
+        "x": 188.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "9": {
+        "x": 178.96,
+        "y": 10,
+        "exit": "up"
+      },
+      "A0": {
+        "x": 224.96,
+        "y": 200,
+        "exit": "down"
+      },
+      "A1": {
+        "x": 234.96,
+        "y": 200,
+        "exit": "down"
+      },
+      "A2": {
+        "x": 244.96,
+        "y": 200,
+        "exit": "down"
+      },
+      "A3": {
+        "x": 254.96,
+        "y": 200,
+        "exit": "down"
+      },
+      "A4": {
+        "x": 264.96,
+        "y": 200,
+        "exit": "down"
+      },
+      "A5": {
+        "x": 274.96,
+        "y": 200,
+        "exit": "down"
+      }
+    },
+    "power": {
+      "3V3": [
+        {
+          "x": 164.96,
+          "y": 200,
+          "exit": "down"
+        }
+      ],
+      "5V": [
+        {
+          "x": 174.96,
+          "y": 200,
+          "exit": "down"
+        }
+      ],
+      "GND": [
+        {
+          "x": 128.96,
+          "y": 10,
+          "exit": "up"
+        },
+        {
+          "x": 184.96,
+          "y": 200,
+          "exit": "down"
+        },
+        {
+          "x": 194.96,
+          "y": 200,
+          "exit": "down"
+        }
+      ],
+      "VIN": [
+        {
+          "x": 204.96,
+          "y": 200,
+          "exit": "down"
+        }
+      ]
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 150,
+    "height": 230,
+    "pins": {
+      "0": {
+        "x": 150,
+        "y": 40,
+        "exit": "right"
+      },
+      "1": {
+        "x": 150,
+        "y": 50,
+        "exit": "right"
+      },
+      "10": {
+        "x": 150,
+        "y": 140,
+        "exit": "right"
+      },
+      "11": {
+        "x": 150,
+        "y": 150,
+        "exit": "right"
+      },
+      "12": {
+        "x": 150,
+        "y": 160,
+        "exit": "right"
+      },
+      "13": {
+        "x": 150,
+        "y": 170,
+        "exit": "right"
+      },
+      "2": {
+        "x": 150,
+        "y": 60,
+        "exit": "right"
+      },
+      "3": {
+        "x": 150,
+        "y": 70,
+        "exit": "right"
+      },
+      "4": {
+        "x": 150,
+        "y": 80,
+        "exit": "right"
+      },
+      "5": {
+        "x": 150,
+        "y": 90,
+        "exit": "right"
+      },
+      "6": {
+        "x": 150,
+        "y": 100,
+        "exit": "right"
+      },
+      "7": {
+        "x": 150,
+        "y": 110,
+        "exit": "right"
+      },
+      "8": {
+        "x": 150,
+        "y": 120,
+        "exit": "right"
+      },
+      "9": {
+        "x": 150,
+        "y": 130,
+        "exit": "right"
+      },
+      "A0": {
+        "x": 0,
+        "y": 90,
+        "exit": "left"
+      },
+      "A1": {
+        "x": 0,
+        "y": 100,
+        "exit": "left"
+      },
+      "A2": {
+        "x": 0,
+        "y": 110,
+        "exit": "left"
+      },
+      "A3": {
+        "x": 0,
+        "y": 120,
+        "exit": "left"
+      },
+      "A4": {
+        "x": 0,
+        "y": 130,
+        "exit": "left"
+      },
+      "A5": {
+        "x": 0,
+        "y": 140,
+        "exit": "left"
+      }
+    },
+    "power": {
+      "3V3": [
+        {
+          "x": 50,
+          "y": 0,
+          "exit": "up"
+        }
+      ],
+      "5V": [
+        {
+          "x": 70,
+          "y": 0,
+          "exit": "up"
+        }
+      ],
+      "GND": [
+        {
+          "x": 80,
+          "y": 230,
+          "exit": "down"
+        },
+        {
+          "x": 80,
+          "y": 230,
+          "exit": "down"
+        },
+        {
+          "x": 80,
+          "y": 230,
+          "exit": "down"
+        }
+      ],
+      "VIN": [
+        {
+          "x": 90,
+          "y": 0,
+          "exit": "up"
+        }
+      ]
+    }
+  }
+}

@@ -15,6 +15,17 @@
     "if / else"
   ],
   "intro": "No wiring needed! Write a chatbot that talks to you in the Serial Monitor.",
+  "circuit": {
+    "breadboard": "none",
+    "parts": [],
+    "wires": []
+  },
+  "wiring_steps": [
+    {
+      "title": "Just your board",
+      "text": "This project needs no parts at all. Plug your board into the laptop with its USB cable. You'll talk to it through the Serial Monitor."
+    }
+  ],
   "steps": [
     {
       "title": "Say hello",

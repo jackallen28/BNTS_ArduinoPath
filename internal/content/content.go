@@ -37,6 +37,10 @@ type PartInfo struct {
 	Plural  string `json:"plural"`
 	Group   string `json:"group"`
 	Needs5V bool   `json:"needs_5v,omitempty"`
+	// For the Wiring Wizard's "Meet the parts".
+	What       string `json:"what,omitempty"`
+	Legs       string `json:"legs,omitempty"`
+	DidYouKnow string `json:"did_you_know,omitempty"`
 }
 
 // Kit is what one class kit holds.

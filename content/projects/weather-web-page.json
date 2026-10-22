@@ -19,6 +19,51 @@
     "sensors"
   ],
   "intro": "Show the temperature and humidity on a web page anyone in the room can open.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "dht",
+        "type": "dht",
+        "label": "DHT sensor",
+        "at": "J10",
+        "step": 1
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:DHT_PIN",
+        "to": "G10",
+        "step": 1
+      },
+      {
+        "from": "F11",
+        "to": "BP10",
+        "step": 1
+      },
+      {
+        "from": "F12",
+        "to": "BN10",
+        "step": 1
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The temperature sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the DHT sensor's three pins into J10, J11 and J12: S (data) in J10, + in J11, − in J12. Add a wire from {{pin:DHT_PIN}} to G10, a red wire from F11 to the red (+) rail, and a black wire from F12 to the blue (−) rail."
+    }
+  ],
   "steps": [
     {
       "title": "Read the sensor",

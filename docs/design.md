@@ -86,6 +86,15 @@ rail line is joined end to end. **Endpoints** of a wire: a hole, `pin:<ROLE>`, `
 board pin by code, e.g. `pin:LED_BUILTIN` or `pin:A0`), `board:<power>`, `part:<id>:<leg>`.
 Wire colours default to: red = VCC / 5V / 3V3, black = GND, otherwise by signal.
 
+`board:5V` on a board without a 5V pin (NodeMCU, ESP32 DevKit) means VIN (the USB's 5V). 5V parts
+(servo, HC-SR04, PIR, NeoPixels, the LED matrix) take the + rail on 5V boards and `board:5V` on 3.3V
+boards (`when`), and the HC-SR04's echo goes through a 10k/10k divider on 3.3V boards.
+
+**Wiring step text** may say `{{pin:ROLE}}` (becomes "pin 12" / "pin D5", the label on the student's
+board), `{{VCC}}` ("5V" / "3V3"), `{{5V}}` ("5V", or "VIN"), `{{3V3}}` and `{{board}}`:
+`fillWiringText(text, board, pins)` in `ui/js/circuit/wiring-text.js`. The first step starts with
+the USB safety line. `internal/content/circuit_test.go` checks every circuit on every board.
+
 **`{{pins}}`** in a step's `starter` or `demo` becomes the pin header for the student's board:
 
 ```cpp
@@ -230,6 +239,12 @@ view.onControl((partId, control, value) => {});   // button press/release, pot 0
 view.destroy();
 import { buildNetlist, validateCircuit } from "./circuit/netlist.js";
 ```
+
+Units are 0.01 inch (the breadboard pitch is 10); offboard positions are measured from the
+breadboard's top-left corner, and the board sits to its left (tall boards turned on their side).
+`loadParts({types, boards})` / `loadCircuitParts(circuit, board)` (`./parts.js`) fetch the part
+catalogue the renderer and netlist take. `buildNetlist(...)` returns `nets` and helpers
+(`legNet`, `pinNet`, `powerNet`, `pinsForLeg`, `powerForLeg`, `legsOnNet`, `joined`, `legHoles`).
 
 Controls drawn on parts: buttons (press with the mouse), a knob on pots and joysticks, sliders
 for LDR light, distance (HC-SR04), temperature and humidity (DHT), soil moisture, a "wave" button

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- unitless: Fritzing reads it as 90 dpi, so 9 units = 0.1in -->
+<svg xmlns="http://www.w3.org/2000/svg" width="27" height="18" viewBox="0 0 27 18">
+  <g id="schematic">
+    <rect id="connector0pin" x="0" y="8" width="9" height="2" fill="#000"/>
+    <rect id="connector0terminal" x="0" y="8" width="0.1" height="2" fill="none"/>
+    <rect id="connector1pin" x="18" y="8" width="9" height="2" fill="#000"/>
+    <rect x="9" y="4" width="9" height="10" fill="none" stroke="#000"/>
+  </g>
+</svg>

@@ -1,0 +1,69 @@
+{
+  "type": "ldr",
+  "title": "Photocell (LDR)",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/LDR_photocell_300mil_v5.fzp",
+    "title": "Photocell (LDR)",
+    "breadboard": "svg/core/breadboard/ldr.svg",
+    "schematic": "svg/core/schematic/ldr.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "ldr",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "1",
+      "name": "leg 1 (either way round)",
+      "fritzing": "connector0"
+    },
+    {
+      "id": "2",
+      "name": "leg 2 (either way round)",
+      "fritzing": "connector1"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      3,
+      0
+    ]
+  ],
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 33.79,
+    "height": 15.18,
+    "connectors": {
+      "1": {
+        "x": 1.46,
+        "y": 13.72
+      },
+      "2": {
+        "x": 32.33,
+        "y": 13.72
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 48.78,
+    "height": 16.8,
+    "connectors": {
+      "1": {
+        "x": 0.39,
+        "y": 8.4,
+        "dir": "left"
+      },
+      "2": {
+        "x": 48.39,
+        "y": 8.4,
+        "dir": "right"
+      }
+    }
+  }
+}

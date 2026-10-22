@@ -28,6 +28,115 @@
     "variables"
   ],
   "intro": "Catch anyone sneaking past with a motion sensor, a flashing light and an alarm.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "pir",
+        "type": "pir",
+        "label": "motion sensor",
+        "offboard": {
+          "x": 345,
+          "y": -150
+        },
+        "step": 1
+      },
+      {
+        "id": "led",
+        "type": "led",
+        "color": "red",
+        "label": "LED",
+        "at": "H5",
+        "step": 2
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E5",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 500,
+          "y": 0
+        },
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:pir:out",
+        "to": "pin:PIR_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:pir:vcc",
+        "to": "BP21",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "part:pir:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "part:pir:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J6",
+        "step": 2
+      },
+      {
+        "from": "A5",
+        "to": "BN5",
+        "step": 2
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 3
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN22",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The motion sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the motion sensor's three pins with wires: GND to the blue (−) rail, OUT to {{pin:PIR_PIN}}, and VCC to power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board. (The sensor's OUT pin only sends 3.3V, so it's safe for every board.)"
+    },
+    {
+      "title": "The LED",
+      "text": "Push the LED into holes H5 and H6, with the long leg (+) in H6. Put a 220Ω resistor from G5 across the gap to E5. Add a wire from {{pin:LED_PIN}} to J6, and a black wire from A5 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
   "steps": [
     {
       "title": "Test the motion sensor",

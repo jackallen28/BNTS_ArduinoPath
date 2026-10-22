@@ -1,0 +1,94 @@
+{
+  "type": "potentiometer",
+  "title": "12mm Trimmer Potentiometer (Large)",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/potentiometer_trimmer_12mm_5.fzp",
+    "title": "12mm Trimmer Potentiometer (Large)",
+    "breadboard": "svg/core/breadboard/potentiometer_trimmer_12mm_5_breadboard.svg",
+    "schematic": "svg/core/schematic/potentiometer_1_schematic.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "potentiometer",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "end1",
+      "name": "outside leg 1 (to GND or power)",
+      "fritzing": "connector0"
+    },
+    {
+      "id": "wiper",
+      "name": "middle leg: the wiper (to an analog pin)",
+      "fritzing": "connector1"
+    },
+    {
+      "id": "end2",
+      "name": "outside leg 2 (to power or GND)",
+      "fritzing": "connector2"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      -4
+    ],
+    [
+      2,
+      0
+    ]
+  ],
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 40.55,
+    "height": 42.89,
+    "connectors": {
+      "end1": {
+        "x": 10.41,
+        "y": 40.87
+      },
+      "end2": {
+        "x": 30.09,
+        "y": 40.87
+      },
+      "wiper": {
+        "x": 20.25,
+        "y": 1.5
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 25.03,
+    "height": 41.02,
+    "connectors": {
+      "end1": {
+        "x": 4.53,
+        "y": 40.5,
+        "dir": "down"
+      },
+      "end2": {
+        "x": 4.53,
+        "y": 0.5,
+        "dir": "up"
+      },
+      "wiper": {
+        "x": 24.53,
+        "y": 20.5,
+        "dir": "right"
+      }
+    }
+  },
+  "sim": {
+    "knob": {
+      "x": 20.28,
+      "y": 21.08,
+      "r": 13.39
+    }
+  }
+}
