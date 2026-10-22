@@ -28,6 +28,118 @@
     "displays"
   ],
   "intro": "Check if a plant needs water. Show a happy or thirsty face on the screen.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "soil",
+        "type": "soil-moisture",
+        "label": "soil sensor",
+        "offboard": {
+          "x": 345,
+          "y": -30
+        },
+        "step": 1
+      },
+      {
+        "id": "oled",
+        "type": "oled",
+        "label": "OLED screen",
+        "offboard": {
+          "x": 440,
+          "y": -30
+        },
+        "step": 2
+      },
+      {
+        "id": "led",
+        "type": "led",
+        "color": "green",
+        "label": "LED",
+        "at": "H6",
+        "step": 3
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E6",
+        "rotate": 270,
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:soil:vcc",
+        "to": "BP20",
+        "step": 1
+      },
+      {
+        "from": "part:soil:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "part:soil:sig",
+        "to": "pin:SOIL_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:oled:gnd",
+        "to": "BN22",
+        "step": 2
+      },
+      {
+        "from": "part:oled:vcc",
+        "to": "BP21",
+        "step": 2
+      },
+      {
+        "from": "part:oled:scl",
+        "to": "pin:SCL",
+        "step": 2
+      },
+      {
+        "from": "part:oled:sda",
+        "to": "pin:SDA",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J7",
+        "step": 3
+      },
+      {
+        "from": "A6",
+        "to": "BN5",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The soil sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the soil sensor's three pins with wires: VCC to the red (+) rail, GND to the blue (−) rail, and SIG to {{pin:SOIL_PIN}}."
+    },
+    {
+      "title": "The OLED screen",
+      "text": "Connect the OLED screen's four pins with wires: GND to the blue (−) rail, VCC to the red (+) rail, SCL to {{pin:SCL}} and SDA to {{pin:SDA}}. SCL and SDA are the board's I2C pins: lots of screens and sensors can share them."
+    },
+    {
+      "title": "The LED",
+      "text": "Push the LED into holes H6 and H7, with the long leg (+) in H7. Put a 220Ω resistor from G6 across the gap to E6. Add a wire from {{pin:LED_PIN}} to J7, and a black wire from A6 to the blue (−) rail at the bottom."
+    }
+  ],
   "steps": [
     {
       "title": "Read the soil",

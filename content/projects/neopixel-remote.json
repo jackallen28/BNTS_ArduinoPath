@@ -19,6 +19,61 @@
     "colour"
   ],
   "intro": "Slide sliders on a web page to change the colours of a NeoPixel strip.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "strip",
+        "type": "neopixel-strip",
+        "label": "NeoPixel strip",
+        "offboard": {
+          "x": 60,
+          "y": -70
+        },
+        "step": 1
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:strip:din",
+        "to": "pin:NEOPIXEL_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:strip:vcc",
+        "to": "BP20",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "part:strip:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "part:strip:gnd",
+        "to": "BN21",
+        "step": 1
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The NeoPixel strip",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the strip's input end with three wires: DIN to {{pin:NEOPIXEL_PIN}}, GND to the blue (−) rail, and the power pin (4-7VDC) to power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    }
+  ],
   "steps": [
     {
       "title": "Light the strip",

@@ -25,6 +25,76 @@
     "INPUT_PULLUP"
   ],
   "intro": "Press a button to turn a light on and off. Then make it remember what it was doing.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "led",
+        "type": "led",
+        "color": "white",
+        "label": "LED",
+        "at": "H5",
+        "step": 1
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E5",
+        "rotate": 270,
+        "step": 1
+      },
+      {
+        "id": "b1",
+        "type": "button",
+        "label": "button",
+        "at": "F14",
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J6",
+        "step": 1
+      },
+      {
+        "from": "A5",
+        "to": "BN5",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_PIN",
+        "to": "J14",
+        "step": 2
+      },
+      {
+        "from": "A16",
+        "to": "BN14",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The LED",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the LED into holes H5 and H6, with the long leg (+) in H6. Put a 220Ω resistor from G5 across the gap to E5. Add a wire from {{pin:LED_PIN}} to J6, and a black wire from A5 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The button",
+      "text": "Press the button into the middle of the breadboard so it sits across the gap: its legs go in F14, F16, E14 and E16. Add a wire from {{pin:BUTTON_PIN}} to J14, and a black wire from A16 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    }
+  ],
   "steps": [
     {
       "title": "Test the LED",

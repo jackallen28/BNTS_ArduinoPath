@@ -25,6 +25,82 @@
     "tone"
   ],
   "intro": "Wave your hand over a light sensor to play music, like a real theremin.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "ldr",
+        "type": "ldr",
+        "label": "light sensor",
+        "at": "C5",
+        "step": 1
+      },
+      {
+        "id": "r10k",
+        "type": "resistor-10k",
+        "label": "10kΩ",
+        "at": "B8",
+        "step": 1
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "A5",
+        "to": "BP5",
+        "step": 1
+      },
+      {
+        "from": "A12",
+        "to": "BN10",
+        "step": 1
+      },
+      {
+        "from": "pin:LDR_PIN",
+        "to": "E8",
+        "step": 1
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 2
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The light sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the light sensor's legs into C5 and C8 (either way round). Put the 10kΩ resistor from B8 to B12. Add a red wire from A5 to the red (+) rail, a black wire from A12 to the blue (−) rail, and a wire from {{pin:LDR_PIN}} to E8, where the sensor and resistor meet."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
   "steps": [
     {
       "title": "Read the light",

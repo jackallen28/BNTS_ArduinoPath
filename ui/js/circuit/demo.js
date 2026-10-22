@@ -2,7 +2,7 @@
 // with a pretend simulation so every kind of drawn behaviour shows.
 
 import { drawBreadboard, drawSchematic, loadCircuitParts } from "./render.js";
-import { validateCircuit } from "./netlist.js";
+import { validateCircuit, defaultResolvePin, pinOverrides } from "./netlist.js";
 import { stepCount } from "./layout.js";
 import { demoCircuit } from "./demo-circuit.js";
 import { glyph } from "./font5x7.js";
@@ -16,7 +16,14 @@ async function main() {
   const select = $("board");
   for (const b of boards) select.append(new Option(b.name, b.id));
   select.value = params.get("board") || "uno";
-  const steps = stepCount(demoCircuit);
+  // ?project=<id> draws a project's circuit instead of the sample.
+  let circuit = demoCircuit, project = null;
+  if (params.get("project")) {
+    project = await (await fetch(`api/projects/${encodeURIComponent(params.get("project"))}`)).json();
+    circuit = project.circuit;
+    document.title = `${project.title}: circuit`;
+  }
+  const steps = stepCount(circuit) || 1;
   let step = params.has("step") ? +params.get("step") : 1;
   let all = params.get("all") === "1";
   let views = [];
@@ -27,8 +34,9 @@ async function main() {
     for (const v of views) v.destroy();
     clearInterval(timer);
     const board = boards.find((b) => b.id === select.value);
-    const parts = await loadCircuitParts(demoCircuit, board);
-    const opts = { board, circuit: demoCircuit, parts, step, showAll: all, names: cat.parts };
+    const parts = await loadCircuitParts(circuit, board);
+    const pins = defaultResolvePin(board, pinOverrides(project?.pins, board));
+    const opts = { board, circuit, parts, pins, step, showAll: all, names: cat.parts };
     const bb = drawBreadboard($("breadboard"), opts);
     const sch = drawSchematic($("schematic"), opts);
     views = [bb, sch];
@@ -37,7 +45,7 @@ async function main() {
       if (control === "position") pot = value;
       if (id === "b1" && control === "press") pressed = value;
     });
-    const problems = validateCircuit(demoCircuit, board, parts);
+    const problems = validateCircuit(circuit, board, parts, pins);
     $("problems").replaceChildren(...(problems.length ? problems : [{ level: "ok", message: "No problems found." }])
       .map((p) => Object.assign(document.createElement("li"), { className: p.level, textContent: p.message })));
     updateStep();
@@ -67,7 +75,8 @@ async function main() {
   }
 
   function updateStep() {
-    $("step-label").textContent = all ? "The whole circuit" : `Step ${step} of ${steps}`;
+    const title = project?.wiring_steps?.[step - 1]?.title;
+    $("step-label").textContent = all ? "The whole circuit" : `Step ${step} of ${steps}${title ? `: ${title}` : ""}`;
     $("prev").disabled = all || step <= 1;
     $("next").disabled = all || step >= steps;
     $("all").setAttribute("aria-pressed", String(all));

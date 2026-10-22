@@ -362,11 +362,11 @@ func segmentPolys(x, y, w, h, t float64) map[byte]string {
 func tm1637Art() (*Node, *Node) {
 	w, h := 166.0, 76.0
 	root := svgRoot(w+12, h, "4-digit display (TM1637)")
-	g := el("g")
+	g := el("g", "transform", "translate(12 0)")
 	g.Add(pcb(w, h, "#1b4f9c", "#0f3263", true)...)
-	g.Add(rect(16, 10, 122, 56, "#111111", "rx", "2"))
+	g.Add(rect(28, 10, 122, 56, "#111111", "rx", "2"))
 	for d := 0; d < 4; d++ {
-		x := 24 + float64(d)*28
+		x := 36 + float64(d)*28
 		if d >= 2 {
 			x += 6
 		}
@@ -375,14 +375,14 @@ func tm1637Art() (*Node, *Node) {
 			g.Add(el("polygon", "points", pts, "fill", "#3a1616", "data-cp", "seg", "data-d", fmt.Sprint(d), "data-s", string(s)))
 		}
 	}
-	g.Add(circle(78, 31, 2.4, "#3a1616", "data-cp", "colon"))
-	g.Add(circle(78, 45, 2.4, "#3a1616", "data-cp", "colon"))
+	g.Add(circle(90, 31, 2.4, "#3a1616", "data-cp", "colon"))
+	g.Add(circle(90, 45, 2.4, "#3a1616", "data-cp", "colon"))
 	ids := []string{"clk", "dio", "vcc", "gnd"}
 	names := []string{"CLK", "DIO", "VCC", "GND"}
 	for i, id := range ids {
 		y := 23 + float64(i)*10
-		g.Add(sidePin(w, y, 12, "right", "pin-"+id)...)
-		g.Add(label(w-8, y+2, 5.5, names[i], silk, "end"))
+		g.Add(sidePin(0, y, 12, "left", "pin-"+id)...)
+		g.Add(label(4, y+2, 5, names[i], silk, "start"))
 	}
 	root.Add(g)
 	sch := schematicBox("TM1637\n4 digits", ids, names, nil, nil)

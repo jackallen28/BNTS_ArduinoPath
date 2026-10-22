@@ -49,6 +49,19 @@ export function parseEndpoint(s) {
   return null;
 }
 
+/**
+ * The board power pin a `board:<name>` wire uses: VCC is the logic voltage
+ * (5V or 3V3), and 5V on a board without a 5V pin is VIN (the USB 5V on
+ * NodeMCU and ESP32 DevKit boards). Null if the board has no such pin.
+ */
+export function powerName(board, name) {
+  const pins = board?.power?.pins || [];
+  if (name === "VCC") return board?.power?.vcc || "5V";
+  if (pins.includes(name)) return name;
+  if (name === "5V" && pins.includes("VIN")) return "VIN";
+  return null;
+}
+
 /** "3v3" for 3.3V boards, "5v" for 5V boards. */
 export function boardVoltage(board) {
   return board?.power?.vcc === "3V3" || board?.logic_volts === 3.3 ? "3v3" : "5v";
@@ -218,7 +231,7 @@ export function buildNetlist(circuit, board, parts, resolvePin) {
     switch (e.kind) {
       case "hole": return breadboard?.holes?.[e.hole] ? add(`hole:${e.hole}`) : null;
       case "pin": { const r = resolve(e.name); return r ? add(`pin:${r.code}`) : null; }
-      case "power": return add(`power:${e.name === "VCC" ? board.power?.vcc || "5V" : e.name}`);
+      case "power": { const n = powerName(board, e.name); return n ? add(`power:${n}`) : null; }
       case "part": {
         const p = partById.get(e.part);
         const def = p && parts?.types?.[p.type];
@@ -367,7 +380,6 @@ export function validateCircuit(circuit, board, parts, resolvePin) {
     }
   }
 
-  const powerPins = new Set([...(board.power?.pins || []), "VCC"]);
   wires.forEach((w, i) => {
     const label = `Wire ${i + 1} (${w.from} → ${w.to})`;
     const ends = [w.from, w.to];
@@ -391,7 +403,7 @@ export function validateCircuit(circuit, board, parts, resolvePin) {
             : `${label}: the ${board.name || board.id} has no pin "${e.name}".`, { wire: i });
         }
       } else if (e.kind === "power") {
-        if (!powerPins.has(e.name)) err("no-power-pin", `${label}: the ${board.name || board.id} has no ${e.name} pin.`, { wire: i });
+        if (!powerName(board, e.name)) err("no-power-pin", `${label}: the ${board.name || board.id} has no ${e.name} pin.`, { wire: i });
       } else if (e.kind === "part") {
         if (!activeIds.has(e.part)) {
           err("unknown-part", allIds.has(e.part)

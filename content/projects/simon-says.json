@@ -31,6 +31,237 @@
     "loops"
   ],
   "intro": "Watch the pattern of lights and sounds, then copy it. It gets longer every round.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H2",
+        "step": 1
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E2",
+        "rotate": 270,
+        "step": 1
+      },
+      {
+        "id": "b-red",
+        "type": "button",
+        "label": "red button",
+        "at": "F5",
+        "step": 1
+      },
+      {
+        "id": "yellow",
+        "type": "led",
+        "color": "yellow",
+        "label": "yellow LED",
+        "at": "H9",
+        "step": 2
+      },
+      {
+        "id": "r-yellow",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E9",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "b-yellow",
+        "type": "button",
+        "label": "yellow button",
+        "at": "F12",
+        "step": 2
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green LED",
+        "at": "H16",
+        "step": 3
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E16",
+        "rotate": 270,
+        "step": 3
+      },
+      {
+        "id": "b-green",
+        "type": "button",
+        "label": "green button",
+        "at": "F19",
+        "step": 3
+      },
+      {
+        "id": "blue",
+        "type": "led",
+        "color": "blue",
+        "label": "blue LED",
+        "at": "H23",
+        "step": 4
+      },
+      {
+        "id": "r-blue",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E23",
+        "rotate": 270,
+        "step": 4
+      },
+      {
+        "id": "b-blue",
+        "type": "button",
+        "label": "blue button",
+        "at": "F26",
+        "step": 4
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 5
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J3",
+        "step": 1
+      },
+      {
+        "from": "A2",
+        "to": "BN2",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_RED",
+        "to": "J5",
+        "step": 1
+      },
+      {
+        "from": "A7",
+        "to": "BN6",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_YELLOW",
+        "to": "J10",
+        "step": 2
+      },
+      {
+        "from": "A9",
+        "to": "BN8",
+        "step": 2
+      },
+      {
+        "from": "pin:BUTTON_YELLOW",
+        "to": "J12",
+        "step": 2
+      },
+      {
+        "from": "A14",
+        "to": "BN12",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J17",
+        "step": 3
+      },
+      {
+        "from": "A16",
+        "to": "BN14",
+        "step": 3
+      },
+      {
+        "from": "pin:BUTTON_GREEN",
+        "to": "J19",
+        "step": 3
+      },
+      {
+        "from": "A21",
+        "to": "BN18",
+        "step": 3
+      },
+      {
+        "from": "pin:LED_BLUE",
+        "to": "J24",
+        "step": 4
+      },
+      {
+        "from": "A23",
+        "to": "BN20",
+        "step": 4
+      },
+      {
+        "from": "pin:BUTTON_BLUE",
+        "to": "J26",
+        "step": 4
+      },
+      {
+        "from": "A28",
+        "to": "BN24",
+        "step": 4
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 5
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 5
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The red light and button",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the red LED into holes H2 and H3, with the long leg (+) in H3. Put a 220Ω resistor from G2 across the gap to E2. Add a wire from {{pin:LED_RED}} to J3, and a black wire from A2 to the blue (−) rail at the bottom. Press the red button into the middle of the breadboard so it sits across the gap: its legs go in F5, F7, E5 and E7. Add a wire from {{pin:BUTTON_RED}} to J5, and a black wire from A7 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The yellow light and button",
+      "text": "Push the yellow LED into holes H9 and H10, with the long leg (+) in H10. Put a 220Ω resistor from G9 across the gap to E9. Add a wire from {{pin:LED_YELLOW}} to J10, and a black wire from A9 to the blue (−) rail at the bottom. Press the yellow button into the middle of the breadboard so it sits across the gap: its legs go in F12, F14, E12 and E14. Add a wire from {{pin:BUTTON_YELLOW}} to J12, and a black wire from A14 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The green light and button",
+      "text": "Push the green LED into holes H16 and H17, with the long leg (+) in H17. Put a 220Ω resistor from G16 across the gap to E16. Add a wire from {{pin:LED_GREEN}} to J17, and a black wire from A16 to the blue (−) rail at the bottom. Press the green button into the middle of the breadboard so it sits across the gap: its legs go in F19, F21, E19 and E21. Add a wire from {{pin:BUTTON_GREEN}} to J19, and a black wire from A21 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The blue light and button",
+      "text": "Push the blue LED into holes H23 and H24, with the long leg (+) in H24. Put a 220Ω resistor from G23 across the gap to E23. Add a wire from {{pin:LED_BLUE}} to J24, and a black wire from A23 to the blue (−) rail at the bottom. Press the blue button into the middle of the breadboard so it sits across the gap: its legs go in F26, F28, E26 and E28. Add a wire from {{pin:BUTTON_BLUE}} to J26, and a black wire from A28 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
   "steps": [
     {
       "title": "Lights and notes",

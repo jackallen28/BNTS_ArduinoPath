@@ -22,6 +22,55 @@
     "HTML"
   ],
   "intro": "Make your own web page that turns an LED on and off from your phone.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "led",
+        "type": "led",
+        "color": "blue",
+        "label": "LED",
+        "at": "H8",
+        "step": 1
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E8",
+        "rotate": 270,
+        "step": 1
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J9",
+        "step": 1
+      },
+      {
+        "from": "A8",
+        "to": "BN7",
+        "step": 1
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The LED",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the LED into holes H8 and H9, with the long leg (+) in H9. Put a 220Ω resistor from G8 across the gap to E8. Add a wire from {{pin:LED_PIN}} to J9, and a black wire from A8 to the blue (−) rail at the bottom."
+    }
+  ],
   "steps": [
     {
       "title": "Make a hotspot",

@@ -22,6 +22,87 @@
     "Servo library"
   ],
   "intro": "Turn a knob and a servo motor follows it, like a dial on a dashboard.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "pot",
+        "type": "potentiometer",
+        "label": "knob",
+        "at": "E8",
+        "step": 1
+      },
+      {
+        "id": "servo",
+        "type": "servo",
+        "label": "servo",
+        "offboard": {
+          "x": 120,
+          "y": -115
+        },
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "A8",
+        "to": "BN7",
+        "step": 1
+      },
+      {
+        "from": "A10",
+        "to": "BP9",
+        "step": 1
+      },
+      {
+        "from": "pin:POT_PIN",
+        "to": "J9",
+        "step": 1
+      },
+      {
+        "from": "part:servo:signal",
+        "to": "pin:SERVO_PIN",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "BP17",
+        "when": "5v",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 2
+      },
+      {
+        "from": "part:servo:gnd",
+        "to": "BN19",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The knob",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the potentiometer in so its two outside legs go in E8 and E10 and its middle leg in G9. Add a black wire from A8 to the blue (−) rail, a red wire from A10 to the red (+) rail, and a wire from {{pin:POT_PIN}} to J9 (the middle leg)."
+    },
+    {
+      "title": "The servo",
+      "text": "Plug three wires into the servo's plug. Brown (or black) goes to the blue (−) rail, orange (or yellow) goes to {{pin:SERVO_PIN}}, and red is power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    }
+  ],
   "steps": [
     {
       "title": "Read the knob",

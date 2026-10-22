@@ -558,6 +558,9 @@ export function drawBreadboard(container, opts) {
     };
     const hidden = new Set(items.filter((i) => i.kind === "part" && i.state === "later").map((i) => i.id));
     const used = [];
+    const asRect = (b) => { const q = toScreen(b); return { left: q.left, top: q.top, w: q.width, h: q.height }; };
+    const bbScreen = layout.breadboard ? asRect({ x: 0, y: 0, w: layout.breadboard.width, h: layout.breadboard.height }) : null;
+    const partScreens = layout.parts.filter((p) => !hidden.has(p.part.id)).map((p) => ({ id: p.part.id, ...asRect(p.box) }));
     for (const c of ctrls) {
       c.el.hidden = hidden.has(c.id);
       if (c.el.hidden) continue;
@@ -565,14 +568,25 @@ export function drawBreadboard(container, opts) {
       if (c.kind === "hot") {
         Object.assign(c.el.style, { left: `${s.left}px`, top: `${s.top}px`, width: `${s.width}px`, height: `${s.height}px` });
       } else {
+        // Try above, below, right and left of the part; keep off the
+        // breadboard and other chips where possible.
         const w = c.el.offsetWidth || 160, h = c.el.offsetHeight || 40;
-        let left = s.left + s.width / 2 - w / 2;
-        let top = s.top + s.height + 6;
-        if (top + h > r.height) top = Math.max(0, s.top - h - 6);
-        left = Math.max(2, Math.min(left, r.width - w - 2));
-        for (const u of used) { // don't sit on another chip
-          if (left < u.left + u.w && left + w > u.left && top < u.top + u.h && top + h > u.top) top = u.top + u.h + 4;
+        const cx = s.left + s.width / 2 - w / 2, cy = s.top + s.height / 2 - h / 2;
+        const spots = [
+          [cx, s.top - h - 6], [cx, s.top + s.height + 6],
+          [s.left + s.width + 6, cy], [s.left - w - 6, cy],
+        ];
+        const overlap = (l, t, r2) => Math.max(0, Math.min(l + w, r2.left + r2.w) - Math.max(l, r2.left)) *
+          Math.max(0, Math.min(t + h, r2.top + r2.h) - Math.max(t, r2.top));
+        let best = null;
+        for (const [l0, t0] of spots) {
+          const l = Math.max(2, Math.min(l0, r.width - w - 2)), t = Math.max(2, Math.min(t0, r.height - h - 2));
+          let cost = (l !== l0 || t !== t0 ? 400 : 0) + used.reduce((sum, u) => sum + overlap(l, t, u) * 3, 0);
+          if (bbScreen) cost += overlap(l, t, bbScreen);
+          for (const pb of partScreens) if (pb.id !== c.id) cost += overlap(l, t, pb) * 0.5;
+          if (!best || cost < best.cost) best = { l, t, cost };
         }
+        const left = best.l, top = best.t;
         used.push({ left, top, w, h });
         Object.assign(c.el.style, { left: `${left}px`, top: `${top}px` });
       }

@@ -26,6 +26,108 @@
     "libraries"
   ],
   "intro": "Build a glowing lamp. Turn the knob to change the colour and press the button for light shows.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "ring",
+        "type": "neopixel-ring",
+        "label": "NeoPixel ring",
+        "offboard": {
+          "x": 345,
+          "y": -40
+        },
+        "step": 1
+      },
+      {
+        "id": "pot",
+        "type": "potentiometer",
+        "label": "knob",
+        "at": "E6",
+        "step": 2
+      },
+      {
+        "id": "b1",
+        "type": "button",
+        "label": "button",
+        "at": "F14",
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:ring:din",
+        "to": "pin:NEOPIXEL_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:ring:vcc",
+        "to": "BP20",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "part:ring:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "part:ring:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "A6",
+        "to": "BN5",
+        "step": 2
+      },
+      {
+        "from": "A8",
+        "to": "BP7",
+        "step": 2
+      },
+      {
+        "from": "pin:POT_PIN",
+        "to": "J7",
+        "step": 2
+      },
+      {
+        "from": "pin:BUTTON_PIN",
+        "to": "J14",
+        "step": 3
+      },
+      {
+        "from": "A16",
+        "to": "BN14",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The NeoPixel ring",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the NeoPixel ring with three wires: GND to the blue (−) rail, Data Input (DI) to {{pin:NEOPIXEL_PIN}}, and PWR to power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    },
+    {
+      "title": "The knob",
+      "text": "Push the potentiometer in so its two outside legs go in E6 and E8 and its middle leg in G7. Add a black wire from A6 to the blue (−) rail, a red wire from A8 to the red (+) rail, and a wire from {{pin:POT_PIN}} to J7 (the middle leg)."
+    },
+    {
+      "title": "The button",
+      "text": "Press the button into the middle of the breadboard so it sits across the gap: its legs go in F14, F16, E14 and E16. Add a wire from {{pin:BUTTON_PIN}} to J14, and a black wire from A16 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    }
+  ],
   "steps": [
     {
       "title": "One colour",

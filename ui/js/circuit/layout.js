@@ -6,7 +6,7 @@
 // Units: 0.01 inch (the breadboard's 0.1" pitch is 10). Offboard positions
 // are in the same units, measured from the breadboard's top-left corner.
 
-import { activeItems, defaultResolvePin, parseEndpoint, rotateOffset } from "./netlist.js";
+import { activeItems, defaultResolvePin, parseEndpoint, powerName, rotateOffset } from "./netlist.js";
 
 /** Fritzing's standard wire colours. */
 export const WIRE_COLORS = {
@@ -194,7 +194,7 @@ export function layoutCircuit({ board, circuit, parts, pins }) {
       return { ...pt, dir: exitDir(pt, boardLayout.box) };
     }
     if (e.kind === "power") {
-      const name = e.name === "VCC" ? board.power?.vcc || "5V" : e.name;
+      const name = powerName(board, e.name);
       const list = boardArt.breadboard.power[name];
       if (!list?.length) return null;
       const pts = list.map((p) => { const pt = apply(bm, p.x, p.y); return { ...pt, dir: exitDir(pt, boardLayout.box) }; });

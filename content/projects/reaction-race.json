@@ -31,6 +31,177 @@
     "game state"
   ],
   "intro": "A game for 2 players. Wait for the light, then race to press your button first!",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "b1",
+        "type": "button",
+        "label": "player 1 button",
+        "at": "F2",
+        "step": 1
+      },
+      {
+        "id": "b2",
+        "type": "button",
+        "label": "player 2 button",
+        "at": "F26",
+        "step": 2
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green \"go\" LED",
+        "at": "H13",
+        "step": 3
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E13",
+        "rotate": 270,
+        "step": 3
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 4
+      },
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H7",
+        "step": 5
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E7",
+        "rotate": 270,
+        "step": 5
+      },
+      {
+        "id": "yellow",
+        "type": "led",
+        "color": "yellow",
+        "label": "yellow LED",
+        "at": "H21",
+        "step": 5
+      },
+      {
+        "id": "r-yellow",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E21",
+        "rotate": 270,
+        "step": 5
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_PIN",
+        "to": "J2",
+        "step": 1
+      },
+      {
+        "from": "A4",
+        "to": "BN4",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON2_PIN",
+        "to": "J26",
+        "step": 2
+      },
+      {
+        "from": "A28",
+        "to": "BN24",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J14",
+        "step": 3
+      },
+      {
+        "from": "A13",
+        "to": "BN11",
+        "step": 3
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 4
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 4
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J8",
+        "step": 5
+      },
+      {
+        "from": "A7",
+        "to": "BN6",
+        "step": 5
+      },
+      {
+        "from": "pin:LED_YELLOW",
+        "to": "J22",
+        "step": 5
+      },
+      {
+        "from": "A21",
+        "to": "BN18",
+        "step": 5
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "Player 1's button",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Press the player 1 button into the middle of the breadboard so it sits across the gap: its legs go in F2, F4, E2 and E4. Add a wire from {{pin:BUTTON_PIN}} to J2, and a black wire from A4 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "Player 2's button",
+      "text": "Press the player 2 button into the middle of the breadboard so it sits across the gap: its legs go in F26, F28, E26 and E28. Add a wire from {{pin:BUTTON2_PIN}} to J26, and a black wire from A28 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The green LED",
+      "text": "Push the green \"go\" LED into holes H13 and H14, with the long leg (+) in H14. Put a 220Ω resistor from G13 across the gap to E13. Add a wire from {{pin:LED_GREEN}} to J14, and a black wire from A13 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    },
+    {
+      "title": "The player LEDs",
+      "text": "Each player gets a light. Red is player 1's: Push the red LED into holes H7 and H8, with the long leg (+) in H8. Put a 220Ω resistor from G7 across the gap to E7. Add a wire from {{pin:LED_RED}} to J8, and a black wire from A7 to the blue (−) rail at the bottom. Yellow is player 2's: Push the yellow LED into holes H21 and H22, with the long leg (+) in H22. Put a 220Ω resistor from G21 across the gap to E21. Add a wire from {{pin:LED_YELLOW}} to J22, and a black wire from A21 to the blue (−) rail at the bottom."
+    }
+  ],
   "steps": [
     {
       "title": "Test both buttons",

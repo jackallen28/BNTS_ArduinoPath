@@ -26,6 +26,142 @@
     "libraries"
   ],
   "intro": "Type the secret code on a keypad to unlock a safe. A servo opens the lock.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "keys",
+        "type": "keypad-4x4",
+        "label": "keypad",
+        "offboard": {
+          "x": -320,
+          "y": -480
+        },
+        "step": 1
+      },
+      {
+        "id": "lcd",
+        "type": "lcd-i2c",
+        "label": "LCD screen",
+        "offboard": {
+          "x": 360,
+          "y": 30
+        },
+        "step": 2
+      },
+      {
+        "id": "servo",
+        "type": "servo",
+        "label": "servo lock",
+        "offboard": {
+          "x": 140,
+          "y": -115
+        },
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:keys:r1",
+        "to": "pin:KEYPAD_R1",
+        "step": 1
+      },
+      {
+        "from": "part:keys:r2",
+        "to": "pin:KEYPAD_R2",
+        "step": 1
+      },
+      {
+        "from": "part:keys:r3",
+        "to": "pin:KEYPAD_R3",
+        "step": 1
+      },
+      {
+        "from": "part:keys:r4",
+        "to": "pin:KEYPAD_R4",
+        "step": 1
+      },
+      {
+        "from": "part:keys:c1",
+        "to": "pin:KEYPAD_C1",
+        "step": 1
+      },
+      {
+        "from": "part:keys:c2",
+        "to": "pin:KEYPAD_C2",
+        "step": 1
+      },
+      {
+        "from": "part:keys:c3",
+        "to": "pin:KEYPAD_C3",
+        "step": 1
+      },
+      {
+        "from": "part:keys:c4",
+        "to": "pin:KEYPAD_C4",
+        "step": 1
+      },
+      {
+        "from": "part:lcd:gnd",
+        "to": "BN21",
+        "step": 2
+      },
+      {
+        "from": "part:lcd:vcc",
+        "to": "BP21",
+        "step": 2
+      },
+      {
+        "from": "part:lcd:sda",
+        "to": "pin:SDA",
+        "step": 2
+      },
+      {
+        "from": "part:lcd:scl",
+        "to": "pin:SCL",
+        "step": 2
+      },
+      {
+        "from": "part:servo:signal",
+        "to": "pin:SERVO_PIN",
+        "step": 3
+      },
+      {
+        "from": "part:servo:power",
+        "to": "BP17",
+        "step": 3
+      },
+      {
+        "from": "part:servo:gnd",
+        "to": "BN18",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The keypad",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. The keypad has eight pins on its ribbon. From left to right they are rows R1 to R4, then columns C1 to C4. Wire each one to the pin with the same name: R1 to {{pin:KEYPAD_R1}}, R2 to {{pin:KEYPAD_R2}}, R3 to {{pin:KEYPAD_R3}}, R4 to {{pin:KEYPAD_R4}}, C1 to {{pin:KEYPAD_C1}}, C2 to {{pin:KEYPAD_C2}}, C3 to {{pin:KEYPAD_C3}} and C4 to {{pin:KEYPAD_C4}}. Take your time and check each one!"
+    },
+    {
+      "title": "The LCD screen",
+      "text": "Connect the four pins on the back of the LCD (the I2C backpack) with wires: GND to the blue (−) rail, VCC to the red (+) rail, SDA to {{pin:SDA}} and SCL to {{pin:SCL}}."
+    },
+    {
+      "title": "The servo lock",
+      "text": "Plug three wires into the servo's plug: brown (or black) to the blue (−) rail, red to the red (+) rail, and orange (or yellow) to {{pin:SERVO_PIN}}."
+    }
+  ],
   "steps": [
     {
       "title": "Read the keypad",

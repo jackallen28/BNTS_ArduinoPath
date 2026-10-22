@@ -23,6 +23,110 @@
     "analogRead"
   ],
   "intro": "Steer a snake around an 8×8 LED matrix with a joystick. Eat the dots to grow!",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "joy",
+        "type": "joystick",
+        "label": "joystick",
+        "offboard": {
+          "x": 120,
+          "y": -150
+        },
+        "step": 1
+      },
+      {
+        "id": "matrix",
+        "type": "led-matrix",
+        "label": "LED matrix",
+        "offboard": {
+          "x": 360,
+          "y": 30
+        },
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:joy:gnd",
+        "to": "BN9",
+        "step": 1
+      },
+      {
+        "from": "part:joy:vcc",
+        "to": "BP10",
+        "step": 1
+      },
+      {
+        "from": "part:joy:vrx",
+        "to": "pin:JOY_X_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:joy:vry",
+        "to": "pin:JOY_Y_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:joy:sw",
+        "to": "pin:JOY_SW_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:matrix:vcc",
+        "to": "BP20",
+        "when": "5v",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:gnd",
+        "to": "BN21",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:din",
+        "to": "pin:MOSI",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:cs",
+        "to": "pin:MATRIX_CS",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:clk",
+        "to": "pin:SCK",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The joystick",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the joystick's five pins with wires: GND to the blue (−) rail, +5V to the red (+) rail, VRx to {{pin:JOY_X_PIN}}, VRy to {{pin:JOY_Y_PIN}} and SW to {{pin:JOY_SW_PIN}}."
+    },
+    {
+      "title": "The LED matrix",
+      "text": "Connect the matrix's five input pins (the end marked DIN) with wires: GND to the blue (−) rail, DIN to {{pin:MOSI}}, CS to {{pin:MATRIX_CS}}, CLK to {{pin:SCK}}, and VCC to power. DIN and CLK use the board's SPI pins. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    }
+  ],
   "steps": [
     {
       "title": "Read the joystick",
