@@ -141,6 +141,7 @@ func TestRealBundle(t *testing.T) {
 	}
 
 	compileDemos(ctx, t, tools, cat)
+	compileTestSketches(ctx, t, tools, cat)
 	for fam, st := range tools.Status() {
 		t.Logf("%s: %s", fam, st.State)
 	}
@@ -211,4 +212,49 @@ func firstChars(s string, n int) string {
 		return s[:n]
 	}
 	return s
+}
+
+// compileTestSketches compiles the Wiring Wizard's test program for every
+// project on every board it lists, when ARDUINOPATH_TEST_SKETCHES names
+// the file tools/test-sketches.mjs wrote (CI's boards job).
+func compileTestSketches(ctx context.Context, t *testing.T, tools *Tools, cat *content.Catalogue) {
+	path := os.Getenv("ARDUINOPATH_TEST_SKETCHES")
+	if path == "" {
+		t.Log("ARDUINOPATH_TEST_SKETCHES isn't set: not compiling the wiring test programs")
+		return
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var list []struct {
+		Project string `json:"project"`
+		Board   string `json:"board"`
+		Code    string `json:"code"`
+	}
+	if err := json.Unmarshal(raw, &list); err != nil {
+		t.Fatal(err)
+	}
+	if len(list) == 0 {
+		t.Fatal("no wiring test programs")
+	}
+	done := map[string]bool{} // board + code: the same program needs compiling once
+	start := time.Now()
+	for _, s := range list {
+		key := s.Board + "\x00" + s.Code
+		if done[key] {
+			continue
+		}
+		done[key] = true
+		b, ok := cat.Board(s.Board)
+		if !ok {
+			t.Errorf("%s: unknown board %s", s.Project, s.Board)
+			continue
+		}
+		res, err := tools.Compile(ctx, s.Code, b.FQBN, b.BuildProperties, nil)
+		if err != nil || !res.OK {
+			t.Errorf("wiring test for %s on %s: %v\n%s\n%s", s.Project, s.Board, err, CoachText(res.Diagnostics), tail(res.Output, 15))
+		}
+	}
+	t.Logf("%d wiring test programs compiled in %s", len(done), time.Since(start).Round(time.Second))
 }

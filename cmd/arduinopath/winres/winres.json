@@ -9,7 +9,7 @@
       "0409": {
         "identity": {
           "name": "BNTS.ArduinoPath",
-          "version": "1.0.0.0"
+          "version": "1.0.1.0"
         },
         "description": "ArduinoPath: Arduino and ESP coding tutor",
         "minimum-os": "win10",
@@ -33,18 +33,18 @@
     "#1": {
       "0000": {
         "fixed": {
-          "file_version": "1.0.0.0",
-          "product_version": "1.0.0.0"
+          "file_version": "1.0.1.0",
+          "product_version": "1.0.1.0"
         },
         "info": {
           "0409": {
             "CompanyName": "Banyule Nillumbik Tech School",
             "FileDescription": "ArduinoPath",
-            "FileVersion": "1.0.0",
+            "FileVersion": "1.0.1",
             "LegalCopyright": "Banyule Nillumbik Tech School. Parts art: Fritzing (CC BY-SA 3.0)",
             "OriginalFilename": "ArduinoPath.exe",
             "ProductName": "ArduinoPath",
-            "ProductVersion": "1.0.0"
+            "ProductVersion": "1.0.1"
           }
         }
       }

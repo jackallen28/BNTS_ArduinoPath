@@ -111,6 +111,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
   let mode = "sim"; // what the checklist is about: "sim" | "board"
   let boardSerial = ""; // what the real board has printed since the last upload
   let serialConn = null;
+  let simSerialWrite = null; // the run panel's own Send (to the simulator)
   let clue = null; // the Coach's explanation of the last clue, or a message
   let clueHints = 0; // how many of the clue's hints are showing
   let nudge = null;
@@ -511,6 +512,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       onEvents: () => { if (runKind === "run" && mode === "sim") scheduleEvaluate(); },
     });
     rp.busyLoopText = "Your loop is running without a break, so the board can't do anything else. Add a delay(...) inside the loop, or check your while loop can finish.";
+    simSerialWrite = rp.serialWrite;
     runHolder.replaceChildren(rp.el, rp.console.el);
     return rp;
   }
@@ -583,14 +585,14 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     } catch {
       ports = [];
     }
-    const remembered = localStorageGet("arduinopath.port");
-    const guess = realboard.guessPort(ports, board(), portSelect.value || remembered);
+    ports = realboard.sortPorts(ports);
+    const guess = realboard.guessPort(ports, board(), portSelect.value || realboard.rememberedPort());
     portSelect.replaceChildren(
       h("option", { value: "", text: ports.length ? "Pick your board's port" : "Plug in your board..." }),
       ports.map((p) => h("option", { value: p.port, text: realboard.portLabel(p), selected: p.port === guess || null })));
   }
   portSelect.addEventListener("focus", refreshPorts);
-  portSelect.addEventListener("change", () => localStorageSet("arduinopath.port", portSelect.value));
+  portSelect.addEventListener("change", () => realboard.rememberPort(portSelect.value));
 
   function setBusy(on) {
     [uploadBtn, checkBtn].forEach((b) => { b.disabled = on; });
@@ -617,13 +619,12 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     if (!editor || blanksClue()) return;
     const b = board();
     await refreshPorts();
-    let port = portSelect.value;
-    if (!port && ports.length === 1) port = ports[0].port;
+    const port = portSelect.value || realboard.guessPort(ports, b, realboard.rememberedPort());
     if (!port) {
       await messageBox({
         kind: "info",
-        instruction: ports.length ? "Which port is your board on?" : "Plug in your board",
-        text: ports.length
+        instruction: ports.some(realboard.isUsb) ? "Which port is your board on?" : "Plug in your board",
+        text: ports.some(realboard.isUsb)
           ? "Pick your board's port from the list next to Upload, then press Upload again."
           : ["ArduinoPath can't see a board yet.", "Plug it in with a USB cable that can send data (some only charge), then press Upload again."],
       });
@@ -642,7 +643,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       });
       if (!afterCompile(job, b, con, true)) return;
       con.setStatus("Uploaded ✓", "good");
-      localStorageSet("arduinopath.port", port);
+      realboard.rememberPort(port);
       mode = "board";
       boardSerial = "";
       openBoardSerial(port, con);
@@ -693,12 +694,15 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     return parts.join("\n");
   }
 
-  function openBoardSerial(port, con) {
+  function openBoardSerial(port, con, { afterUpload = true } = {}) {
     con.clear();
     con.showMonitor();
     con.setBaudVisible(true);
-    con.baud = baudOf(code());
+    if (afterUpload) con.baud = baudOf(code());
+    con.setStatus(`Listening to your board on ${port}...`, "");
     serialConn = realboard.openSerial(port, con.baud, {
+      retryMs: afterUpload ? 8000 : 3000, // the board restarts after an upload
+      onOpen: () => con.setStatus(`Connected to ${port} at ${con.baud} baud`, "good"),
       onData: (text) => {
         con.append(text);
         boardSerial += text.replace(/\r\n/g, "\n");
@@ -707,6 +711,13 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       },
       onClose: (reason) => { if (reason) con.setStatus(reason, "warn"); },
     });
+    // The Serial Monitor's Send box and speed now talk to the real board.
+    rp.serialWrite = (text) => serialConn?.write(text).catch((err) => con.setStatus(err.message, "warn"));
+    rp.onBaud = () => {
+      if (!serialConn) return;
+      serialConn.close();
+      openBoardSerial(port, con, { afterUpload: false });
+    };
   }
 
   function scheduleEvaluateBoard() {
@@ -717,7 +728,11 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
   function closeBoardSerial() {
     if (serialConn) serialConn.close();
     serialConn = null;
-    if (rp) rp.console.setBaudVisible(false);
+    if (rp) {
+      rp.console.setBaudVisible(false);
+      rp.serialWrite = simSerialWrite; // Send goes to the simulator again
+      rp.onBaud = null;
+    }
   }
 
   // ---------- Wiring ----------
@@ -844,18 +859,4 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     await saver.flush();
     saver.stop();
   };
-}
-
-function localStorageGet(k) {
-  try {
-    return localStorage.getItem(k);
-  } catch {
-    return null;
-  }
-}
-
-function localStorageSet(k, v) {
-  try {
-    localStorage.setItem(k, v);
-  } catch { /* private window */ }
 }

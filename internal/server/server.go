@@ -42,7 +42,10 @@ type Server struct {
 	Problems  []content.Problem
 	UI        fs.FS
 	Version   string
-	Log       *slog.Logger
+	// DataDir is the folder with everyone's work and arduinopath.log (shown
+	// in the About box, for troubleshooting).
+	DataDir string
+	Log     *slog.Logger
 	// CacheStatic lets browsers cache the web app's files (they are checked
 	// with an ETag on every load). Turn it off when editing ui/ live.
 	CacheStatic bool

@@ -126,7 +126,10 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
   // Sound may only start after a click or key press on the page.
   for (const ev of ["pointerdown", "keydown"]) el.addEventListener(ev, () => sound.unlock(), { passive: true });
 
-  const con = serialConsole({ onSend: (text) => api.serialWrite(text) });
+  // Send and the speed go through the panel, so a real board's Serial
+  // Monitor can take them over (the workspace replaces serialWrite and
+  // sets onBaud after an Upload).
+  const con = serialConsole({ onSend: (text) => api.serialWrite(text), onBaud: (baud) => api.onBaud?.(baud) });
 
   // ----- the circuit -----
   const pinsFn = () => defaultResolvePin(curBoard, pinOverrides(curProject?.pins, curBoard));
