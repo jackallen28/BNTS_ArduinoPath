@@ -137,3 +137,4 @@
 .wiz-drawing-host > .cp-circuit { flex: 1; }
 .wiz-port { display: flex; gap: 6px; align-items: center; }
 .wiz-confirm { white-space: nowrap; }
+.rp-phone-screen-host { flex: 1; display: flex; min-height: 260px; background: #fff; border-radius: 4px; }

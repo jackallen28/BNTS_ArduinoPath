@@ -103,9 +103,10 @@ export function openWiringWizard({ project, board, pins, onDone = () => {}, onCl
     renderDots();
     const p = pages[at];
     back.disabled = at === 0;
-    next.hidden = p.kind === "test";
-    finish.hidden = p.kind !== "test";
-    skip.hidden = p.kind !== "meet";
+    // (style, not the hidden attribute: .btn's display would win over [hidden])
+    next.style.display = p.kind === "test" ? "none" : "";
+    finish.style.display = p.kind !== "test" ? "none" : "";
+    skip.style.display = p.kind !== "meet" ? "none" : "";
     page.replaceChildren(h("p", { class: "muted", text: "Getting things ready…" }));
     await ready();
     if (pages[at] !== p) return;

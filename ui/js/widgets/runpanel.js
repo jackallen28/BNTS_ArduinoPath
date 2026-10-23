@@ -98,14 +98,24 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
     } }, "🔊 Sound on");
   const stage = h("div", { class: "rp-stage" });
   const tip = h("div", { class: "balloon rp-tip", hidden: true, role: "status" });
-  const phoneScreen = h("iframe", { class: "rp-phone-screen", title: "The phone's web page", sandbox: "allow-same-origin" });
+  // The phone's screen: made when a sketch first serves a page (an empty
+  // sandboxed frame logs a warning, so don't make one before it's needed).
+  let phoneScreen = null;
+  const screenHost = h("div", { class: "rp-phone-screen-host" });
+  function screen() {
+    if (phoneScreen) return phoneScreen;
+    phoneScreen = h("iframe", { class: "rp-phone-screen", title: "The phone's web page", sandbox: "allow-same-origin", srcdoc: "<p></p>" });
+    phoneScreen.addEventListener("load", hookScreen);
+    screenHost.append(phoneScreen);
+    return phoneScreen;
+  }
   const phoneAddress = h("input", { class: "input rp-phone-address", "aria-label": "Web address on the phone", value: "/" });
   const phoneGo = h("button", { class: "btn small", type: "button", onclick: () => phoneOpen(phoneAddress.value) }, "Go");
   const phoneNote = h("p", { class: "rp-phone-note", text: "Start your web server, then press Go." });
   const phone = h("aside", { class: "rp-phone", hidden: true, "aria-label": "Phone" },
     h("div", { class: "rp-phone-top" }, h("span", { class: "rp-phone-wifi", text: "📶 WiFi" }), h("span", { class: "rp-phone-ip", text: "" })),
     h("div", { class: "rp-phone-bar" }, phoneAddress, phoneGo),
-    phoneScreen, phoneNote);
+    screenHost, phoneNote);
   const el = h("section", { class: "run-panel", "aria-label": "Simulator" },
     h("div", { class: "rp-head" },
       h("div", { class: "tabs", role: "tablist", "aria-label": "Drawing" }, tabBb, tabSch),
@@ -182,10 +192,10 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
     }
     phoneNote.textContent = `Page ${res.status === 200 ? "loaded" : `answered ${res.status}`}`;
     const html = /html/.test(res.type || "") ? res.body : `<pre>${String(res.body).replace(/[<&]/g, (c) => (c === "<" ? "&lt;" : "&amp;"))}</pre>`;
-    phoneScreen.srcdoc = html;
+    screen().srcdoc = html;
   }
   // Links and forms on the phone's page become requests to the sketch.
-  phoneScreen.addEventListener("load", () => {
+  function hookScreen() {
     const doc = phoneScreen.contentDocument;
     if (!doc) return;
     doc.addEventListener("click", (e) => {
@@ -203,7 +213,7 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
       if (method === "GET") phoneOpen(`${action}?${new URLSearchParams(data)}`);
       else phoneOpen(action, { method, form: data });
     });
-  });
+  }
 
   function showPhone(ip) {
     phone.hidden = false;
