@@ -61,7 +61,11 @@ export class TestRows {
       const r = this.row(m.id);
       if (!r) continue;
       changed.add(r.id);
-      if (m.kind === "TEST") { r.signal = true; r.value = m.value; continue; }
+      if (m.kind === "TEST") {
+        if (this.current && this.current !== r.id) changed.add(this.current);
+        r.signal = true; r.value = m.value; this.current = r.id;
+        continue;
+      }
       this.reading(r, m.value);
     }
     return [...changed];
@@ -99,6 +103,7 @@ export class TestRows {
   restart() {
     this.partial = "";
     this.hello = false;
+    this.current = null;
     for (const r of this.rows) {
       Object.assign(r, { signal: false, first: null, value: null, level: null });
       if (r.kind === "input") Object.assign(r, { seen: false, ok: false });

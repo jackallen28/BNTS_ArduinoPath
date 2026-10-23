@@ -229,7 +229,8 @@ export function openWiringWizard({ project, board, pins, onDone = () => {}, onCl
         const mark = r.ok ? "✓" : testRunning ? "…" : r.signal || r.seen ? "?" : "✗";
         const hint = r.kind === "input"
           ? (r.ok ? "Working!" : r.prompt || "") + (r.value != null && !["dht", "keypad-4x4", "rfid-rc522"].includes(r.type) ? "" : r.value ? ` Reading: ${r.value}` : "")
-          : r.ok ? "You saw it work." : r.signal ? "It's having its turn now. Did you see (or hear) it?" : "Wait for its turn, then tick the box.";
+          : r.ok ? "You saw it work." : rows.current === r.id ? "It's having its turn now. Did you see (or hear) it?"
+            : r.signal ? "It had a turn. Did you see (or hear) it? It will go again soon." : "Wait for its turn, then tick the box.";
         const bar = r.level != null ? h("div", { class: "wiz-bar", "aria-hidden": "true" }, barFill(r.level)) : null;
         const confirm = r.kind === "output" ? h("label", { class: "wiz-confirm" },
           h("input", { type: "checkbox", checked: r.confirmed, onchange: (e) => { rows.confirm(r.id, e.target.checked); drawRows(); } }), " I saw it work") : null;
