@@ -510,7 +510,8 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       },
       onEvents: () => { if (runKind === "run" && mode === "sim") scheduleEvaluate(); },
     });
-    runHolder.replaceChildren(rp.el);
+    rp.busyLoopText = "Your loop is running without a break, so the board can't do anything else. Add a delay(...) inside the loop, or check your while loop can finish.";
+    runHolder.replaceChildren(rp.el, rp.console.el);
     return rp;
   }
 

@@ -20,9 +20,12 @@ async function newStudent(page, name) {
   await expect(page.getByRole("heading", { name: new RegExp(`Hi ${name}!`) })).toBeVisible();
 }
 
-async function closeWizardIfOpen(page) {
+// A project with parts opens the Wiring Wizard first (its own test goes through it).
+async function closeWizard(page) {
   const wizard = page.getByRole("dialog", { name: /Wiring Wizard/ });
-  if (await wizard.isVisible({ timeout: 1500 }).catch(() => false)) await page.keyboard.press("Escape");
+  await expect(wizard).toBeVisible();
+  await wizard.getByRole("button", { name: "Close" }).click();
+  await expect(wizard).toBeHidden();
 }
 
 test("a project, one step at a time", async ({ page }) => {
@@ -31,7 +34,7 @@ test("a project, one step at a time", async ({ page }) => {
   await newStudent(page, "Zara");
 
   await page.locator(".project-card", { hasText: "Blink & Traffic Lights" }).click();
-  await closeWizardIfOpen(page);
+  await closeWizard(page);
   const guide = page.locator(".side-panel.guide");
   await expect(guide.getByRole("heading", { name: /Step 1 of 4/ })).toBeVisible();
   const editor = page.locator(".editor-text");
@@ -72,12 +75,12 @@ test("a project, one step at a time", async ({ page }) => {
 
   // Watch the goal plays the model answer, and doesn't tick anything.
   await page.locator("#tool-goal").click();
-  await expect(page.locator(".run-banner.goal")).toContainText("Watching the goal");
+  await expect(page.locator(".rp-banner")).toContainText("Watching the goal");
 
   // Progress is saved: reopening the project comes back to step 2.
   await page.getByRole("button", { name: "Projects" }).click();
   await page.locator(".project-card", { hasText: "Blink & Traffic Lights" }).click();
-  await closeWizardIfOpen(page);
+  await closeWizard(page);
   await expect(guide.getByRole("heading", { name: /Step 2 of 4/ })).toBeVisible();
   await expect(guide.locator(".step-dot.done")).toHaveCount(1);
 
@@ -89,7 +92,7 @@ test("a screen-only project with the Serial Monitor", async ({ page }) => {
   page.on("pageerror", (e) => problems.push(e.message));
   await newStudent(page, "Omar");
   await page.locator(".project-card", { hasText: "Serial Chatbot" }).click();
-  await closeWizardIfOpen(page);
+  await expect(page.getByRole("dialog", { name: /Wiring Wizard/ })).toHaveCount(0); // no parts, no wiring
   const editor = page.locator(".editor-text");
   await expect(editor).toHaveValue(/___/);
   await editor.fill((await editor.inputValue()).replace("___", '"Hello from Omar!"'));
