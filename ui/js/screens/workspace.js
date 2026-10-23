@@ -19,6 +19,7 @@ import { explain } from "../coach.js";
 import { normalise, stepState, stepStars, projectStars, starsMessage, hintsUnlocked, Coach, harder, easier } from "../learning.js";
 import { review } from "../review.js";
 import * as realboard from "../realboard.js";
+import { pinPlan } from "../sim/pins.js";
 import { splitText, showExplanation, starterFor, demoFor, blanks, baudOf, simDiagnostics, checklist, allDone, firstFailing, canSkip, openingStep } from "../guide.js";
 
 export function starterSketch(title) {
@@ -720,7 +721,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
 
   // ---------- Wiring ----------
   async function openWiring(first) {
-    if (!project?.circuit || project.circuit.breadboard === "none" && !project.parts?.length) return;
+    if (!project?.circuit || (project.circuit.breadboard === "none" && !project.parts?.length)) return;
     let wizard;
     try {
       wizard = await import("../wizard.js");
@@ -729,7 +730,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     }
     stopRun();
     wizard.openWiringWizard({
-      project, board: board(),
+      project, board: board(), pins: pinPlan(project, board()),
       onDone: () => {
         progress.wiring_done = true;
         saveProgress();
