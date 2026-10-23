@@ -2,7 +2,7 @@
 // mode, a fresh data folder, its own port). Run: npm run e2e
 import { defineConfig } from "@playwright/test";
 
-const PORT = 8543;
+const PORT = Number(process.env.E2E_PORT) || 8543; // E2E_PORT lets two test runs share a computer
 
 export default defineConfig({
   testDir: "tests/e2e",

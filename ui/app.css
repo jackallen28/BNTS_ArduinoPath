@@ -471,3 +471,78 @@
 .curriculum-strand h4 { margin: 10px 0 4px; color: var(--bnts-purple); }
 .curriculum-strand ul { margin: 0; padding-left: 18px; }
 @media (max-width: 760px) { .curriculum { grid-template-columns: 1fr; } }
+
+/* ---------- Workspace: guide | code | simulator ---------- */
+
+.workspace-split { align-items: stretch; }
+.workspace .side-panel.guide { width: 330px; }
+.code-column { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
+.code-column .editor-holder { flex: 1; }
+.run-holder {
+  flex: none;
+  width: clamp(320px, 36vw, 620px);
+  position: sticky;
+  top: 66px;
+  height: calc(100vh - 100px);
+  padding: 10px 10px 10px 0;
+  display: flex;
+  flex-direction: column;
+}
+.run-panel { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.run-panel .console { flex: 1; min-height: 160px; }
+.run-view { min-height: 60px; padding: 6px 8px; border: 1px solid #c9d6e3; border-radius: 4px; background: #fff; }
+.run-banner { padding: 3px 10px; border-radius: 3px; background: linear-gradient(180deg, #e9f9fa, #c9eef0); border: 1px solid #8fd3d7; font-weight: 600; color: #0b5f63; }
+.run-banner.goal { background: linear-gradient(180deg, #f3eef8, #ddd0ea); border-color: #b9a2cf; color: var(--instruction); }
+.port-select { max-width: 190px; align-self: center; }
+
+.guide-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; padding: 0; list-style: none; }
+.step-dot {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid #8ea4b8; background: linear-gradient(180deg, #ffffff, #dfe7ee);
+  font: inherit; font-size: 12px; font-weight: 600; color: #3b4b5a; cursor: pointer;
+  box-shadow: inset 0 1px 0 #fff;
+}
+.step-dot.done { border-color: #4f9a45; background: linear-gradient(180deg, #e9f8e5, #b9e3ae); color: var(--good); }
+.step-dot.current { border-color: var(--instruction); box-shadow: 0 0 0 2px #cfc2e0; color: var(--instruction); }
+.step-dot:disabled { opacity: 0.5; cursor: default; }
+.stars { margin-left: auto; color: #b8860b; font-weight: 600; }
+.stars-line { color: #8a6500; }
+.step-title { margin: 0 0 8px; font-size: 15px; }
+.step-text p, .step-goal p { margin: 0 0 8px; }
+.step-goal { padding: 6px 9px; border-left: 3px solid var(--instruction); background: #f6f2fa; margin-bottom: 8px; }
+.step-goal p:last-child { margin-bottom: 0; }
+.btn.link { border: 0; background: none; box-shadow: none; padding: 0; color: #1d63a6; text-decoration: underline; cursor: pointer; margin-bottom: 8px; }
+.checklist ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.check-row { display: flex; gap: 6px; align-items: flex-start; }
+.check-mark { flex: none; width: 16px; text-align: center; color: #8b97a3; font-weight: 700; }
+.check-row.ok .check-mark { color: var(--good); }
+.check-row.ok > span:not(.check-mark) { color: var(--good); }
+.check-tick { display: inline-flex; gap: 5px; align-items: flex-start; }
+.checklist, .hints { margin-bottom: 10px; }
+.hint { margin-bottom: 6px; }
+.hint p { display: inline; }
+.clue { margin-bottom: 10px; }
+.clue p { margin: 4px 0; }
+.clue .btn { margin: 4px 6px 0 0; }
+.compiler-message { white-space: pre-wrap; font-size: 11px; background: #fff; border: 1px solid #e7a9a1; padding: 4px 6px; margin: 4px 0; }
+.step-done { margin-bottom: 10px; }
+.review ul { margin: 4px 0 0; padding-left: 18px; }
+.step-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.nudge.balloon-inline {
+  position: relative;
+  margin-bottom: 12px; padding: 9px 30px 10px 12px;
+  border: 1px solid var(--balloon-border); border-radius: 8px;
+  background: var(--balloon); box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.25);
+  font-size: var(--font-size-small);
+}
+.nudge p { margin: 4px 0 8px; }
+.nudge-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+.nudge .caption-close { position: absolute; top: 6px; right: 6px; }
+.ideas { margin: 0; padding-left: 18px; }
+.cheat { margin: 0; font-size: 11.5px; white-space: pre-wrap; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 1100px) {
+  .workspace-split { flex-wrap: wrap; }
+  .run-holder { position: static; width: 100%; height: auto; min-height: 420px; padding: 0 10px 10px; }
+}
