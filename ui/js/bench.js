@@ -288,7 +288,8 @@ export class Bench {
         }
         return {};
       }
-      case "soil-moisture": return analog("sig", v.moisture ?? 0.5);
+      // Soil sensors read higher when the soil is drier (about 900 dry, 300 in water on a 10-bit pin).
+      case "soil-moisture": return analog("sig", 0.88 - 0.6 * (v.moisture ?? 0.5));
       case "joystick": {
         const out = { ...analog("vrx", v.x ?? 0.5) };
         const y = analog("vry", v.y ?? 0.5).analog || {};

@@ -290,7 +290,20 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
   /** Applies one sim_event during a demo run (in real time). */
   function applySimEvent(ev) {
     if (!sim?.running) return;
-    if (ev.set) sim.setInputs(ev.set);
+    if (ev.set) {
+      sim.setInputs(ev.set);
+      // Show a pretend button press on the drawing too.
+      if (ev.set.digital && bench) {
+        const resolve = pinsFn();
+        const buttons = bench.testParts().filter((p) => p.type === "button");
+        const pressed = {};
+        for (const [name, v] of Object.entries(ev.set.digital)) {
+          const code = resolve(name)?.code ?? name;
+          for (const b of buttons) if (b.pins.signal === code) pressed[b.id] = v === 0 || v === "LOW";
+        }
+        if (Object.keys(pressed).length) setState({ button: pressed });
+      }
+    }
     if (ev.serial != null) sim.serialWrite(String(ev.serial));
     if (ev.key != null) sim.pressKey(String(ev.key));
     if (ev.card != null) sim.tapCard(ev.card);
@@ -393,6 +406,10 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
     },
 
     serialWrite(text) { sim?.serialWrite(text); },
+
+    /** Shows a Coach balloon on the panel (title, text). */
+    showTip(title, text) { showTip(title, text); },
+    hideTip() { tip.hidden = true; },
 
     /** Calls fn(text) with the simulator's serial output as it arrives. Returns an unsubscribe function. */
     onSerial(fn) { serialListeners.add(fn); return () => serialListeners.delete(fn); },

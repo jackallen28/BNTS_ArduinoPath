@@ -105,3 +105,10 @@ test("the blink demo, run headless, lights the red LED on the drawing", () => {
   for (const ev of r.events) max = Math.max(max, bench.apply([ev]).state.led?.red ?? 0);
   assert.equal(max, 1);
 });
+
+test("soil sensors read higher when the soil is drier", () => {
+  const bench = benchFor("plant-buddy", "uno");
+  const dry = bench.control("soil", "moisture", 0).inputs.analog[16];
+  const wet = bench.control("soil", "moisture", 1).inputs.analog[16];
+  assert.ok(dry > 850 && wet < 320, `${dry} ${wet}`);
+});
