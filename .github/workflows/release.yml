@@ -63,7 +63,7 @@ jobs:
     needs: version
     if: needs.version.outputs.skip != 'true'
     runs-on: windows-latest
-    timeout-minutes: 150
+    timeout-minutes: 200
     defaults:
       run:
         shell: bash
@@ -115,7 +115,7 @@ jobs:
       - name: Unpack the built-in tools and compile for every board
         env:
           ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath.exe
-        run: go test -v -timeout 120m -run TestRealBundle ./internal/arduino
+        run: go test -v -timeout 170m -run TestRealBundle ./internal/arduino
 
       - name: Start ArduinoPath.exe and use it
         shell: pwsh

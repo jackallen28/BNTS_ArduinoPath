@@ -32,8 +32,14 @@ func TestRealBundle(t *testing.T) {
 		t.Fatalf("the bundle has tools %s, this build pins %s", b.Manifest.Hash, Pinned().Hash())
 	}
 	data := t.TempDir()
-	tools := NewTools(b, data, nil)
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Minute)
+	// Where the app puts them (on Windows, a short folder in the home folder).
+	tools := NewTools(b, ToolsFolder(data), nil)
+	// As long as go test allows (-timeout), less a minute to report.
+	deadline, ok := t.Deadline()
+	if !ok {
+		deadline = time.Now().Add(50 * time.Minute)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline.Add(-time.Minute))
 	defer cancel()
 
 	type board struct {

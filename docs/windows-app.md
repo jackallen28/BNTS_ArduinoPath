@@ -33,6 +33,11 @@ In `%LOCALAPPDATA%\ArduinoPath` (for example `C:\Users\<you>\AppData\Local\Ardui
 - `arduinopath.db`: every profile on this laptop, with their code and progress
 - `arduinopath.log`: what happened, for troubleshooting
 
+The tools that compile code for each board are unpacked the first time they're needed into a
+hidden folder, `C:\Users\<you>\.arduinopath` (a short path, because Windows can't open the
+ESP8266 compiler's files from deeper folders). It holds no student work, and can be deleted at any
+time: ArduinoPath unpacks the tools again when it next needs them.
+
 It's inside the Windows account that ran it. If students log in to the laptop with their own
 Windows accounts, each one has their own ArduinoPath with their own profiles. To move work to
 another laptop: **Settings > My work > Save my work**, then **Open my work** on the other laptop.

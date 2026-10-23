@@ -45,12 +45,16 @@ type FamilyStatus struct {
 }
 
 // NewTools uses the board tools in bundle, unpacking them into a folder
-// inside dataDir (one per tools version; older ones are removed).
-func NewTools(bundle *Bundle, dataDir string, log *slog.Logger) *Tools {
+// inside folder (one per tools version, kept short for Windows; older ones
+// are removed). The app passes ToolsFolder(its data folder).
+func NewTools(bundle *Bundle, folder string, log *slog.Logger) *Tools {
 	if log == nil {
 		log = slog.Default()
 	}
-	dir := filepath.Join(dataDir, "arduino-"+bundle.Manifest.Hash[:12])
+	dir := filepath.Join(folder, "tools-"+bundle.Manifest.Hash[:8])
+	if n := len(dir) + longestToolPath; n > 250 {
+		log.Warn("the board tools' paths may be too long for Windows", "folder", dir, "longest", n)
+	}
 	t := &Tools{env: &Env{Dir: dir, Log: log}, bundle: bundle, log: log, status: map[string]*FamilyStatus{}}
 	t.cond = sync.NewCond(&t.mu)
 	for _, f := range append([]string{"common"}, Families...) {
@@ -63,9 +67,14 @@ func NewTools(bundle *Bundle, dataDir string, log *slog.Logger) *Tools {
 		}
 		t.status[f] = st
 	}
-	go removeOldTools(dataDir, filepath.Base(dir), log)
+	go RemoveOldTools(folder, filepath.Base(dir), log)
 	return t
 }
+
+// longestToolPath is about the longest path the compilers open inside a
+// tools folder: the ESP8266 compiler's route to c++config.h, through its
+// bin folder. Windows can't open paths of 260 letters or more.
+const longestToolPath = len(`\data\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.1.0-gcc10.3-e5f9fec\bin\..\lib\gcc\xtensa-lx106-elf\10.3.0\..\..\..\..\xtensa-lx106-elf\include\c++\10.3.0\xtensa-lx106-elf\bits\c++config.h`)
 
 // InstalledTools uses tools already installed by Env.Setup in dir.
 func InstalledTools(dir string, log *slog.Logger) (*Tools, error) {
@@ -93,13 +102,16 @@ func (t *Tools) unpacked(family string) bool {
 	return err == nil && strings.TrimSpace(string(b)) == t.bundle.Manifest.Hash
 }
 
-// removeOldTools deletes tools unpacked by older versions of ArduinoPath.
-func removeOldTools(dataDir, keep string, log *slog.Logger) {
-	entries, _ := os.ReadDir(dataDir)
+// RemoveOldTools deletes tools unpacked by older versions of ArduinoPath
+// in folder (tools-<version>, and arduino-<version> from before 0.4), except
+// keep.
+func RemoveOldTools(folder, keep string, log *slog.Logger) {
+	entries, _ := os.ReadDir(folder)
 	for _, e := range entries {
-		if e.IsDir() && strings.HasPrefix(e.Name(), "arduino-") && e.Name() != keep {
-			log.Info("removing old board tools", "folder", e.Name())
-			os.RemoveAll(filepath.Join(dataDir, e.Name()))
+		name := e.Name()
+		if e.IsDir() && (strings.HasPrefix(name, "arduino-") || strings.HasPrefix(name, "tools-")) && name != keep {
+			log.Info("removing old board tools", "folder", filepath.Join(folder, name))
+			os.RemoveAll(filepath.Join(folder, name))
 		}
 	}
 }

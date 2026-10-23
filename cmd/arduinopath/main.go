@@ -344,7 +344,11 @@ func boardTools(cfg config, log *slog.Logger) (*arduino.Tools, func()) {
 		return nil, func() {}
 	}
 	log.Info("board tools found", "in", b.Path, "families", len(b.Manifest.Families))
-	return arduino.NewTools(b, cfg.dataDir, log), func() { b.Close() }
+	folder := arduino.ToolsFolder(cfg.dataDir)
+	if folder != cfg.dataDir {
+		go arduino.RemoveOldTools(cfg.dataDir, "", log) // tools unpacked here by older versions
+	}
+	return arduino.NewTools(b, folder, log), func() { b.Close() }
 }
 
 func shutdown(hs *http.Server) error {

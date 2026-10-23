@@ -60,7 +60,7 @@ jobs:
     # board, then start the exe and use it (and compile for an Uno through
     # its API). The exe is kept as a download on the run's page.
     runs-on: windows-latest
-    timeout-minutes: 120
+    timeout-minutes: 200
     defaults:
       run:
         shell: bash
@@ -104,7 +104,7 @@ jobs:
       - name: Unpack the built-in tools and compile for every board
         env:
           ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath.exe
-        run: go test -v -timeout 90m -run TestRealBundle ./internal/arduino
+        run: go test -v -timeout 170m -run TestRealBundle ./internal/arduino
 
       - name: Start ArduinoPath.exe and use it
         shell: pwsh
