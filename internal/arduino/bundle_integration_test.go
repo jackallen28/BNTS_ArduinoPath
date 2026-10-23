@@ -148,7 +148,16 @@ func TestRealBundle(t *testing.T) {
 
 // demoBoards are the boards every model answer is compiled for: one per
 // chip (the other boards of a family share its core and libraries).
-var demoBoards = []string{"uno", "nodemcu", "esp32", "esp32-c3"}
+// GitHub's Windows machines give up partway through the ESP32 ones (they're
+// slow there), so Windows compiles every answer for the Uno and the NodeMCU
+// (whose compiler's paths are the longest), and the ESP32 boards get Blink
+// and the kit check above; Mac, Linux and the Pi compile them all.
+var demoBoards = func() []string {
+	if runtime.GOOS == "windows" {
+		return []string{"uno", "nodemcu"}
+	}
+	return []string{"uno", "nodemcu", "esp32", "esp32-c3"}
+}()
 
 // compileDemos compiles every step's model answer for every board its
 // project lists, with the pin header for that board. Boards compile side
