@@ -1,0 +1,139 @@
+/*
+ * The run panel (ui/js/widgets/runpanel.js) and the Wiring Wizard
+ * (ui/js/wizard.js). Colours and gradients come from theme.css.
+ */
+
+/* ---------- Run panel ---------- */
+
+.run-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  border: 1px solid var(--panel-border);
+  border-radius: 3px;
+  background: var(--panel-frame);
+}
+.rp-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 4px 6px 0;
+  background: var(--toolbar);
+  border-bottom: 1px solid var(--toolbar-border);
+}
+.rp-head .tabs { margin-bottom: -1px; }
+.rp-status {
+  flex: 1;
+  align-self: center;
+  color: var(--text-muted);
+  font-size: var(--font-size-small);
+  text-align: right;
+}
+.run-panel.rp-running .rp-status { color: var(--good); font-weight: 600; }
+.rp-mute { align-self: center; margin-bottom: 3px; }
+.rp-banner {
+  padding: 4px 10px;
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  background: var(--pill-purple);
+  border-bottom: 1px solid var(--pill-purple-border);
+}
+.run-panel.rp-goal .rp-stage { box-shadow: inset 0 0 0 3px var(--bnts-lilac); }
+.rp-body { flex: 1; display: flex; min-height: 0; }
+.rp-stage { flex: 1; min-width: 0; min-height: 220px; display: flex; }
+.rp-stage > .cp-circuit { flex: 1; }
+.rp-error { margin: auto; color: var(--warn); }
+
+.rp-tip {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  max-width: 300px;
+  z-index: 5;
+}
+.rp-tip p { margin: 4px 0 6px; }
+
+/* The phone panel, for sketches that serve web pages. */
+.rp-phone {
+  display: flex;
+  flex-direction: column;
+  width: 230px;
+  margin: 8px;
+  padding: 26px 10px 30px;
+  border-radius: 26px;
+  background: linear-gradient(160deg, #3a3f48, #16181c);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 0 0 2px #555b66;
+}
+.rp-phone[hidden] { display: none; }
+.rp-phone-top { display: flex; justify-content: space-between; color: #cfd6df; font-size: 11px; padding: 0 4px 4px; }
+.rp-phone-bar { display: flex; gap: 4px; margin-bottom: 4px; }
+.rp-phone-address { flex: 1; min-width: 0; font-size: 12px; padding: 2px 4px; }
+.rp-phone-screen { flex: 1; min-height: 260px; width: 100%; border: 0; border-radius: 4px; background: #fff; }
+.rp-phone-note { margin: 4px 2px 0; color: #cfd6df; font-size: 11px; }
+
+/* ---------- Wiring Wizard ---------- */
+
+.dialog.wizard { width: min(1100px, calc(100vw - 32px)); }
+.wizard .window-body { display: flex; flex-direction: column; min-height: min(640px, calc(100vh - 80px)); }
+.wiz-dots { display: flex; gap: 6px; align-items: center; padding: 8px 14px 0; }
+.wiz-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid #7b8794;
+  background: linear-gradient(180deg, #fff, #d6dde5);
+}
+.wiz-dot.done { background: linear-gradient(180deg, #9ce6ea, #19c1ca); border-color: var(--pill-border); }
+.wiz-dot.now { background: linear-gradient(180deg, #d9c7e8, #704988); border-color: var(--pill-purple-border); box-shadow: 0 0 4px var(--bnts-purple); }
+.wiz-dot-label { margin-left: 8px; color: var(--text-muted); font-size: var(--font-size-small); }
+.wiz-page { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 10px 16px; min-height: 0; overflow: auto; }
+.wiz-page h2 { margin: 0; }
+.wiz-safety {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 6px 10px;
+  border: 1px solid #e0c46c;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #fffbe6, #fff3c4);
+  font-size: var(--font-size-small);
+}
+.wiz-meet { display: grid; grid-template-columns: minmax(160px, 260px) 1fr; gap: 18px; align-items: start; }
+.wiz-meet-art {
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px; min-height: 160px;
+  border: 1px solid var(--groupbox-border); border-radius: 4px;
+  background: linear-gradient(180deg, #fbfcfd, #eef2f6);
+}
+.wiz-meet-art svg { max-width: 100%; max-height: 240px; }
+.wiz-meet dl { margin: 0; }
+.wiz-meet dt { margin-top: 8px; font-weight: 600; color: var(--instruction); }
+.wiz-meet dd { margin: 2px 0 0; }
+.wiz-fact { margin-top: 10px; padding: 8px 10px; border-radius: 6px; background: var(--balloon); border: 1px solid var(--balloon-border); }
+.wiz-wire { display: grid; grid-template-columns: 1fr minmax(240px, 34%); gap: 12px; flex: 1; min-height: 0; }
+.wiz-drawing { display: flex; flex-direction: column; min-height: 320px; }
+.wiz-drawing .cp-circuit { flex: 1; border: 1px solid var(--groupbox-border); }
+.wiz-drawing-bar { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+.wiz-text p { margin: 0 0 8px; }
+.wiz-fixit { padding: 8px 10px; border: 1px solid #e3a7a1; border-radius: 4px; background: linear-gradient(180deg, #fff6f5, #fde4e1); }
+.wiz-fixit ul { margin: 4px 0 0; padding-left: 18px; }
+.wiz-test { display: grid; grid-template-columns: 1fr minmax(300px, 42%); gap: 12px; flex: 1; min-height: 0; }
+.wiz-test .run-panel { min-height: 300px; }
+.wiz-mode { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.wiz-rows { list-style: none; margin: 0; padding: 0; border: 1px solid var(--groupbox-border); border-radius: 4px; background: #fff; }
+.wiz-row { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 6px 8px; border-top: 1px solid #e7ecf1; }
+.wiz-row:first-child { border-top: 0; }
+.wiz-mark { font-size: 18px; text-align: center; color: #9aa4ae; }
+.wiz-row.ok .wiz-mark { color: var(--good); }
+.wiz-row.bad .wiz-mark { color: var(--bad); }
+.wiz-row-name { font-weight: 600; }
+.wiz-row-hint { color: var(--text-muted); font-size: var(--font-size-small); }
+.wiz-bar { height: 8px; margin-top: 3px; border: 1px solid #9aa7b4; border-radius: 3px; background: #eef2f6; overflow: hidden; }
+.wiz-bar > span { display: block; height: 100%; width: 0; background: linear-gradient(180deg, #7fe3e8, #19c1ca); }
+.wiz-row-actions { display: flex; gap: 6px; align-items: center; }
+.wiz-status { min-height: 1.4em; color: var(--text-muted); }
+.wiz-status.bad { color: var(--bad); }
+.wiz-buttons { display: flex; gap: 8px; justify-content: flex-end; align-items: center; padding: 8px 14px 12px; border-top: 1px solid var(--separator-dark); background: var(--statusbar); }
+.wiz-buttons .spacer { flex: 1; }
+.wiz-drawing-host { flex: 1; display: flex; min-height: 300px; }
+.wiz-drawing-host > .cp-circuit { flex: 1; }
+.wiz-port { display: flex; gap: 6px; align-items: center; }
+.wiz-confirm { white-space: nowrap; }
