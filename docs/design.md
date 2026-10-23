@@ -250,14 +250,38 @@ Controls drawn on parts: buttons (press with the mouse), a knob on pots and joys
 for LDR light, distance (HC-SR04), temperature and humidity (DHT), soil moisture, a "wave" button
 on the PIR, keys on the keypad, a card to tap on the RFID reader.
 
-## 7. The bench (`ui/js/bench.js`)
+## 7. The bench, the run panel and the Wiring Wizard
 
-Joins a running simulation to the drawing: builds the netlist (breadboard strips, rails, wires,
-resistors and pressed buttons as connections), turns engine events into part states (an LED
-lights when its anode net is driven HIGH or PWM and its cathode net reaches GND), and part
-controls into engine inputs (a pressed button joining a pin's net to GND reads LOW; a pot's wiper
-gives `analog_max` × position; an LDR divider gives a value from the light slider; an HC-SR04
-echo gives `pulse` = cm × 58 µs).
+**`ui/js/bench.js`** joins a running simulation to the drawing through the netlist (wires, strips,
+rails and resistors; a pressed button joins its two sides). `new Bench({ board, circuit, parts, pins })`:
+`apply(events)` → `{ state, tones }` (`state` for `view.setState`: an LED lights when its + leg is
+driven HIGH / PWM and its − leg reaches GND or a LOW pin; servo, buzzer, NeoPixel, OLED, LCD, TM1637,
+matrix by the pins their legs reach), `control(partId, control, value)` → `{ inputs?, key?, card? }`
+for `sim.setInputs` / `pressKey` / `tapCard` (a pressed button gives the pin whatever is on its
+other side, `null` when released; a pot's wiper `analog_max × position`; an LDR divider from the
+light slider; soil sensors read higher when drier; HC-SR04 echo `pulse` = cm × 58 µs), `allInputs()`
+(the controls' values at the start of a run), `testParts()` (the parts with their pins, for
+`testSketch`), `reach(partId, leg)` and `pinOf(partId, leg)`.
+
+**`ui/js/widgets/runpanel.js`**: `createRunPanel({ board, project, circuit, onRuntimeError, onEvents })`
+→ `rp` with `el` (breadboard / schematic tabs, sound toggle, the drawing and its controls, the phone
+panel), `console` (the Serial Monitor widget; put `rp.console.el` where it belongs),
+`run(source, { events, ms, label })` → the compile result (`label: "Watching the goal"` shows a
+banner; `events` are sim_events, applied in real time), `stop()`, `result()` (runHeadless's shape:
+`{ ok, errors, events, serial, http, stopped_at_ms }`), `running`, `serialWrite(text)`,
+`onSerial(fn)`, `showTip(title, text)`, `busyLoopText` (the Coach's words for busy-loop warnings),
+`setBoard`, `setCircuit`, `setProject`, `ready`, `bench`, `view`, `destroy()`. The buzzer plays
+through Web Audio once the student has clicked or pressed a key in the panel.
+
+**`ui/js/wizard.js`**: `openWiringWizard({ project, board, pins, onDone, onClose, partsOnly, save, names })`.
+Pages: meet each kind of part (`content/parts/index.json` texts), each wiring step
+(`fillWiringText`, the step highlighted, schematic toggle, the whole circuit, the safety line),
+then Test it, in the simulator (a run panel) or on the real board (`realboard.upload` then
+`openSerial` at 115200 baud). Rows: inputs tick themselves when a reading shows the student used
+the part; outputs need "I saw it work"; Fix it goes back to the part's step with likely causes
+(`FIXES` in `wizard-rows.js`). Start programming saves `{ wiring_done: true }` into the project's
+progress (merged) and calls `onDone({ confirmed: true })`. Free Play's mini wizard passes a
+pretend project (`{ id, title, circuit, wiring_steps }`) and `partsOnly`, and nothing is saved.
 
 ## 8. Real boards (Go: `/api/...`)
 

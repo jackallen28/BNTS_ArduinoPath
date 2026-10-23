@@ -21,3 +21,8 @@ body.cp-demo { padding: 10px; height: 100vh; margin: 0; }
 .cp-demo-info ul { margin: 0; padding-left: 18px; max-height: 90px; overflow: auto; }
 .cp-demo-info .error { color: var(--bad); }
 .cp-demo-info .warning { color: var(--warn); }
+/* bench-demo.html */
+.bench-demo-body { grid-template-columns: 2fr 3fr; }
+.bench-demo-code { flex: 1; min-height: 300px; width: 100%; font-size: 12px; white-space: pre; }
+#panel .run-panel { flex: 2; }
+#panel .console { flex: 1; min-height: 160px; }
