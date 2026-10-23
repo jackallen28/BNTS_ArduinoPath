@@ -47,14 +47,14 @@ npm run e2e                              # GUI smoke test (Playwright)
 Build the Windows app (from any computer):
 
 ```
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-H windowsgui -s -w -X arduinopath.Version=0.2.0" -o dist/ArduinoPath.exe ./cmd/arduinopath
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-H windowsgui -s -w -X arduinopath.Version=1.0.0" -o dist/ArduinoPath.exe ./cmd/arduinopath
 ```
 
 Build the Mac app (from any computer; sign it on a Mac with `codesign --force --deep -s -`):
 
 ```
 for a in amd64 arm64; do CGO_ENABLED=0 GOOS=darwin GOARCH=$a go build -trimpath -ldflags "-s -w" -o dist/arduinopath-$a ./cmd/arduinopath; done
-go run ./tools/macapp -version 0.3.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
+go run ./tools/macapp -version 1.0.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
 ```
 
 See [docs/development.md](docs/development.md) for how it fits together. To publish a release,

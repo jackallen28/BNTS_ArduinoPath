@@ -39,7 +39,7 @@ so this way a second double-click starts the app afresh, finds the server, and o
 Build the Windows app (one file, no cgo, no console window):
 
 ```
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-H windowsgui -s -w -X arduinopath.Version=0.2.0" -o dist/ArduinoPath.exe ./cmd/arduinopath
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-H windowsgui -s -w -X arduinopath.Version=1.0.0" -o dist/ArduinoPath.exe ./cmd/arduinopath
 ```
 
 The icon, version details and manifest come from `cmd/arduinopath/rsrc_windows_*.syso`, made
@@ -54,7 +54,7 @@ Build the Mac app (`ArduinoPath.app`, one universal program for Intel and Apple 
 
 ```
 for a in amd64 arm64; do CGO_ENABLED=0 GOOS=darwin GOARCH=$a go build -trimpath -ldflags "-s -w -X arduinopath.Version=0.3.0" -o dist/arduinopath-$a ./cmd/arduinopath; done
-go run ./tools/macapp -version 0.3.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
+go run ./tools/macapp -version 1.0.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
 codesign --force --deep -s - dist/ArduinoPath.app     # on a Mac (or rcodesign sign on Linux)
 ```
 

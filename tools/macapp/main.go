@@ -3,7 +3,7 @@
 //
 //	GOOS=darwin GOARCH=amd64 go build -o dist/arduinopath-amd64 ./cmd/arduinopath
 //	GOOS=darwin GOARCH=arm64 go build -o dist/arduinopath-arm64 ./cmd/arduinopath
-//	go run ./tools/macapp -version 0.3.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
+//	go run ./tools/macapp -version 1.0.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
 //
 // The app holds one universal program (both builds, so it runs natively on
 // every Mac), Info.plist, the icon and (with -boards) the board tools. Sign it afterwards (ad hoc at least:
