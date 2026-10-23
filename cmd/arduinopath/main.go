@@ -267,6 +267,7 @@ func run(cfg config, log *slog.Logger) error {
 		Problems:    problems,
 		UI:          uiFS,
 		Version:     arduinopath.Version,
+		DataDir:     cfg.dataDir,
 		Log:         log,
 		CacheStatic: cfg.uiDir == "",
 		Hosts:       []string{"localhost", "127.0.0.1", "::1"},

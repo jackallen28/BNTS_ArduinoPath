@@ -18,7 +18,9 @@ import { fillWiringText } from "./circuit/wiring-text.js";
 import { createRunPanel } from "./widgets/runpanel.js";
 import { testSketch, TEST_BAUD } from "./wiring-test.js";
 import { TestRows, FIXES, wizardPages } from "./wizard-rows.js";
-import { compile, upload, openSerial, guessPort, portLabel } from "./realboard.js";
+import { upload, openSerial, guessPort, portLabel, sortPorts, rememberedPort, rememberPort } from "./realboard.js";
+import { explain } from "./coach.js";
+import { state } from "./state.js";
 
 const SAFETY = "Unplug the USB cable before you change any wires, and plug it back in when you're done. " +
   "ESP boards use 3.3V: never connect 5V to one of their pins. LEDs always need a resistor.";
@@ -206,9 +208,9 @@ export function openWiringWizard({ project, board, pins, onDone = () => {}, onCl
     async function findPorts() {
       try {
         const ports = await api.ports();
-        const list = Array.isArray(ports) ? ports : ports?.ports || [];
+        const list = sortPorts(Array.isArray(ports) ? ports : ports?.ports || []);
         portSel.replaceChildren(...list.map((p) => new Option(portLabel(p), p.port)));
-        const g = guessPort(list, board, localStorageGet("ap-port"));
+        const g = guessPort(list, board, rememberedPort());
         if (g) portSel.value = g;
         status.textContent = list.length ? "" : "No board found. Plug it in, then press Look again.";
       } catch (e) {
@@ -271,22 +273,23 @@ export function openWiringWizard({ project, board, pins, onDone = () => {}, onCl
       }
       const port = portSel.value;
       if (!port) { status.textContent = "Choose your board's USB port first."; testRunning = false; drawRows(); return; }
-      localStorageSet("ap-port", port);
+      rememberPort(port);
       status.className = "wiz-status";
       status.textContent = "Getting the test program ready…";
       try {
-        const job = await upload(rows.code, board, "", port, (j) => {
+        const job = await upload(rows.code, board, state.me?.settings?.board_variant || "", port, (j) => {
           status.textContent = j.state === "compiling" ? "Getting the test program ready…" : j.state === "uploading" ? "Sending it to your board…" : status.textContent;
         });
         if (job.state !== "done") {
           status.className = "wiz-status bad";
-          status.textContent = "The test program couldn't go onto your board. Check the USB cable and the port, then press Test again.";
+          status.textContent = uploadProblem(job);
           testRunning = false;
           drawRows();
           return;
         }
         status.textContent = "Listening to your board…";
         serial = openSerial(port, TEST_BAUD, {
+          retryMs: 8000, // the board restarts after the upload
           onData: onSerial,
           onClose: (reason) => { if (reason) status.textContent = reason; },
         });
@@ -326,5 +329,14 @@ export function openWiringWizard({ project, board, pins, onDone = () => {}, onCl
   return { el: dlg.el, close: () => dlg.close(undefined) };
 }
 
-function localStorageGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
-function localStorageSet(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } }
+/** What went wrong putting the test program on the board, in the Coach's words. */
+function uploadProblem(job) {
+  const errors = state.catalogue?.errors ?? [];
+  const r = job.result;
+  const c = r && !r.ok
+    ? explain(errors, "compile", { diagnostics: r.errors || [], output: r.output || "" })
+    : explain(errors, "upload", { output: `${job.output || ""}\n${job.error || ""}` });
+  const fallback = "The test program couldn't go onto your board. Check the USB cable and the port, then press Test again.";
+  if (!c) return fallback;
+  return [c.title, c.explain, c.hints?.[0]].filter(Boolean).join(" ");
+}

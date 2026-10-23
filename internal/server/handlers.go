@@ -26,9 +26,10 @@ func (s *Server) handleInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
-		"app":     "ArduinoPath",
-		"version": s.Version,
-		"school":  school,
+		"app":      "ArduinoPath",
+		"version":  s.Version,
+		"school":   school,
+		"data_dir": s.DataDir,
 	})
 }
 

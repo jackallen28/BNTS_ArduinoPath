@@ -546,3 +546,4 @@
   .workspace-split { flex-wrap: wrap; }
   .run-holder { position: static; width: 100%; height: auto; min-height: 420px; padding: 0 10px 10px; }
 }
+.about-path { word-break: break-all; user-select: all; }

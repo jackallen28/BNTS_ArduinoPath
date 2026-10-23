@@ -102,3 +102,64 @@ test("a screen-only project with the Serial Monitor", async ({ page }) => {
   await expect(rows.first()).toHaveClass(/ok/, { timeout: 10_000 });
   expect(problems).toEqual([]);
 });
+
+// Upload, the real Serial Monitor and Send, with the app's board API
+// pretended (the Pi's own serial ports are listed too).
+test("uploading to a real board", async ({ page }) => {
+  const problems = [];
+  page.on("pageerror", (e) => problems.push(e.message));
+  const writes = [];
+  let uploads = 0;
+  let serialOpens = [];
+  await page.route("**/api/ports", (r) => r.fulfill({ json: [
+    { port: "/dev/ttyAMA0", label: "/dev/ttyAMA0" },
+    { port: "/dev/ttyUSB0", label: "/dev/ttyUSB0", vid: "0x1a86", pid: "0x7523", chip: "CH340" },
+  ] }));
+  await page.route("**/api/upload", (r) => {
+    uploads++;
+    expect(r.request().postDataJSON().port).toBe("/dev/ttyUSB0");
+    return r.fulfill({ status: 202, json: { id: `job${uploads}` } });
+  });
+  // The first upload fails like an ESP board that needs its BOOT button; the second works.
+  await page.route("**/api/jobs/job1", (r) => r.fulfill({ json: { id: "job1", kind: "upload", state: "failed", output: "Connecting........_____\nA fatal error occurred: Failed to connect to ESP8266: Timed out waiting for packet header", error: "exit status 2" } }));
+  await page.route("**/api/jobs/job2", (r) => r.fulfill({ json: { id: "job2", kind: "upload", state: "done", output: "Done uploading.", progress: 100, result: { ok: true, output: "", errors: [] } } }));
+  await page.route("**/api/serial?*", (r) => {
+    serialOpens.push(new URL(r.request().url()).searchParams.get("baud"));
+    return r.fulfill({ status: 200, contentType: "text/event-stream", body: 'event: open\ndata: {}\n\nevent: data\ndata: "Hello from my real board!\\r\\n"\n\n' });
+  });
+  await page.route("**/api/serial/write", (r) => { writes.push(r.request().postDataJSON()); return r.fulfill({ status: 204 }); });
+  await page.route("**/api/serial/close", (r) => r.fulfill({ status: 204 }));
+
+  await newStudent(page, "Lena");
+  await page.locator(".project-card", { hasText: "Serial Chatbot" }).click();
+  const editor = page.locator(".editor-text");
+  await expect(editor).toHaveValue(/___/);
+  await editor.fill((await editor.inputValue()).replace("___", '"Hello from my real board!"'));
+
+  // The board's USB port is picked, not the Pi's own port.
+  await page.locator("#tool-upload").click();
+  const guide = page.locator(".side-panel.guide");
+  await expect(guide.locator(".clue")).toContainText(/BOOT|FLASH/);
+
+  await page.locator("#tool-upload").click();
+  const monitor = page.locator(".console-out").first();
+  await expect(monitor).toContainText("Hello from my real board!");
+  expect(serialOpens[0]).toBe("9600"); // the speed in Serial.begin()
+  await expect(guide.locator(".checklist legend")).toContainText("on your board");
+  await expect(guide.locator(".check-row").first()).toHaveClass(/ok/);
+
+  // Send goes to the real board, not the simulator.
+  await page.getByLabel("Text to send").fill("hi board");
+  await page.getByLabel("Text to send").press("Enter");
+  await expect.poll(() => writes.length).toBe(1);
+  expect(writes[0]).toEqual({ port: "/dev/ttyUSB0", text: "hi board\n" });
+
+  // Changing the speed reconnects at the new speed.
+  await page.getByLabel("Speed (baud)").selectOption("115200");
+  await expect.poll(() => serialOpens.includes("115200")).toBe(true);
+
+  // Run goes back to the simulator, and Send with it.
+  await page.locator("#tool-run").click();
+  await expect(guide.locator(".checklist legend")).toHaveText("Checklist");
+  expect(problems).toEqual([]);
+});

@@ -249,9 +249,10 @@ jobs:
   boards:
     # Every board compiles the kit check (every library the projects use)
     # with the pinned cores and libraries (internal/arduino/requirements.json);
-    # then the tools are packed and unpacked like the apps do, and compile again.
+    # then the tools are packed and unpacked like the apps do, and compile
+    # again: every model answer, and every Wiring Wizard test program.
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
 
@@ -278,7 +279,13 @@ jobs:
           path: ${{ runner.temp }}/cp/arduino
           key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Pack the tools like the apps, unpack them and compile again
         run: |
           go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out "$RUNNER_TEMP/boards.zip"
-          ARDUINOPATH_BOARDS="$RUNNER_TEMP/boards.zip" go test -v -timeout 90m -run TestRealBundle ./internal/arduino
+          node tools/test-sketches.mjs "$RUNNER_TEMP/test-sketches.json"
+          ARDUINOPATH_BOARDS="$RUNNER_TEMP/boards.zip" ARDUINOPATH_TEST_SKETCHES="$RUNNER_TEMP/test-sketches.json" \
+            go test -v -timeout 110m -run TestRealBundle ./internal/arduino
