@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -151,7 +152,9 @@ var demoBoards = []string{"uno", "nodemcu", "esp32", "esp32-c3"}
 
 // compileDemos compiles every step's model answer for every board its
 // project lists, with the pin header for that board. Boards compile side
-// by side; each board's sketches go one at a time (they share a build folder).
+// by side, except on Windows, where parallel ESP32 builds can run CI's
+// machine out of memory; each board's sketches go one at a time (they share
+// a build folder).
 func compileDemos(ctx context.Context, t *testing.T, tools *Tools, cat *content.Catalogue) {
 	var wg sync.WaitGroup
 	for _, id := range demoBoards {
@@ -159,6 +162,9 @@ func compileDemos(ctx context.Context, t *testing.T, tools *Tools, cat *content.
 		if !ok {
 			t.Errorf("no board %s", id)
 			continue
+		}
+		if runtime.GOOS == "windows" {
+			wg.Wait() // one board at a time (see above)
 		}
 		wg.Add(1)
 		go func() {
