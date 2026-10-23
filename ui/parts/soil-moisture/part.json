@@ -1,0 +1,74 @@
+{
+  "type": "soil-moisture",
+  "title": "Soil Moisture Sensor",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/SparkFun_Soil_Moisture_Sensor.fzp",
+    "title": "Soil Moisture Sensor",
+    "breadboard": "svg/core/breadboard/SparkFun_Soil_Moisture_Sensor_breadboard.svg",
+    "schematic": "svg/core/schematic/SparkFun_Soil_Moisture_Sensor_schematic.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "soil-moisture",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "vcc",
+      "name": "VCC (power)",
+      "fritzing": "connector2"
+    },
+    {
+      "id": "gnd",
+      "name": "GND",
+      "fritzing": "connector3"
+    },
+    {
+      "id": "sig",
+      "name": "SIG (analog signal)",
+      "fritzing": "connector4"
+    }
+  ],
+  "footprint": null,
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 72,
+    "height": 192.06,
+    "connectors": {
+      "gnd": {
+        "x": 36,
+        "y": 20.06
+      },
+      "sig": {
+        "x": 44,
+        "y": 20.06
+      },
+      "vcc": {
+        "x": 28,
+        "y": 20.06
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 100,
+    "height": 100,
+    "connectors": {
+      "gnd": {
+        "x": 50,
+        "y": 100,
+        "dir": "down"
+      },
+      "sig": {
+        "x": 0,
+        "y": 40,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 50,
+        "y": 0,
+        "dir": "up"
+      }
+    }
+  }
+}

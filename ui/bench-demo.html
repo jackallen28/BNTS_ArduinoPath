@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArduinoPath: run panel and Wiring Wizard (demo)</title>
+  <meta name="description" content="A developer page for the run panel, the bench and the Wiring Wizard. Not part of the app's screens.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="circuit.css">
+  <link rel="stylesheet" href="bench.css">
+  <link rel="stylesheet" href="js/circuit/demo.css">
+  <script type="module" src="js/bench-demo.js"></script>
+</head>
+<body class="cp-demo">
+  <div class="window cp-demo-window">
+    <div class="titlebar"><span class="title">Run panel and Wiring Wizard: demo and test page</span></div>
+    <div class="toolbar cp-demo-toolbar">
+      <label>Project <select id="project" class="input"></select></label>
+      <label>Board <select id="board" class="input"></select></label>
+      <label>Step <select id="step" class="input"></select></label>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="btn" id="run">▶ Run</button>
+      <button type="button" class="btn" id="goal">Watch the goal</button>
+      <button type="button" class="btn" id="stop">■ Stop</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="btn" id="wizard">Wiring Wizard</button>
+    </div>
+    <div class="window-body cp-demo-body bench-demo-body">
+      <section class="cp-demo-pane" aria-label="Code">
+        <textarea id="code" class="input code bench-demo-code" spellcheck="false" aria-label="Code"></textarea>
+        <p id="log" class="muted" role="status"></p>
+      </section>
+      <section class="cp-demo-pane" id="panel" aria-label="Simulator"></section>
+    </div>
+  </div>
+  <div id="modal-root"></div>
+</body>
+</html>

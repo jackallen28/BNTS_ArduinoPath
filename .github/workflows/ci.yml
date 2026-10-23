@@ -55,12 +55,12 @@ jobs:
           if-no-files-found: ignore
 
   windows:
-    # The real CircuitPath.exe on real Windows, with the board tools built
+    # The real ArduinoPath.exe on real Windows, with the board tools built
     # in: the Go tests, pack the tools, unpack them and compile for every
     # board, then start the exe and use it (and compile for an Uno through
     # its API). The exe is kept as a download on the run's page.
     runs-on: windows-latest
-    timeout-minutes: 120
+    timeout-minutes: 200
     defaults:
       run:
         shell: bash
@@ -83,7 +83,7 @@ jobs:
 
       - name: Install the board tools
         run: |
-          go run ./cmd/circuitpath -data "$RUNNER_TEMP/cp" -install-arduino
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
           rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
 
       - name: Save the board tools
@@ -93,33 +93,33 @@ jobs:
           path: ${{ runner.temp }}/cp/arduino
           key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
 
-      - name: Build CircuitPath.exe with the board tools built in
+      - name: Build ArduinoPath.exe with the board tools built in
         run: |
           mkdir -p dist
-          CGO_ENABLED=0 go build -trimpath -ldflags "-H windowsgui -s -w -X circuitpath.Version=${GITHUB_SHA::7}" -o dist/CircuitPath.exe ./cmd/circuitpath
+          CGO_ENABLED=0 go build -trimpath -ldflags "-H windowsgui -s -w -X arduinopath.Version=${GITHUB_SHA::7}" -o dist/ArduinoPath.exe ./cmd/arduinopath
           go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out dist/boards.zip
-          go run ./tools/packboards -append dist/CircuitPath.exe -bundle dist/boards.zip
+          go run ./tools/packboards -append dist/ArduinoPath.exe -bundle dist/boards.zip
           ls -la dist
 
       - name: Unpack the built-in tools and compile for every board
         env:
-          CIRCUITPATH_BOARDS: ${{ github.workspace }}/dist/CircuitPath.exe
-        run: go test -v -timeout 90m -run TestRealBundle ./internal/arduino
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath.exe
+        run: go test -v -timeout 170m -run TestRealBundle ./internal/arduino
 
-      - name: Start CircuitPath.exe and use it
+      - name: Start ArduinoPath.exe and use it
         shell: pwsh
         env:
-          CIRCUITPATH_EXPECT_TOOLS: "1"
-        run: ./tests/windows/smoke.ps1 -Exe dist/CircuitPath.exe
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: ./tests/windows/smoke.ps1 -Exe dist/ArduinoPath.exe
 
       - uses: actions/upload-artifact@v4
         with:
-          name: CircuitPath-exe
-          path: dist/CircuitPath.exe
+          name: ArduinoPath-exe
+          path: dist/ArduinoPath.exe
           retention-days: 7
 
   macos:
-    # The real CircuitPath.app on a real (Apple Silicon) Mac, with the board
+    # The real ArduinoPath.app on a real (Apple Silicon) Mac, with the board
     # tools built in: the Go tests, pack the tools, build the universal app,
     # sign it (ad hoc), compile for every board, start it and use it.
     runs-on: macos-latest
@@ -143,7 +143,7 @@ jobs:
 
       - name: Install the board tools
         run: |
-          go run ./cmd/circuitpath -data "$RUNNER_TEMP/cp" -install-arduino
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
           rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
 
       - name: Save the board tools
@@ -153,32 +153,97 @@ jobs:
           path: ${{ runner.temp }}/cp/arduino
           key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
 
-      - name: Build CircuitPath.app with the board tools built in
+      - name: Build ArduinoPath.app with the board tools built in
         run: |
           for arch in amd64 arm64; do
-            CGO_ENABLED=0 GOOS=darwin GOARCH=$arch go build -trimpath -ldflags "-s -w -X circuitpath.Version=${GITHUB_SHA::7}" -o dist/circuitpath-$arch ./cmd/circuitpath
+            CGO_ENABLED=0 GOOS=darwin GOARCH=$arch go build -trimpath -ldflags "-s -w -X arduinopath.Version=${GITHUB_SHA::7}" -o dist/arduinopath-$arch ./cmd/arduinopath
           done
           go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out dist/boards.zip
-          go run ./tools/macapp -version 0.0.0 -amd64 dist/circuitpath-amd64 -arm64 dist/circuitpath-arm64 -boards dist/boards.zip -out dist
-          codesign --force --deep -s - dist/CircuitPath.app
+          go run ./tools/macapp -version 0.0.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -boards dist/boards.zip -out dist
+          codesign --force --deep -s - dist/ArduinoPath.app
 
       - name: Unpack the built-in tools and compile for every board
         env:
-          CIRCUITPATH_BOARDS: ${{ github.workspace }}/dist/CircuitPath.app/Contents/Resources/boards.zip
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath.app/Contents/Resources/boards.zip
         run: go test -v -timeout 90m -run TestRealBundle ./internal/arduino
 
-      - name: Start CircuitPath.app and use it
+      - name: Start ArduinoPath.app and use it
         env:
-          CIRCUITPATH_EXPECT_TOOLS: "1"
-        run: tests/macos/smoke.sh dist/CircuitPath.app
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: tests/macos/smoke.sh dist/ArduinoPath.app
 
       - name: Zip
-        run: ditto -c -k --keepParent dist/CircuitPath.app dist/CircuitPath-macOS.zip
+        run: ditto -c -k --keepParent dist/ArduinoPath.app dist/ArduinoPath-macOS.zip
 
       - uses: actions/upload-artifact@v4
         with:
-          name: CircuitPath-macOS
-          path: dist/CircuitPath-macOS.zip
+          name: ArduinoPath-macOS
+          path: dist/ArduinoPath-macOS.zip
+          retention-days: 7
+
+  pi:
+    # ArduinoPath for Raspberry Pi (64-bit Raspberry Pi OS on a Pi 4 / 5) on
+    # a real 64-bit ARM Linux machine, with the board tools built in: the Go
+    # tests, pack the tools, build it, compile every model answer for every
+    # board, start it and use it.
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Go tests on 64-bit ARM Linux
+        run: go test ./...
+
+      - name: Restore the board tools
+        id: tools-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Install the board tools
+        run: |
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
+          rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
+
+      - name: Save the board tools
+        if: steps.tools-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Build ArduinoPath for Raspberry Pi with the board tools built in
+        run: |
+          mkdir -p dist/ArduinoPath
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "-s -w -X arduinopath.Version=${GITHUB_SHA::7}" -o dist/ArduinoPath/ArduinoPath ./cmd/arduinopath
+          go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out dist/boards.zip
+          go run ./tools/packboards -append dist/ArduinoPath/ArduinoPath -bundle dist/boards.zip
+          ls -l dist/ArduinoPath
+
+      - name: Unpack the built-in tools and compile for every board
+        env:
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath/ArduinoPath
+        run: go test -v -timeout 120m -run TestRealBundle ./internal/arduino
+
+      - name: Start ArduinoPath and use it
+        env:
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: tests/linux/smoke.sh dist/ArduinoPath/ArduinoPath
+
+      - name: Pack for download
+        run: |
+          cp docs/raspberry-pi-readme.txt dist/ArduinoPath/README.txt
+          tar -C dist -czf dist/ArduinoPath-RaspberryPi.tar.gz ArduinoPath
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ArduinoPath-RaspberryPi
+          path: dist/ArduinoPath-RaspberryPi.tar.gz
           retention-days: 7
 
   boards:
@@ -203,7 +268,7 @@ jobs:
 
       - name: Install the Arduino tools and compile for every board
         run: |
-          go run ./cmd/circuitpath -data "$RUNNER_TEMP/cp" -setup-arduino
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -setup-arduino
           rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
 
       - name: Save the board tools
@@ -216,4 +281,4 @@ jobs:
       - name: Pack the tools like the apps, unpack them and compile again
         run: |
           go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out "$RUNNER_TEMP/boards.zip"
-          CIRCUITPATH_BOARDS="$RUNNER_TEMP/boards.zip" go test -v -timeout 90m -run TestRealBundle ./internal/arduino
+          ARDUINOPATH_BOARDS="$RUNNER_TEMP/boards.zip" go test -v -timeout 90m -run TestRealBundle ./internal/arduino

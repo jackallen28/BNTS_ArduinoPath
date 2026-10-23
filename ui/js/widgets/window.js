@@ -13,7 +13,7 @@ export function appWindow({ title, toolbar = [], body, status = [], className = 
     h("header", { class: "app-chrome" },
       h("div", { class: "titlebar" },
         icon("app", "app-icon"),
-        h("span", { class: "title", text: title ? `${title} - CircuitPath` : "CircuitPath" })),
+        h("span", { class: "title", text: title ? `${title} - ArduinoPath` : "ArduinoPath" })),
       h("nav", { class: "toolbar", "aria-label": "Toolbar" }, toolbar)),
     h("div", { class: "window-body" }, body),
     h("footer", { class: "statusbar", role: "status" }, status));
@@ -105,7 +105,7 @@ function trapFocus(e, root) {
 }
 
 /** A Vista-style message box. Resolves with the id of the button pressed. */
-export function messageBox({ title = "CircuitPath", instruction, text, kind = "info", buttons = [{ id: "ok", label: "OK", default: true }] }) {
+export function messageBox({ title = "ArduinoPath", instruction, text, kind = "info", buttons = [{ id: "ok", label: "OK", default: true }] }) {
   let dlg;
   const btns = buttons.map((b) => h("button", {
     class: ["btn", b.default && "default"],

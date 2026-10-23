@@ -19,5 +19,163 @@
     "sorting"
   ],
   "intro": "Find the WiFi networks around you and show how strong each one is.",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "oled",
+        "type": "oled",
+        "label": "OLED screen",
+        "offboard": {
+          "x": 350,
+          "y": 60
+        },
+        "step": 1
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:oled:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "part:oled:vcc",
+        "to": "BP21",
+        "step": 1
+      },
+      {
+        "from": "part:oled:scl",
+        "to": "pin:SCL",
+        "step": 1
+      },
+      {
+        "from": "part:oled:sda",
+        "to": "pin:SDA",
+        "step": 1
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The OLED screen",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the OLED screen's four pins with wires: GND to the blue (−) rail, VCC to the red (+) rail, SCL to {{pin:SCL}} and SDA to {{pin:SDA}}. SCL and SDA are the board's I2C pins: lots of screens and sensors can share them."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Scan the airwaves",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  WiFi.disconnect();\n}\n\nvoid loop() {\n  Serial.println(\"Scanning...\");\n  int found = WiFi.scanNetworks();\n  Serial.print(\"Found \");\n  Serial.print(found);\n  Serial.println(\" networks\");\n  for (int i = 0; i < found; i++) {\n    Serial.print(WiFi.SSID(i));   // the network's name\n    Serial.print(\"  \");\n    Serial.print(WiFi.RSSI(i));   // its strength\n    Serial.println(\" dBm\");\n  }\n  delay(5000);\n}\n",
+      "text": "`WiFi.scanNetworks()` listens for every WiFi network nearby and gives how many it found. `WiFi.SSID(i)` is a network's name and `WiFi.RSSI(i)` its signal strength in **dBm**: closer to 0 is stronger.\n\n**Your task:** Run, open the **Serial Monitor**, and look at the list. Which network is strongest?",
+      "hints": [
+        "The scan takes a few seconds.",
+        "-40 dBm is very strong; -90 dBm is very weak.",
+        "Walk around with the board and scan again."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It finds networks",
+          "pattern": "Found \\d+ networks"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It shows strengths",
+          "text": "dBm"
+        },
+        {
+          "type": "confirm",
+          "label": "I found the strongest network"
+        }
+      ],
+      "success": "Your board can see all the WiFi around it.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  WiFi.disconnect();\n}\n\nvoid loop() {\n  Serial.println(\"Scanning...\");\n  int found = WiFi.scanNetworks();\n  Serial.print(\"Found \");\n  Serial.print(found);\n  Serial.println(\" networks\");\n  for (int i = 0; i < found; i++) {\n    Serial.print(WiFi.SSID(i));   // the network's name\n    Serial.print(\"  \");\n    Serial.print(WiFi.RSSI(i));   // its strength\n    Serial.println(\" dBm\");\n  }\n  delay(5000);\n}\n",
+      "sim_ms": 4000
+    },
+    {
+      "title": "Signal bars",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n\n// -90 dBm is very weak, -30 dBm is very strong: 0 to 4 bars.\nint bars(int rssi) {\n  if (rssi > -55) return 4;\n  if (rssi > ___) return 3;\n  if (rssi > ___) return ___;\n  if (rssi > -85) return 1;\n  return 0;\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  WiFi.disconnect();\n}\n\nvoid loop() {\n  Serial.println(\"Scanning...\");\n  int found = WiFi.scanNetworks();\n  Serial.print(\"Found \");\n  Serial.print(found);\n  Serial.println(\" networks\");\n  for (int i = 0; i < found; i++) {\n    Serial.print(WiFi.SSID(i));   // the network's name\n    Serial.print(\"  \");\n    Serial.print(bars(WiFi.RSSI(i)));\n    Serial.println(\" bars\");\n  }\n  delay(5000);\n}\n",
+      "text": "dBm numbers are hard to read. The `bars()` function turns them into 0 to 4 bars, like a phone does.\n\n**Your task:** fill in the blanks for 3 bars (stronger than -67) and 2 bars (stronger than -75).",
+      "hints": [
+        "The `if`s go from strongest to weakest.",
+        "3 bars is stronger than -67, 2 bars is stronger than -75.",
+        "The blanks are `-67`, `-75` and `2`."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It shows bars",
+          "text": "bars"
+        },
+        {
+          "type": "code_contains",
+          "label": "3 bars works",
+          "text": "return 3"
+        },
+        {
+          "type": "code_contains",
+          "label": "2 bars works",
+          "text": "return 2"
+        }
+      ],
+      "success": "Easy to read at a glance.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n\n// -90 dBm is very weak, -30 dBm is very strong: 0 to 4 bars.\nint bars(int rssi) {\n  if (rssi > -55) return 4;\n  if (rssi > -67) return 3;\n  if (rssi > -75) return 2;\n  if (rssi > -85) return 1;\n  return 0;\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  WiFi.disconnect();\n}\n\nvoid loop() {\n  Serial.println(\"Scanning...\");\n  int found = WiFi.scanNetworks();\n  Serial.print(\"Found \");\n  Serial.print(found);\n  Serial.println(\" networks\");\n  for (int i = 0; i < found; i++) {\n    Serial.print(WiFi.SSID(i));   // the network's name\n    Serial.print(\"  \");\n    Serial.print(bars(WiFi.RSSI(i)));\n    Serial.println(\" bars\");\n  }\n  delay(5000);\n}\n",
+      "sim_ms": 4000
+    },
+    {
+      "title": "The radar screen",
+      "support": "brief",
+      "text": "**Goal:** show the scan on the OLED: how many networks, then up to 6 network names, each with bars that grow taller from left to right. Scan again every 5 seconds.",
+      "hints": [
+        "Each line is 9 pixels tall: `y = 12 + i * 9`.",
+        "`fillRect(x, y, width, height, SSD1306_WHITE)` draws a bar.",
+        "`.substring(0, 14)` cuts long names short so they fit."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "It shows the radar",
+          "text": "WiFi radar"
+        },
+        {
+          "type": "uses_function",
+          "label": "It draws bars",
+          "name": "fillRect"
+        },
+        {
+          "type": "confirm",
+          "label": "My radar shows the networks around me"
+        }
+      ],
+      "success": "A WiFi radar! Now you can find the best spot for WiFi.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 display(128, 64, &Wire, -1);\n\n// -90 dBm is very weak, -30 dBm is very strong: 0 to 4 bars.\nint bars(int rssi) {\n  if (rssi > -55) return 4;\n  if (rssi > -67) return 3;\n  if (rssi > -75) return 2;\n  if (rssi > -85) return 1;\n  return 0;\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);\n  display.setTextColor(SSD1306_WHITE);\n  WiFi.mode(WIFI_STA);\n  WiFi.disconnect();\n}\n\nvoid loop() {\n  int found = WiFi.scanNetworks();\n  display.clearDisplay();\n  display.setTextSize(1);\n  display.setCursor(0, 0);\n  display.print(\"WiFi radar: \");\n  display.println(found);\n  // Up to 6 networks, one per line: name, then bars.\n  for (int i = 0; i < found && i < 6; i++) {\n    int y = 12 + i * 9;\n    display.setCursor(0, y);\n    display.print(WiFi.SSID(i).substring(0, 14));\n    for (int b = 0; b < bars(WiFi.RSSI(i)); b++) {\n      display.fillRect(100 + b * 6, y + 6 - b * 2, 4, 2 + b * 2, SSD1306_WHITE);\n    }\n  }\n  display.display();\n  Serial.println(\"Scanned\");\n  delay(5000);\n}\n",
+      "sim_ms": 4000
+    }
+  ],
+  "curriculum": [
+    "910-networks",
+    "910-data",
+    "910-algorithms",
+    "910-programming"
+  ],
+  "outro": "Your radar **scans** the airwaves, measures **signal strength** (RSSI, in dBm) and turns it into bars. Phones show WiFi bars exactly this way.",
+  "stretch": [
+    "Count how many networks are open (no password) and show the number.",
+    "Sort the networks from strongest to weakest before showing them.",
+    "Make an LED blink faster when your favourite network is stronger."
+  ]
 }

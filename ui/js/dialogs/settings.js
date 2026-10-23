@@ -107,7 +107,7 @@ export function openSettings({ tab = "me", onSaved = () => {}, projectId = null 
     return h("div", {},
       h("fieldset", { class: "groupbox" },
         h("legend", { text: "Save my work" }),
-        h("p", { text: "Download all your projects as a .circuit file, to keep or take home. You can open it again on any CircuitPath." }),
+        h("p", { text: "Download all your projects as a .circuit file, to keep or take home. You can open it again on any ArduinoPath." }),
         h("button", { class: "pill", type: "button", onclick: saveMyWork }, icon("save"), "Save my work")),
       h("fieldset", { class: "groupbox" },
         h("legend", { text: "Open my work" }),
@@ -141,14 +141,14 @@ export function openSettings({ tab = "me", onSaved = () => {}, projectId = null 
   return dlg.result;
 }
 
-/** Save my work: downloads <Name>_CircuitPath_<date>.circuit. */
+/** Save my work: downloads <Name>_ArduinoPath_<date>.circuit. */
 export async function saveMyWork() {
   try {
     const res = await request("GET", api.exportUrl, undefined, { raw: true });
     const cd = res.headers.get("Content-Disposition") || "";
     const utf = /filename\*=UTF-8''([^;]+)/.exec(cd);
     const ascii = /filename="([^"]+)"/.exec(cd);
-    const name = utf ? decodeURIComponent(utf[1]) : ascii ? ascii[1] : "My_CircuitPath.circuit";
+    const name = utf ? decodeURIComponent(utf[1]) : ascii ? ascii[1] : "My_ArduinoPath.circuit";
     download(await res.blob(), name);
   } catch (err) {
     if (err.code !== "logged_out") messageBox({ kind: "error", instruction: "Your work couldn't be saved to a file.", text: err.message });
@@ -203,7 +203,7 @@ async function openMyWork(input) {
     if (done.added) parts.push(`${done.added} project${done.added === 1 ? "" : "s"} added`);
     if (done.replaced) parts.push(`${done.replaced} replaced`);
     messageBox({ instruction: "Your work is open.", text: parts.length ? `${parts.join(", ")}.` : "Nothing needed changing." });
-    window.dispatchEvent(new CustomEvent("circuitpath:work-changed"));
+    window.dispatchEvent(new CustomEvent("arduinopath:work-changed"));
   } catch (err) {
     messageBox({ kind: "error", instruction: "That file can't be opened.", text: err.message });
   }

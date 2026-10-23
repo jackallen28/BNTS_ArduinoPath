@@ -53,3 +53,13 @@ test("upload explanations use the whole output", () => {
   assert.equal(e.id, "esp-not-connecting");
   assert.equal(e.line, undefined);
 });
+
+test("USB permission problems on a Raspberry Pi", () => {
+  for (const out of [
+    'avrdude: ser_open(): can\'t open device "/dev/ttyACM0": Permission denied',
+    "A fatal error occurred: Could not open /dev/ttyUSB0, the port is busy or doesn't exist.\n([Errno 13] could not open port /dev/ttyUSB0: [Errno 13] Permission denied: '/dev/ttyUSB0')",
+    "open /dev/ttyUSB0: permission denied",
+  ]) assert.equal(match(db, "upload", out)?.entry.id, "port-permission", out);
+  // Windows "Access is denied" is still another program using the port.
+  assert.equal(match(db, "upload", 'avrdude: ser_open(): can\'t set com-state for "\\\\.\\COM4": Access is denied.')?.entry.id, "port-busy");
+});

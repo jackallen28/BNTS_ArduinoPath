@@ -31,7 +31,7 @@ const TESTS = {
     outputs: [`Serial.println(F("TEST:${p.id}:BEEP"));`, `tone(${p.pins.positive}, 880);`, "delay(250);", `noTone(${p.pins.positive});`, "delay(150);"],
   }),
   servo: (p) => p.pins.signal && ({
-    includes: ["#if defined(ESP32)", "#include <ESP32Servo.h>", "#else", "#include <Servo.h>", "#endif"],
+    includes: ["#include <Servo.h>"], // on ESP32, ArduinoPath's Servo.h is ESP32Servo
     globals: [`Servo servo_${cid(p.id)};`],
     setup: [`servo_${cid(p.id)}.attach(${p.pins.signal});`],
     outputs: [0, 90, 180, 90].flatMap((a) => [`servo_${cid(p.id)}.write(${a});`, `Serial.println(F("TEST:${p.id}:${a}"));`, "delay(400);"]),
@@ -217,7 +217,7 @@ export function testSketch(parts, board) {
   const dedupedIncludes = dedupeIncludes(includes);
   const ind = (lines, n = 1) => lines.map((l) => "  ".repeat(n) + l).join("\n");
   const turns = outputs.map((o, i) => `    case ${i}:\n${ind(o.code, 3)}\n      break;`).join("\n");
-  const code = `// CircuitPath wiring test for your ${board.name}.
+  const code = `// ArduinoPath wiring test for your ${board.name}.
 // It tries each part in turn and reports on the Serial Monitor (${TEST_BAUD} baud).
 ${dedupedIncludes.join("\n")}${dedupedIncludes.length ? "\n" : ""}
 ${globals.join("\n")}${globals.length ? "\n" : ""}int turn = 0;

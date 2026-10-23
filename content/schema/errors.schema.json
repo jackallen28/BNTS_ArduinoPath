@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "errors.schema.json",
-  "title": "CircuitPath errors database",
+  "title": "ArduinoPath errors database",
   "description": "The Coach's plain-English explanations of compiler and upload errors.",
   "type": "object",
   "additionalProperties": false,

@@ -7,7 +7,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"circuitpath/internal/content"
+	"arduinopath/internal/content"
 )
 
 const (

@@ -1,0 +1,90 @@
+{
+  "type": "led-matrix",
+  "title": "8×8 LED matrix (MAX7219)",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
+  "behaviour": "led-matrix",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "vcc",
+      "name": "VCC (5V)"
+    },
+    {
+      "id": "gnd",
+      "name": "GND"
+    },
+    {
+      "id": "din",
+      "name": "DIN (data in)"
+    },
+    {
+      "id": "cs",
+      "name": "CS"
+    },
+    {
+      "id": "clk",
+      "name": "CLK"
+    }
+  ],
+  "footprint": null,
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 224,
+    "height": 132,
+    "connectors": {
+      "clk": {
+        "x": 0,
+        "y": 86
+      },
+      "cs": {
+        "x": 0,
+        "y": 76
+      },
+      "din": {
+        "x": 0,
+        "y": 66
+      },
+      "gnd": {
+        "x": 0,
+        "y": 56
+      },
+      "vcc": {
+        "x": 0,
+        "y": 46
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 120,
+    "height": 60,
+    "connectors": {
+      "clk": {
+        "x": 1,
+        "y": 50,
+        "dir": "left"
+      },
+      "cs": {
+        "x": 1,
+        "y": 40,
+        "dir": "left"
+      },
+      "din": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      },
+      "gnd": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      }
+    }
+  }
+}

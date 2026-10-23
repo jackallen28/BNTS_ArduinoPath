@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"circuitpath/internal/arduino"
-	"circuitpath/internal/serialmon"
+	"arduinopath/internal/arduino"
+	"arduinopath/internal/serialmon"
 )
 
 type fakeTools struct {

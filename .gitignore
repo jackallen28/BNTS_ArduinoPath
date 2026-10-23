@@ -3,8 +3,8 @@
 /data/
 
 # Build output
-/circuitpath
-/CircuitPath.exe
+/arduinopath
+/ArduinoPath.exe
 /dist/
 
 # Node (dev-only test tooling)

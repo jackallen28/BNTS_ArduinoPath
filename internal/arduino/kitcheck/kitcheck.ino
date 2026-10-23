@@ -1,7 +1,6 @@
-// CircuitPath kit check: uses every library the projects need, so a board
-// that compiles this has everything a student will use. The Pi compiles it
-// for every board after installing or updating the Arduino tools (which
-// also fills the build cache, so students' first compiles are quick).
+// ArduinoPath kit check: uses every library the projects need, so a board
+// that compiles this has everything a student will use. CI compiles it
+// for every board after installing the Arduino tools.
 
 // Board-specific libraries first: Keypad.h defines CLOSED and OPEN as
 // macros, which clash with the ESP8266 WiFi headers if they come after it.
@@ -9,14 +8,14 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <esp_now.h>
-#include <ESP32Servo.h>
+#include <Servo.h> // ArduinoPath's Servo.h for ESP32 (ESP32Servo)
 WebServer server(80);
 #elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+#include <WiFi.h>      // ArduinoPath's WiFi.h for ESP8266 (ESP8266WiFi)
+#include <WebServer.h> // ArduinoPath's WebServer.h for ESP8266 (ESP8266WebServer)
 #include <espnow.h>
 #include <Servo.h>
-ESP8266WebServer server(80);
+WebServer server(80);
 #else
 #include <Servo.h>
 #include <LiquidCrystal_I2C.h> // Keypad Safe (Uno / Mega)

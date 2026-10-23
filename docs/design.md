@@ -1,4 +1,4 @@
-# CircuitPath v1: how the pieces fit
+# ArduinoPath v1: how the pieces fit
 
 The brief is [CLAUDE.md](../CLAUDE.md). This page is the contract between the parts of the app:
 the board files, the circuit format in projects, the simulator engine, the circuit renderer, the
@@ -16,7 +16,7 @@ Change it when a contract changes.
                 student code ──────────────────────►│  Web Worker)   circuit/ (renderer: SVG)    │
                      │                              │ checks.js ◄── trace                        │
                      ▼                              └───────┬────────────────────────────────────┘
-          CircuitPath.exe / .app (Go)  ◄── /api/compile, /api/upload, /api/ports, /api/serial ──┘
+          ArduinoPath.exe / .app (Go)  ◄── /api/compile, /api/upload, /api/ports, /api/serial ──┘
           arduino-cli + board tools (built in) ──► USB ──► the real board
 ```
 
@@ -85,6 +85,15 @@ in each column, rows F–J joined in each column, the centre gap between E and F
 rail line is joined end to end. **Endpoints** of a wire: a hole, `pin:<ROLE>`, `pin:<code>` (a
 board pin by code, e.g. `pin:LED_BUILTIN` or `pin:A0`), `board:<power>`, `part:<id>:<leg>`.
 Wire colours default to: red = VCC / 5V / 3V3, black = GND, otherwise by signal.
+
+`board:5V` on a board without a 5V pin (NodeMCU, ESP32 DevKit) means VIN (the USB's 5V). 5V parts
+(servo, HC-SR04, PIR, NeoPixels, the LED matrix) take the + rail on 5V boards and `board:5V` on 3.3V
+boards (`when`), and the HC-SR04's echo goes through a 10k/10k divider on 3.3V boards.
+
+**Wiring step text** may say `{{pin:ROLE}}` (becomes "pin 12" / "pin D5", the label on the student's
+board), `{{VCC}}` ("5V" / "3V3"), `{{5V}}` ("5V", or "VIN"), `{{3V3}}` and `{{board}}`:
+`fillWiringText(text, board, pins)` in `ui/js/circuit/wiring-text.js`. The first step starts with
+the USB safety line. `internal/content/circuit_test.go` checks every circuit on every board.
 
 **`{{pins}}`** in a step's `starter` or `demo` becomes the pin header for the student's board:
 
@@ -160,6 +169,33 @@ runHeadless(source, { board, ms: 5000, events: simEvents, inputs })
   LiquidCrystal_I2C, TM1637Display, Keypad, MFRC522, MD_MAX72XX, ESP8266WiFi / WiFi,
   ESP8266WebServer / WebServer, time / NTP (`configTime`, `getLocalTime`: the laptop's clock).
 
+**Engine details (additions; everything above still holds):**
+
+- The page's CSP forbids `eval`, so `compile()` builds JavaScript closures, not source; `program`
+  is opaque. `compile()` also returns `{ ok: false, unsupported: true, message, line, col, errors: [] }`.
+  A missing `setup` / `loop` is gcc's link error ``undefined reference to `setup'`` with `line: 0`.
+- `runHeadless(source, { board, ms, events, inputs, project, clock })`: `project` resolves role
+  names in `events` / `inputs`; `clock` (ms since 1970) fixes the laptop clock for `time()`.
+  The result also has `http: [{ request, response }]` (the `http` sim_events) and `truncated`
+  (over 200 000 events). `serial` has `\r\n` turned into `\n`; `serial` events keep `\r\n`.
+  A sim_event with no `at_ms` happens at 0; an analog value may be `"ANALOG_MAX"`; and
+  `{ at_ms, espnow: { from, text | data } }` delivers an ESP-NOW message.
+- `new Simulation(...)` also takes `project` (role names in `setInputs`); `start(source)` resolves
+  with the compile result; `setSpeed(0)` pauses, `Infinity` runs flat out; `sim.espNowReceive(from,
+  data)`. `onError` gets `{ kind: "compile" | "unsupported" | "runtime", line, message, errors? }`.
+- Event details: `digital` / `pwm` / `servo` / `tone` are sent when the value changes;
+  `analogWrite` on a non-PWM AVR pin sends `digital` (like the Arduino core). `oled.buffer` is
+  the SSD1306 layout (byte `x + (y >> 3) * width`, bit `y & 7`). `matrix.rows[r]` bit `c` is
+  `getPoint(r, c)`, plus `devices` and `intensity`. `lcd` also has `custom` (createChar).
+  `tm1637` also has `brightness`, `on`. `http_route` is sent when `server.on()` registers a page;
+  `http_response {method, path, status}` when a request is answered; `wifi.status` is
+  `connecting | connected | disconnected | failed | ap`; `espnow {from, to, data, text}`.
+  `warning` kinds besides `busy-loop`: `serial-no-begin`, `pin` (a pin the board doesn't have),
+  `interrupt`, `keypad-key`, `oled-begin`, `lcd-init`, each with a student-friendly `message`.
+- Timing: each statement costs 1 µs on AVR and 0.5 µs on ESP; `loop()` itself 1 / 2 µs; library
+  calls cost about what they take on the board (`analogRead` 112 µs on AVR); Serial output takes
+  the baud rate's time once its 64-byte buffer is full; `pulseIn` with no echo waits its timeout.
+
 ## 5. Checks (`ui/js/sim/checks.js`)
 
 A step's `checks[]`, each with a `label` (the checklist line). Evaluated after a Run (simulator)
@@ -204,23 +240,53 @@ view.destroy();
 import { buildNetlist, validateCircuit } from "./circuit/netlist.js";
 ```
 
+Units are 0.01 inch (the breadboard pitch is 10); offboard positions are measured from the
+breadboard's top-left corner, and the board sits to its left (tall boards turned on their side).
+`loadParts({types, boards})` / `loadCircuitParts(circuit, board)` (`./parts.js`) fetch the part
+catalogue the renderer and netlist take. `buildNetlist(...)` returns `nets` and helpers
+(`legNet`, `pinNet`, `powerNet`, `pinsForLeg`, `powerForLeg`, `legsOnNet`, `joined`, `legHoles`).
+
 Controls drawn on parts: buttons (press with the mouse), a knob on pots and joysticks, sliders
 for LDR light, distance (HC-SR04), temperature and humidity (DHT), soil moisture, a "wave" button
 on the PIR, keys on the keypad, a card to tap on the RFID reader.
 
-## 7. The bench (`ui/js/bench.js`)
+## 7. The bench, the run panel and the Wiring Wizard
 
-Joins a running simulation to the drawing: builds the netlist (breadboard strips, rails, wires,
-resistors and pressed buttons as connections), turns engine events into part states (an LED
-lights when its anode net is driven HIGH or PWM and its cathode net reaches GND), and part
-controls into engine inputs (a pressed button joining a pin's net to GND reads LOW; a pot's wiper
-gives `analog_max` × position; an LDR divider gives a value from the light slider; an HC-SR04
-echo gives `pulse` = cm × 58 µs).
+**`ui/js/bench.js`** joins a running simulation to the drawing through the netlist (wires, strips,
+rails and resistors; a pressed button joins its two sides). `new Bench({ board, circuit, parts, pins })`:
+`apply(events)` → `{ state, tones }` (`state` for `view.setState`: an LED lights when its + leg is
+driven HIGH / PWM and its − leg reaches GND or a LOW pin; servo, buzzer, NeoPixel, OLED, LCD, TM1637,
+matrix by the pins their legs reach), `control(partId, control, value)` → `{ inputs?, key?, card? }`
+for `sim.setInputs` / `pressKey` / `tapCard` (a pressed button gives the pin whatever is on its
+other side, `null` when released; a pot's wiper `analog_max × position`; an LDR divider from the
+light slider; soil sensors read higher when drier; HC-SR04 echo `pulse` = cm × 58 µs), `allInputs()`
+(the controls' values at the start of a run), `testParts()` (the parts with their pins, for
+`testSketch`), `reach(partId, leg)` and `pinOf(partId, leg)`.
+
+**`ui/js/widgets/runpanel.js`**: `createRunPanel({ board, project, circuit, onRuntimeError, onEvents })`
+→ `rp` with `el` (breadboard / schematic tabs, sound toggle, the drawing and its controls, the phone
+panel), `console` (the Serial Monitor widget; put `rp.console.el` where it belongs),
+`run(source, { events, ms, label })` → the compile result (`label: "Watching the goal"` shows a
+banner; `events` are sim_events, applied in real time), `stop()`, `result()` (runHeadless's shape:
+`{ ok, errors, events, serial, http, stopped_at_ms }`), `running`, `serialWrite(text)`,
+`onSerial(fn)`, `showTip(title, text)`, `busyLoopText` (the Coach's words for busy-loop warnings),
+`setBoard`, `setCircuit`, `setProject`, `ready`, `bench`, `view`, `destroy()`. The buzzer plays
+through Web Audio once the student has clicked or pressed a key in the panel.
+
+**`ui/js/wizard.js`**: `openWiringWizard({ project, board, pins, onDone, onClose, partsOnly, save, names })`.
+Pages: meet each kind of part (`content/parts/index.json` texts), each wiring step
+(`fillWiringText`, the step highlighted, schematic toggle, the whole circuit, the safety line),
+then Test it, in the simulator (a run panel) or on the real board (`realboard.upload` then
+`openSerial` at 115200 baud). Rows: inputs tick themselves when a reading shows the student used
+the part; outputs need "I saw it work"; Fix it goes back to the part's step with likely causes
+(`FIXES` in `wizard-rows.js`). Start programming saves `{ wiring_done: true }` into the project's
+progress (merged) and calls `onDone({ confirmed: true })`. Free Play's mini wizard passes a
+pretend project (`{ id, title, circuit, wiring_steps }`) and `partsOnly`, and nothing is saved.
 
 ## 8. Real boards (Go: `/api/...`)
 
 The board tools (arduino-cli, the AVR, ESP8266 and ESP32 cores and every library, pinned in
-`internal/arduino/requirements.json`) are **built into** CircuitPath.exe / CircuitPath.app and
+`internal/arduino/requirements.json`) are **built into** ArduinoPath.exe / ArduinoPath.app and
 unpacked to the data folder the first time a family is used (with a progress bar).
 
 | API | |

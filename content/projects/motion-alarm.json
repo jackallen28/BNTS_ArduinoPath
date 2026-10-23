@@ -28,5 +28,387 @@
     "variables"
   ],
   "intro": "Catch anyone sneaking past with a motion sensor, a flashing light and an alarm.",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "pir",
+        "type": "pir",
+        "label": "motion sensor",
+        "offboard": {
+          "x": 345,
+          "y": -150
+        },
+        "step": 1
+      },
+      {
+        "id": "led",
+        "type": "led",
+        "color": "red",
+        "label": "LED",
+        "at": "H5",
+        "step": 2
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E5",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 500,
+          "y": 0
+        },
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:pir:out",
+        "to": "pin:PIR_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:pir:vcc",
+        "to": "BP21",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "part:pir:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "part:pir:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J6",
+        "step": 2
+      },
+      {
+        "from": "A5",
+        "to": "BN5",
+        "step": 2
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 3
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN22",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The motion sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the motion sensor's three pins with wires: GND to the blue (−) rail, OUT to {{pin:PIR_PIN}}, and VCC to power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board. (The sensor's OUT pin only sends 3.3V, so it's safe for every board.)"
+    },
+    {
+      "title": "The LED",
+      "text": "Push the LED into holes H5 and H6, with the long leg (+) in H6. Put a 220Ω resistor from G5 across the gap to E5. Add a wire from {{pin:LED_PIN}} to J6, and a black wire from A5 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Test the motion sensor",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == HIGH) {\n    Serial.println(\"Motion!\");\n  } else {\n    Serial.println(\"All quiet\");\n  }\n  delay(500);\n}\n",
+      "text": "A PIR motion sensor notices the warmth of moving people and animals. When it sees movement its pin goes `HIGH` for a few seconds.\n\n**Your task:** Run the code, open the **Serial Monitor**, then wave your hand in front of the sensor. (In the simulator, press the wave button.) It can take a minute to settle after you plug it in.",
+      "hints": [
+        "Wave your whole hand slowly, about half a metre away.",
+        "The real sensor needs up to a minute to warm up.",
+        "In the simulator, click the hand button next to the sensor."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It notices motion",
+          "text": "Motion!"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It says when it's quiet",
+          "text": "All quiet"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw \"Motion!\" when I waved"
+        }
+      ],
+      "success": "The sensor works! Automatic doors and security lights use these.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == HIGH) {\n    Serial.println(\"Motion!\");\n  } else {\n    Serial.println(\"All quiet\");\n  }\n  delay(500);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "PIR_PIN": 1
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Light on movement",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == ___) {\n    digitalWrite(LED_PIN, ___);\n  } else {\n    digitalWrite(LED_PIN, LOW);\n  }\n}\n",
+      "text": "Join the sensor to the LED: movement turns the light on, and it goes off when everything is still.\n\n**Your task:** fill in the blanks.",
+      "hints": [
+        "The sensor's pin is `HIGH` when it sees movement.",
+        "When there's movement, the LED should be on.",
+        "Both blanks are `HIGH`."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "Movement turns the light on",
+          "pin": "LED_PIN",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Stillness turns it off",
+          "pin": "LED_PIN",
+          "value": "LOW"
+        },
+        {
+          "type": "confirm",
+          "label": "The LED lights up when I wave"
+        }
+      ],
+      "success": "A security light! The sensor decides, your code acts.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == HIGH) {\n    digitalWrite(LED_PIN, HIGH);\n  } else {\n    digitalWrite(LED_PIN, LOW);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "PIR_PIN": 1
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Sound the alarm",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == HIGH) {\n    // A two-tone siren with a flashing light.\n    digitalWrite(LED_PIN, HIGH);\n    tone(BUZZER_PIN, 600);\n    delay(250);\n    digitalWrite(LED_PIN, LOW);\n    tone(BUZZER_PIN, ___);\n    delay(250);\n  } else {\n    noTone(BUZZER_PIN);\n    digitalWrite(LED_PIN, LOW);\n  }\n}\n",
+      "text": "Add a siren: two notes, one after the other, with the LED flashing in time. When everything is still, `noTone` makes it quiet.\n\n**Your task:** fill in the second siren note (try 900 Hz).",
+      "hints": [
+        "The second note should be different from the first, so it sounds like a siren.",
+        "Try 900.",
+        "The line is `tone(BUZZER_PIN, 900);`"
+      ],
+      "checks": [
+        {
+          "type": "tone_seen",
+          "label": "The siren's low note",
+          "pin": "BUZZER_PIN",
+          "min_hz": 550,
+          "max_hz": 650
+        },
+        {
+          "type": "tone_seen",
+          "label": "The siren's high note",
+          "pin": "BUZZER_PIN",
+          "min_hz": 700,
+          "max_hz": 2000
+        },
+        {
+          "type": "code_contains",
+          "label": "It goes quiet with noTone",
+          "text": "noTone"
+        },
+        {
+          "type": "confirm",
+          "label": "I heard the siren when I waved"
+        }
+      ],
+      "success": "Nee-naw! Now nobody can sneak past.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n}\n\nvoid loop() {\n  if (digitalRead(PIR_PIN) == HIGH) {\n    // A two-tone siren with a flashing light.\n    digitalWrite(LED_PIN, HIGH);\n    tone(BUZZER_PIN, 600);\n    delay(250);\n    digitalWrite(LED_PIN, LOW);\n    tone(BUZZER_PIN, 900);\n    delay(250);\n  } else {\n    noTone(BUZZER_PIN);\n    digitalWrite(LED_PIN, LOW);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "PIR_PIN": 1
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Count the intruders",
+      "support": "brief",
+      "text": "**Goal:** count each *new* visit. When movement starts, print `Intruder #1`, then `Intruder #2` next time, and so on, while the siren still sounds. One visit should only be counted once, however long it lasts.",
+      "hints": [
+        "Make a counter variable above `setup()`: `int intruders = 0;`",
+        "Remember the last reading. A new visit is when it was `LOW` before and is `HIGH` now.",
+        "Use **Watch the goal** to compare."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "The first intruder is counted",
+          "text": "Intruder #1"
+        },
+        {
+          "type": "serial_contains",
+          "label": "The second intruder is counted",
+          "text": "Intruder #2"
+        },
+        {
+          "type": "tone_seen",
+          "label": "The siren still sounds",
+          "pin": "BUZZER_PIN",
+          "min_hz": 550,
+          "max_hz": 650
+        },
+        {
+          "type": "confirm",
+          "label": "Each wave counts once"
+        }
+      ],
+      "success": "Your alarm keeps score. Spotting the moment something changes is called edge detection.",
+      "demo": "{{pins}}\nint intruders = 0;\nint lastMotion = LOW;\n\nvoid setup() {\n  pinMode(PIR_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int motion = digitalRead(PIR_PIN);\n  // New movement: quiet last time, motion now.\n  if (motion == HIGH && lastMotion == LOW) {\n    intruders++;\n    Serial.print(\"Intruder #\");\n    Serial.println(intruders);\n  }\n  lastMotion = motion;\n\n  if (motion == HIGH) {\n    digitalWrite(LED_PIN, HIGH);\n    tone(BUZZER_PIN, 600);\n    delay(250);\n    digitalWrite(LED_PIN, LOW);\n    tone(BUZZER_PIN, 900);\n    delay(250);\n  } else {\n    noTone(BUZZER_PIN);\n    digitalWrite(LED_PIN, LOW);\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 1
+            }
+          }
+        },
+        {
+          "at_ms": 1500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 2500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 1
+            }
+          }
+        },
+        {
+          "at_ms": 3500,
+          "set": {
+            "digital": {
+              "PIR_PIN": 0
+            }
+          }
+        }
+      ],
+      "sim_ms": 4500
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-algorithms",
+    "78-programming",
+    "78-evaluate"
+  ],
+  "outro": "Your alarm catches movement and counts intruders. You read a **motion sensor**, made a siren with **tone()**, and counted only *new* movements by remembering the last reading.",
+  "stretch": [
+    "Add a button to arm and disarm the alarm, with the LED showing whether it's armed.",
+    "Give people 5 seconds to leave after arming before the alarm starts watching.",
+    "Make the siren pattern your own: try a rising whoop from 400 Hz to 1200 Hz."
+  ]
 }

@@ -1,4 +1,4 @@
-// Package arduino installs and checks the Arduino tools CircuitPath compiles
+// Package arduino installs and checks the Arduino tools ArduinoPath compiles
 // with: arduino-cli, the board cores (AVR, ESP8266, ESP32) and every library
 // the projects use, at the exact versions in requirements.json.
 //
@@ -16,12 +16,13 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/sha256"
-	_ "embed"
+	"embed"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -178,8 +179,33 @@ func (e *Env) Setup(ctx context.Context) error {
 			return err
 		}
 	}
+	if err := installOwnLibraries(filepath.Join(e.Dir, "user", "libraries")); err != nil {
+		return err
+	}
 	b, _ := json.MarshalIndent(stamp{Hash: r.Hash(), Requirements: r, InstalledAt: time.Now().UTC().Format(time.RFC3339)}, "", "  ")
 	return os.WriteFile(e.stampFile(), b, 0o644)
+}
+
+//go:embed libraries
+var ownLibraries embed.FS
+
+// installOwnLibraries copies ArduinoPath's own small libraries (such as the
+// one that makes <Servo.h> work on ESP32 boards) into the libraries folder.
+func installOwnLibraries(dir string) error {
+	return fs.WalkDir(ownLibraries, "libraries", func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		dest := filepath.Join(dir, filepath.FromSlash(strings.TrimPrefix(p, "libraries")))
+		if d.IsDir() {
+			return os.MkdirAll(dest, 0o755)
+		}
+		data, err := ownLibraries.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(dest, data, 0o644)
+	})
 }
 
 // Result is how one board did in the kit check.
@@ -192,7 +218,7 @@ type Result struct {
 
 // Check compiles the kit-check sketch for each board.
 func (e *Env) Check(ctx context.Context, boards []Board) ([]Result, error) {
-	tmp, err := os.MkdirTemp("", "circuitpath-kitcheck-")
+	tmp, err := os.MkdirTemp("", "arduinopath-kitcheck-")
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +267,7 @@ func tail(s string, lines int) string {
 
 func (e *Env) writeConfig(r Requirements) error {
 	var b strings.Builder
-	b.WriteString("# Written by CircuitPath (internal/arduino). Changes are overwritten.\n")
+	b.WriteString("# Written by ArduinoPath (internal/arduino). Changes are overwritten.\n")
 	b.WriteString("board_manager:\n  additional_urls:\n")
 	for _, u := range r.BoardManagerURLs {
 		fmt.Fprintf(&b, "    - %s\n", u)

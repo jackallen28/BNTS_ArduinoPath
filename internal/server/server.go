@@ -1,4 +1,4 @@
-// Package server is CircuitPath's local web server: the web app's files and
+// Package server is ArduinoPath's local web server: the web app's files and
 // the JSON API for profiles, logins, autosave, progress, save files and the
 // WIPE page. It runs on the student's own laptop and only answers that
 // laptop (see Hosts).
@@ -21,16 +21,16 @@ import (
 	"sync"
 	"time"
 
-	"circuitpath/internal/auth"
-	"circuitpath/internal/content"
-	"circuitpath/internal/serialmon"
-	"circuitpath/internal/store"
+	"arduinopath/internal/auth"
+	"arduinopath/internal/content"
+	"arduinopath/internal/serialmon"
+	"arduinopath/internal/store"
 )
 
 const (
 	cookieName    = "cp_session"
 	maxJSONBytes  = 256 << 10
-	csrfHeader    = "X-CircuitPath"
+	csrfHeader    = "X-ArduinoPath"
 	defaultSchool = "Banyule Nillumbik Tech School"
 	sessionTTL    = 12 * time.Hour
 )
@@ -121,7 +121,7 @@ func (s *Server) middleware(next http.Handler) http.Handler {
 		h.Set("X-Frame-Options", "DENY")
 		h.Set("Cross-Origin-Opener-Policy", "same-origin")
 		if !s.hostAllowed(r.Host) {
-			http.Error(w, "CircuitPath only answers this computer.", http.StatusMisdirectedRequest)
+			http.Error(w, "ArduinoPath only answers this computer.", http.StatusMisdirectedRequest)
 			return
 		}
 		defer func() {

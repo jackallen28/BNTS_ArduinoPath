@@ -1,4 +1,4 @@
-# Publishes CircuitPath for Windows and macOS as a GitHub release. Any of
+# Publishes ArduinoPath for Windows and macOS as a GitHub release. Any of
 # these starts it:
 #   - changing the VERSION file (on github.com: open VERSION, edit, commit)
 #   - pushing a version tag:  git tag v1.2.3 && git push origin v1.2.3
@@ -6,14 +6,15 @@
 #   - Actions > Release > Run workflow (publishes VERSION if it isn't out yet),
 #     or a change to this file
 # Each app is tested on its own system (started and used) before anything
-# is published: CircuitPath.exe (64-bit Intel/AMD), CircuitPath-arm64.exe,
-# CircuitPath-macOS.zip (one app for Intel and Apple Silicon Macs) and SHA256SUMS.
+# is published: ArduinoPath.exe (64-bit Intel/AMD), ArduinoPath-arm64.exe,
+# ArduinoPath-macOS.zip (one app for Intel and Apple Silicon Macs),
+# ArduinoPath-RaspberryPi.tar.gz (64-bit Raspberry Pi OS) and SHA256SUMS.
 name: Release
 
 on:
   push:
     tags: ["v[0-9]+.[0-9]+.[0-9]+"]
-    branches: [BNTS_CircuitPath, master, main]
+    branches: [main]
     paths: [VERSION, .github/workflows/release.yml]
   release:
     types: [published]
@@ -62,7 +63,7 @@ jobs:
     needs: version
     if: needs.version.outputs.skip != 'true'
     runs-on: windows-latest
-    timeout-minutes: 150
+    timeout-minutes: 200
     defaults:
       run:
         shell: bash
@@ -87,7 +88,7 @@ jobs:
 
       - name: Install the board tools
         run: |
-          go run ./cmd/circuitpath -data "$RUNNER_TEMP/cp" -install-arduino
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
           rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
 
       - name: Save the board tools
@@ -102,10 +103,10 @@ jobs:
           mkdir -p dist
           go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out "$RUNNER_TEMP/boards.zip"
           for arch in amd64 arm64; do
-            out=dist/CircuitPath.exe
-            [ "$arch" = arm64 ] && out=dist/CircuitPath-arm64.exe
+            out=dist/ArduinoPath.exe
+            [ "$arch" = arm64 ] && out=dist/ArduinoPath-arm64.exe
             CGO_ENABLED=0 GOOS=windows GOARCH=$arch go build -trimpath \
-              -ldflags "-H windowsgui -s -w -X circuitpath.Version=$VERSION" -o "$out" ./cmd/circuitpath
+              -ldflags "-H windowsgui -s -w -X arduinopath.Version=$VERSION" -o "$out" ./cmd/arduinopath
             # The tools run as x64 on ARM laptops too (Windows emulates them).
             go run ./tools/packboards -append "$out" -bundle "$RUNNER_TEMP/boards.zip"
           done
@@ -113,14 +114,14 @@ jobs:
 
       - name: Unpack the built-in tools and compile for every board
         env:
-          CIRCUITPATH_BOARDS: ${{ github.workspace }}/dist/CircuitPath.exe
-        run: go test -v -timeout 120m -run TestRealBundle ./internal/arduino
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath.exe
+        run: go test -v -timeout 170m -run TestRealBundle ./internal/arduino
 
-      - name: Start CircuitPath.exe and use it
+      - name: Start ArduinoPath.exe and use it
         shell: pwsh
         env:
-          CIRCUITPATH_EXPECT_TOOLS: "1"
-        run: ./tests/windows/smoke.ps1 -Exe dist/CircuitPath.exe
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: ./tests/windows/smoke.ps1 -Exe dist/ArduinoPath.exe
 
       - uses: actions/upload-artifact@v4
         with:
@@ -154,7 +155,7 @@ jobs:
 
       - name: Install the board tools
         run: |
-          go run ./cmd/circuitpath -data "$RUNNER_TEMP/cp" -install-arduino
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
           rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
 
       - name: Save the board tools
@@ -168,33 +169,98 @@ jobs:
         run: |
           for arch in amd64 arm64; do
             CGO_ENABLED=0 GOOS=darwin GOARCH=$arch go build -trimpath \
-              -ldflags "-s -w -X circuitpath.Version=$VERSION" -o dist/circuitpath-$arch ./cmd/circuitpath
+              -ldflags "-s -w -X arduinopath.Version=$VERSION" -o dist/arduinopath-$arch ./cmd/arduinopath
           done
           go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out "$RUNNER_TEMP/boards.zip"
-          go run ./tools/macapp -version "$VERSION" -amd64 dist/circuitpath-amd64 -arm64 dist/circuitpath-arm64 -boards "$RUNNER_TEMP/boards.zip" -out dist
-          codesign --force --deep -s - dist/CircuitPath.app
+          go run ./tools/macapp -version "$VERSION" -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -boards "$RUNNER_TEMP/boards.zip" -out dist
+          codesign --force --deep -s - dist/ArduinoPath.app
 
       - name: Unpack the built-in tools and compile for every board
         env:
-          CIRCUITPATH_BOARDS: ${{ github.workspace }}/dist/CircuitPath.app/Contents/Resources/boards.zip
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath.app/Contents/Resources/boards.zip
         run: go test -v -timeout 120m -run TestRealBundle ./internal/arduino
 
-      - name: Start CircuitPath.app and use it
+      - name: Start ArduinoPath.app and use it
         env:
-          CIRCUITPATH_EXPECT_TOOLS: "1"
-        run: tests/macos/smoke.sh dist/CircuitPath.app
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: tests/macos/smoke.sh dist/ArduinoPath.app
 
       - name: Zip
-        run: ditto -c -k --keepParent dist/CircuitPath.app dist/CircuitPath-macOS.zip
+        run: ditto -c -k --keepParent dist/ArduinoPath.app dist/ArduinoPath-macOS.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: dist/CircuitPath-macOS.zip
+          path: dist/ArduinoPath-macOS.zip
+          retention-days: 3
+
+  pi:
+    needs: version
+    if: needs.version.outputs.skip != 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 150
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: go test ./...
+
+      - name: Restore the board tools
+        id: tools-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Install the board tools
+        run: |
+          go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
+          rm -rf "$RUNNER_TEMP/cp/arduino/downloads"
+
+      - name: Save the board tools
+        if: steps.tools-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Build (with the board tools built in)
+        run: |
+          mkdir -p dist/ArduinoPath
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath \
+            -ldflags "-s -w -X arduinopath.Version=$VERSION" -o dist/ArduinoPath/ArduinoPath ./cmd/arduinopath
+          go run ./tools/packboards -in "$RUNNER_TEMP/cp/arduino" -out "$RUNNER_TEMP/boards.zip"
+          go run ./tools/packboards -append dist/ArduinoPath/ArduinoPath -bundle "$RUNNER_TEMP/boards.zip"
+
+      - name: Unpack the built-in tools and compile for every board
+        env:
+          ARDUINOPATH_BOARDS: ${{ github.workspace }}/dist/ArduinoPath/ArduinoPath
+        run: go test -v -timeout 120m -run TestRealBundle ./internal/arduino
+
+      - name: Start ArduinoPath and use it
+        env:
+          ARDUINOPATH_EXPECT_TOOLS: "1"
+        run: tests/linux/smoke.sh dist/ArduinoPath/ArduinoPath
+
+      - name: Pack for download
+        run: |
+          cp docs/raspberry-pi-readme.txt dist/ArduinoPath/README.txt
+          tar -C dist -czf "$RUNNER_TEMP/ArduinoPath-RaspberryPi.tar.gz" ArduinoPath
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pi
+          path: ${{ runner.temp }}/ArduinoPath-RaspberryPi.tar.gz
           retention-days: 3
 
   publish:
-    needs: [version, windows, macos]
+    needs: [version, windows, macos, pi]
     runs-on: ubuntu-latest
     env:
       TAG: ${{ needs.version.outputs.tag }}
@@ -209,12 +275,13 @@ jobs:
       - name: Publish
         run: |
           (cd dist && sha256sum * > SHA256SUMS && cat SHA256SUMS)
-          notes="**Windows:** download **CircuitPath.exe** and double-click it (CircuitPath-arm64.exe is for Windows laptops with ARM chips, such as Snapdragon).
-          **Mac:** download **CircuitPath-macOS.zip**, open it, and drag CircuitPath into Applications (one app for Intel and Apple Silicon Macs).
-          CircuitPath opens in Chrome or Edge. Nothing to install, no admin rights needed. If Windows or macOS blocks it the first time, see docs/windows-app.md or docs/mac-app.md."
+          notes="**Windows:** download **ArduinoPath.exe** and double-click it (ArduinoPath-arm64.exe is for Windows laptops with ARM chips, such as Snapdragon).
+          **Mac:** download **ArduinoPath-macOS.zip**, open it, and drag ArduinoPath into Applications (one app for Intel and Apple Silicon Macs).
+          **Raspberry Pi** (Pi 4 or 5, 64-bit Raspberry Pi OS): download **ArduinoPath-RaspberryPi.tar.gz**, right-click it and choose Extract Here, then double-click ArduinoPath in the new folder (choose Execute). It adds itself to the menu (Education) and the desktop.
+          ArduinoPath opens in Chrome, Edge or Chromium. Nothing to install, no admin rights needed. If Windows or macOS blocks it the first time, see docs/windows-app.md or docs/mac-app.md. Raspberry Pi help: docs/raspberry-pi.md."
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title "CircuitPath $VERSION (Windows and Mac)" --notes "$notes" --latest
+              --title "ArduinoPath $VERSION (Windows, Mac and Raspberry Pi)" --notes "$notes" --latest
           fi

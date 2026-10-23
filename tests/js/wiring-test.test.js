@@ -16,7 +16,7 @@ test("a traffic light test", () => {
   assert.match(code, /pinMode\(2, INPUT_PULLUP\);/);
   assert.match(code, /TEST:red:ON/);
   assert.match(code, /READ:btn:/);
-  assert.match(code, /#if defined\(ESP32\)\n#include <ESP32Servo.h>\n#else\n#include <Servo.h>\n#endif/);
+  assert.match(code, /#include <Servo.h>/);
   assert.match(code, /case 1:/, "two outputs take turns");
   assert.match(code, /Serial\.begin\(115200\)/);
   // Balanced braces.

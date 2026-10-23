@@ -1,7 +1,7 @@
 // A tiny key-value store in IndexedDB for code that couldn't reach the
 // server yet. Falls back to memory if IndexedDB isn't available.
 
-const DB_NAME = "circuitpath";
+const DB_NAME = "arduinopath";
 const STORE = "pending";
 
 function openDb() {

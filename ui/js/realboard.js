@@ -1,4 +1,4 @@
-// Real boards: compiling and uploading through CircuitPath.exe / .app (which
+// Real boards: compiling and uploading through ArduinoPath.exe / .app (which
 // has the Arduino tools built in), finding the board's port, and the Serial
 // Monitor connection.
 
@@ -83,7 +83,7 @@ export function openSerial(port, baud, { onData, onOpen = () => {}, onClose = ()
   es.onerror = () => {
     // The server refuses busy ports before the stream starts.
     if (es.readyState === EventSource.CLOSED || es.readyState === EventSource.CONNECTING) {
-      finish("CircuitPath couldn't open the port. Is another program (like the Arduino IDE) using it?");
+      finish("ArduinoPath couldn't open the port. Is another program (like the Arduino IDE) using it?");
     }
   };
   return {

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "project.schema.json",
-  "title": "CircuitPath project",
+  "title": "ArduinoPath project",
   "description": "One project on the picker. The file name must be <id>.json. A project with no steps yet shows as \"Coming soon\".",
   "type": "object",
   "additionalProperties": false,

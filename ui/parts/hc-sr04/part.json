@@ -1,0 +1,105 @@
+{
+  "type": "hc-sr04",
+  "title": "HC-SR04 Ultrasonic Distance Sensor",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/hc-sr04_bf8299a_002.fzp",
+    "title": "HC-SR04 Ultrasonic Distance Sensor",
+    "breadboard": "svg/core/breadboard/hc-sr04_bf8299a_002.svg",
+    "schematic": "svg/core/schematic/hc-sr04_bf8299a_002.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "hc-sr04",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "vcc",
+      "name": "VCC (5V)",
+      "fritzing": "connector0"
+    },
+    {
+      "id": "trig",
+      "name": "Trig",
+      "fritzing": "connector1"
+    },
+    {
+      "id": "echo",
+      "name": "Echo (sends back 5V)",
+      "fritzing": "connector2"
+    },
+    {
+      "id": "gnd",
+      "name": "GND",
+      "fritzing": "connector3"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      3,
+      0
+    ]
+  ],
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 177.55,
+    "height": 92.93,
+    "connectors": {
+      "echo": {
+        "x": 92.43,
+        "y": 90.8
+      },
+      "gnd": {
+        "x": 102.43,
+        "y": 90.8
+      },
+      "trig": {
+        "x": 82.43,
+        "y": 90.8
+      },
+      "vcc": {
+        "x": 72.43,
+        "y": 90.8
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 80,
+    "height": 60,
+    "connectors": {
+      "echo": {
+        "x": 79.52,
+        "y": 20.01,
+        "dir": "right"
+      },
+      "gnd": {
+        "x": 79.52,
+        "y": 40.03,
+        "dir": "right"
+      },
+      "trig": {
+        "x": 0.52,
+        "y": 40.03,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 0.52,
+        "y": 20.01,
+        "dir": "left"
+      }
+    }
+  }
+}

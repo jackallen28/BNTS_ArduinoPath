@@ -5,7 +5,8 @@
   "tier": "games",
   "order": 14,
   "boards": [
-    "all"
+    "avr",
+    "esp32"
   ],
   "parts": [
     {
@@ -22,5 +23,288 @@
     "analogRead"
   ],
   "intro": "Steer a snake around an 8×8 LED matrix with a joystick. Eat the dots to grow!",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "joy",
+        "type": "joystick",
+        "label": "joystick",
+        "offboard": {
+          "x": 120,
+          "y": -150
+        },
+        "step": 1
+      },
+      {
+        "id": "matrix",
+        "type": "led-matrix",
+        "label": "LED matrix",
+        "offboard": {
+          "x": 360,
+          "y": 30
+        },
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:joy:gnd",
+        "to": "BN9",
+        "step": 1
+      },
+      {
+        "from": "part:joy:vcc",
+        "to": "BP10",
+        "step": 1
+      },
+      {
+        "from": "part:joy:vrx",
+        "to": "pin:JOY_X_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:joy:vry",
+        "to": "pin:JOY_Y_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:joy:sw",
+        "to": "pin:JOY_SW_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:matrix:vcc",
+        "to": "BP20",
+        "when": "5v",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:gnd",
+        "to": "BN21",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:din",
+        "to": "pin:MOSI",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:cs",
+        "to": "pin:MATRIX_CS",
+        "step": 2
+      },
+      {
+        "from": "part:matrix:clk",
+        "to": "pin:SCK",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The joystick",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the joystick's five pins with wires: GND to the blue (−) rail, +5V to the red (+) rail, VRx to {{pin:JOY_X_PIN}}, VRy to {{pin:JOY_Y_PIN}} and SW to {{pin:JOY_SW_PIN}}."
+    },
+    {
+      "title": "The LED matrix",
+      "text": "Connect the matrix's five input pins (the end marked DIN) with wires: GND to the blue (−) rail, DIN to {{pin:MOSI}}, CS to {{pin:MATRIX_CS}}, CLK to {{pin:SCK}}, and VCC to power. DIN and CLK use the board's SPI pins. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Read the joystick",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(JOY_SW_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.print(\"x: \");\n  Serial.print(analogRead(JOY_X_PIN));\n  Serial.print(\"  y: \");\n  Serial.print(analogRead(JOY_Y_PIN));\n  Serial.print(\"  pressed: \");\n  Serial.println(digitalRead(JOY_SW_PIN) == LOW ? \"yes\" : \"no\");\n  delay(200);\n}\n",
+      "text": "A joystick is two potentiometers (left-right and up-down) plus a button you press by pushing it down.\n\n**Your task:** Run, open the **Serial Monitor**, and move the joystick around.",
+      "hints": [
+        "In the middle, both numbers are about half of the biggest number.",
+        "In the simulator, drag the joystick's knob.",
+        "Push the joystick down to see \"pressed: yes\"."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It reads left and right",
+          "text": "x: "
+        },
+        {
+          "type": "serial_contains",
+          "label": "It notices a press",
+          "text": "pressed: yes"
+        },
+        {
+          "type": "confirm",
+          "label": "The numbers change as I move the joystick"
+        }
+      ],
+      "success": "Two analog inputs and a button in one part!",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(JOY_SW_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.print(\"x: \");\n  Serial.print(analogRead(JOY_X_PIN));\n  Serial.print(\"  y: \");\n  Serial.print(analogRead(JOY_Y_PIN));\n  Serial.print(\"  pressed: \");\n  Serial.println(digitalRead(JOY_SW_PIN) == LOW ? \"yes\" : \"no\");\n  delay(200);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "JOY_X_PIN": 512,
+              "JOY_Y_PIN": 512
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "JOY_SW_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 700,
+          "set": {
+            "digital": {
+              "JOY_SW_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1200
+    },
+    {
+      "title": "A dot on the matrix",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <MD_MAX72xx.h>\n#include <SPI.h>\n\nMD_MAX72XX matrix(MD_MAX72XX::FC16_HW, MATRIX_CS, 1);\n\nvoid setup() {\n  matrix.begin();\n  matrix.control(MD_MAX72XX::INTENSITY, 2);\n  matrix.clear();\n  matrix.setPoint(3, 4, true);  // row 3, column 4\n}\n\nvoid loop() {\n}\n",
+      "text": "The LED matrix is a grid of 8 × 8 lights. Rows and columns are numbered 0 to 7. `matrix.setPoint(row, column, true)` turns one on.\n\n**Your task:** move the dot to the bottom-right corner, then Run.",
+      "hints": [
+        "The last row and column are number 7.",
+        "The bottom-right corner is row 7, column 7.",
+        "Use `matrix.setPoint(7, 7, true);`"
+      ],
+      "checks": [
+        {
+          "type": "code_regex",
+          "label": "The dot is in the corner",
+          "pattern": "setPoint\\(\\s*7\\s*,\\s*7\\s*,\\s*true\\s*\\)"
+        },
+        {
+          "type": "confirm",
+          "label": "I can see the dot in the corner"
+        }
+      ],
+      "success": "Every picture on a screen is just dots like this: lots of them.",
+      "demo": "{{pins}}\n#include <MD_MAX72xx.h>\n#include <SPI.h>\n\nMD_MAX72XX matrix(MD_MAX72XX::FC16_HW, MATRIX_CS, 1);\n\nvoid setup() {\n  matrix.begin();\n  matrix.control(MD_MAX72XX::INTENSITY, 2);\n  matrix.clear();\n  matrix.setPoint(7, 7, true);  // the bottom-right corner\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Move the dot",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <MD_MAX72xx.h>\n#include <SPI.h>\n\nMD_MAX72XX matrix(MD_MAX72XX::FC16_HW, MATRIX_CS, 1);\n\nint x = 3;\nint y = 3;\n\nvoid setup() {\n  matrix.begin();\n  matrix.control(MD_MAX72XX::INTENSITY, 2);\n}\n\nvoid loop() {\n  int jx = analogRead(JOY_X_PIN);\n  int jy = analogRead(JOY_Y_PIN);\n  if (jx < ANALOG_MAX / 4 && x > 0) x--;\n  if (jx > ANALOG_MAX * 3 / 4 && x < 7) ___;\n  if (jy < ANALOG_MAX / 4 && y > 0) y--;\n  if (jy > ANALOG_MAX * 3 / 4 && y < 7) ___;\n\n  matrix.clear();\n  matrix.setPoint(y, x, true);\n  delay(150);\n}\n",
+      "text": "Now steer the dot. `x` is the column and `y` is the row. Push the joystick past a quarter of the way and the dot moves one step, but never off the edge.\n\n**Your task:** fill in the blanks so the dot moves right and down too.",
+      "hints": [
+        "Left takes 1 away from x (`x--`). Right is the opposite.",
+        "`x++` adds one to x.",
+        "The blanks are `x++` and `y++`."
+      ],
+      "checks": [
+        {
+          "type": "code_contains",
+          "label": "It moves right",
+          "text": "x++"
+        },
+        {
+          "type": "code_contains",
+          "label": "It moves down",
+          "text": "y++"
+        },
+        {
+          "type": "confirm",
+          "label": "The dot follows the joystick"
+        }
+      ],
+      "success": "You're steering! That's the start of every video game.",
+      "demo": "{{pins}}\n#include <MD_MAX72xx.h>\n#include <SPI.h>\n\nMD_MAX72XX matrix(MD_MAX72XX::FC16_HW, MATRIX_CS, 1);\n\nint x = 3;\nint y = 3;\n\nvoid setup() {\n  matrix.begin();\n  matrix.control(MD_MAX72XX::INTENSITY, 2);\n}\n\nvoid loop() {\n  int jx = analogRead(JOY_X_PIN);\n  int jy = analogRead(JOY_Y_PIN);\n  if (jx < ANALOG_MAX / 4 && x > 0) x--;\n  if (jx > ANALOG_MAX * 3 / 4 && x < 7) x++;\n  if (jy < ANALOG_MAX / 4 && y > 0) y--;\n  if (jy > ANALOG_MAX * 3 / 4 && y < 7) y++;\n\n  matrix.clear();\n  matrix.setPoint(y, x, true);\n  delay(150);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "JOY_X_PIN": "ANALOG_MAX",
+              "JOY_Y_PIN": 512
+            }
+          }
+        }
+      ],
+      "sim_ms": 1000
+    },
+    {
+      "title": "Snake",
+      "support": "brief",
+      "text": "**Goal:** the snake game. A snake of 3 dots moves by itself; the joystick steers. Eating the food dot makes it 1 longer and puts new food somewhere random. Hitting the edge or itself is game over: print `Game over!` and start again.",
+      "hints": [
+        "Keep the snake in two arrays, `snakeX` and `snakeY`; part 0 is the head.",
+        "To move, shift every part one place back (from the tail end), then put the new head at the front.",
+        "Use **Watch the goal**, then build it one piece at a time: move, steer, food, crash."
+      ],
+      "checks": [
+        {
+          "type": "code_regex",
+          "label": "The snake is stored in arrays",
+          "pattern": "\\w+\\s*\\[\\s*64\\s*\\]"
+        },
+        {
+          "type": "runs",
+          "label": "The game runs",
+          "ms": 3000
+        },
+        {
+          "type": "confirm",
+          "label": "I played snake"
+        }
+      ],
+      "success": "You made Snake! It was one of the first games on mobile phones.",
+      "demo": "{{pins}}\n#include <MD_MAX72xx.h>\n#include <SPI.h>\n\nMD_MAX72XX matrix(MD_MAX72XX::FC16_HW, MATRIX_CS, 1);\n\nint snakeX[64];\nint snakeY[64];\nint length = 3;\nint dx = 1, dy = 0;     // moving right\nint foodX, foodY;\n\nvoid placeFood() {\n  foodX = random(0, 8);\n  foodY = random(0, 8);\n}\n\nvoid newGame() {\n  length = 3;\n  for (int i = 0; i < length; i++) {\n    snakeX[i] = 3 - i;\n    snakeY[i] = 3;\n  }\n  dx = 1;\n  dy = 0;\n  placeFood();\n}\n\nvoid setup() {\n  matrix.begin();\n  matrix.control(MD_MAX72XX::INTENSITY, 2);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n  newGame();\n}\n\nvoid loop() {\n  // Steer (never straight back into yourself).\n  int jx = analogRead(JOY_X_PIN);\n  int jy = analogRead(JOY_Y_PIN);\n  if (jx < ANALOG_MAX / 4 && dx == 0) { dx = -1; dy = 0; }\n  if (jx > ANALOG_MAX * 3 / 4 && dx == 0) { dx = 1; dy = 0; }\n  if (jy < ANALOG_MAX / 4 && dy == 0) { dx = 0; dy = -1; }\n  if (jy > ANALOG_MAX * 3 / 4 && dy == 0) { dx = 0; dy = 1; }\n\n  // Move: every part takes the place of the one in front.\n  int headX = snakeX[0] + dx;\n  int headY = snakeY[0] + dy;\n  bool crash = headX < 0 || headX > 7 || headY < 0 || headY > 7;\n  for (int i = 0; i < length; i++) {\n    if (snakeX[i] == headX && snakeY[i] == headY) crash = true;\n  }\n  if (crash) {\n    Serial.print(\"Game over! Length: \");\n    Serial.println(length);\n    delay(1500);\n    newGame();\n    return;\n  }\n  bool ate = headX == foodX && headY == foodY;\n  if (ate && length < 64) length++;\n  for (int i = length - 1; i > 0; i--) {\n    snakeX[i] = snakeX[i - 1];\n    snakeY[i] = snakeY[i - 1];\n  }\n  snakeX[0] = headX;\n  snakeY[0] = headY;\n  if (ate) placeFood();\n\n  // Draw.\n  matrix.clear();\n  for (int i = 0; i < length; i++) {\n    matrix.setPoint(snakeY[i], snakeX[i], true);\n  }\n  matrix.setPoint(foodY, foodX, true);\n  delay(250);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "JOY_X_PIN": 512,
+              "JOY_Y_PIN": 512
+            }
+          }
+        }
+      ],
+      "sim_ms": 3500
+    }
+  ],
+  "curriculum": [
+    "910-algorithms",
+    "910-programming",
+    "910-testing",
+    "78-user-experience"
+  ],
+  "outro": "Snake! You used **arrays** to remember every part of the snake, **coordinates** to place dots on a grid, and a game loop that reads input, updates and draws.",
+  "stretch": [
+    "Speed the snake up as it grows.",
+    "Show the score as a number in the Serial Monitor when the game ends.",
+    "Let the snake wrap around the edges instead of crashing."
+  ]
 }

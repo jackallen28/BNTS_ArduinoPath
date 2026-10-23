@@ -1,7 +1,7 @@
-# CircuitPath: Arduino and ESP coding tutor (BNTS)
+# ArduinoPath: Arduino and ESP coding tutor (BNTS)
 
 > The brief for Claude Code. Read it fully before building anything. It records every decision
-> the teacher has made: what CircuitPath is, the rules, the architecture, the wiring wizard,
+> the teacher has made: what ArduinoPath is, the rules, the architecture, the wiring wizard,
 > the simulator, the boards, the projects and what to build first.
 >
 > **This is a separate project from PiPath** (the school's Raspberry Pi Python tutor). Nothing is
@@ -9,18 +9,25 @@
 
 ---
 
-## 1. What CircuitPath is
+## 1. What ArduinoPath is
 
-CircuitPath teaches Arduino C++ on real boards (Arduino Uno, Arduino Nano, NodeMCU, other ESP8266 /
+ArduinoPath teaches Arduino C++ on real boards (Arduino Uno, Arduino Nano, NodeMCU, other ESP8266 /
 ESP32 boards) like a tutor sitting beside the student. It is **one app on each student's laptop:
-`CircuitPath.exe` on Windows, `CircuitPath.app` on a Mac**, like PiPath: double-click it and the
+`ArduinoPath.exe` on Windows, `ArduinoPath.app` on a Mac**, like PiPath: double-click it and the
 web app opens in **Edge or Chrome** as an app window. Nothing to install, no admin rights, **no server and no teacher
 controls**. Work is saved on the laptop. Everything works without the internet.
 
-> **History:** CircuitPath was first planned as a web app served by a Raspberry Pi 5 on the school
+> **History:** ArduinoPath was first planned as a web app served by a Raspberry Pi 5 on the school
 > network, then as a cloud server (Render + Postgres) with student codes and staff logins. The
 > school network blocked the Pi, and the teacher chose a local Windows app instead. The cloud work
 > is parked in the git history (the "Park the unfinished cloud version" commit).
+>
+> **Renamed:** the app was called **CircuitPath** until October 2026, in the `BNTS_CircuitPath`
+> branch of `jackallen28/jackallen`. It is now **ArduinoPath**, in its own repository,
+> **`jackallen28/BNTS_ArduinoPath`** (base branch `main`; PRs go there). The Raspberry Pi tutor
+> (PiPath) has its own repository. On first start, `ArduinoPath.exe` / `.app` moves work saved
+> by CircuitPath (the `CircuitPath` data folder and `circuitpath.db`) to the new name, so nothing
+> is lost. Save files keep the `.circuit` extension, so old save files still open.
 
 Audience: secondary students (Years 7–10), new to text-based coding and electronics. Content links
 to the **Victorian Curriculum Digital Technologies (Levels 7–10)**. Made for the **Banyule
@@ -117,42 +124,48 @@ variables (`ui/theme.css`).
 ```
 student laptop (Windows 10/11, no admin rights)
 ┌──────────────────────────────────────────────────────────────────┐
-│ CircuitPath.exe (Go, one file)        Edge / Chrome app window   │
+│ ArduinoPath.exe (Go, one file)        Edge / Chrome app window   │
 │  - serves the web app on              ┌────────────────────────┐ │
 │    http://localhost:47820 ◀──────────▶│ projects, Wiring Wizard,│ │
 │    (this laptop only)                 │ simulator, editor,      │ │
 │  - profiles + saves (SQLite in        │ Serial Monitor          │ │
-│    %LOCALAPPDATA%\CircuitPath)        │ Upload: Web Serial → USB│ │
+│    %LOCALAPPDATA%\ArduinoPath)        │ Upload: the app → USB   │ │
 │  - WIPE                               └────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-- **`CircuitPath.exe`: one Go program** (no cgo, no console window, an icon and version details).
+- **`ArduinoPath.exe`: one Go program** (no cgo, no console window, an icon and version details).
   Double-click it and it:
   - serves the web app (`ui/`, built in) and a JSON API on **`http://localhost:47820`**, listening
     on `127.0.0.1` / `::1` only and answering only `localhost` Host names (no DNS rebinding);
-    every write needs the `X-CircuitPath: 1` header (no cross-site requests)
+    every write needs the `X-ArduinoPath: 1` header (no cross-site requests)
   - opens it as an **Edge app window** (or Chrome, or the default browser)
   - stores profiles, progress, sketches and settings in **SQLite** (one file in
-    `%LOCALAPPDATA%\CircuitPath`, WAL mode, `fsync` on save)
+    `%LOCALAPPDATA%\ArduinoPath`, WAL mode, `fsync` on save)
   - if it's already running, a second launch just opens another window; it closes itself
     20 minutes after the last window closes (open windows ping every minute)
-  - writes `circuitpath.log` next to the database; shows a message box if it can't start
+  - writes `arduinopath.log` next to the database; shows a message box if it can't start
 - **The simulator runs entirely in the browser** (§6).
-- **Uploading to a real board happens in the browser** with **Web Serial** (Edge / Chrome;
-  `http://localhost` counts as a secure site): STK500v1 (Optiboot) for Uno / Nano, STK500v2 for
-  Mega, `esptool-js` (Apache-2.0, vendored) for ESP8266 / ESP32. The Serial Monitor and the Wiring
-  Wizard's test also use Web Serial.
-- **Compiling for Upload** (arduino-cli and the board cores) is **still to decide** for the local
-  app: shipping them with the app is roughly 300 MB for AVR and over 1 GB with ESP32, unpacked into
-  `%LOCALAPPDATA%` on first use (no admin needed). `internal/arduino` already pins and checks them.
+- **Compiling and uploading happen in the app (decided):** the board tools (arduino-cli 1.5.1, the
+  AVR / ESP8266 / ESP32 cores and every library the projects use, pinned in
+  `internal/arduino/requirements.json`) are **built in**: appended to `ArduinoPath.exe` and the Pi
+  binary, or `Contents/Resources/boards.zip` in the Mac app (trimmed to stay under 2 GB). Each board
+  family is unpacked into the data folder the first time it's needed (no admin). The app compiles
+  with arduino-cli and uploads over USB itself (`/api/compile`, `/api/upload`, one job at a time),
+  and the Serial Monitor reads the port in Go and streams it to the page (`/api/serial`). No Web
+  Serial needed, so any Chromium browser works.
 - **The web app** is plain HTML / CSS / ES modules, no build step; third-party code is vendored
-  with its licence (CodeMirror, esptool-js), never loaded from a CDN.
-- **macOS: `CircuitPath.app`**, the same program as one universal binary (Intel + Apple Silicon,
+  with its licence, never loaded from a CDN.
+- **macOS: `ArduinoPath.app`**, the same program as one universal binary (Intel + Apple Silicon,
   built by `tools/macapp`, signed ad hoc, not notarised yet). Work in
-  `~/Library/Application Support/CircuitPath`. The app starts the server as a background process
+  `~/Library/Application Support/ArduinoPath`. The app starts the server as a background process
   and quits (macOS won't relaunch a running app), and has no Dock icon (`LSUIElement`).
-- **Releases:** changing `VERSION` publishes `CircuitPath.exe` (+ ARM64) and `CircuitPath-macOS.zip`
+- **Raspberry Pi: ArduinoPath for 64-bit Raspberry Pi OS** (Pi 4 / 5), the same program built for
+  linux/arm64 with the board tools appended, shipped as `ArduinoPath-RaspberryPi.tar.gz`. It opens
+  a Chromium app window, keeps work in `~/.config/ArduinoPath`, and adds its own menu entry and
+  desktop icon in the user's home folder on first start (no sudo). Students plug their board into
+  the Pi's USB port. Teacher guide: `docs/raspberry-pi.md`; CI builds and tests it on an ARM runner.
+- **Releases:** changing `VERSION` publishes `ArduinoPath.exe` (+ ARM64), `ArduinoPath-RaspberryPi.tar.gz` and `ArduinoPath-macOS.zip`
   as a GitHub release, after testing each on real Windows and macOS. No automatic updates yet
   (students download the new file).
 - **Performance target:** the app window opens in under 2 s, a project in under 0.5 s.
@@ -170,7 +183,7 @@ student laptop (Windows 10/11, no admin rights)
 For the end of a program, before the next group uses the laptop. It lists the profiles on the
 laptop, offers **Save everyone's work** (one zip of everyone's `.circuit` files), and deletes every
 profile with all their work once the student or teacher types **WIPE**. The database is compacted
-afterwards so deleted work can't be read back. It only affects CircuitPath in that Windows account.
+afterwards so deleted work can't be read back. It only affects ArduinoPath in that Windows account.
 
 ---
 
@@ -215,7 +228,7 @@ workspace (a Vista-style wizard: a glass frame, a title, step dots, Back / Next 
    - plain-English instructions ("Connect the LED's long leg to pin 13 through a 220Ω resistor")
    - a safety reminder (unplug USB while wiring)
    - **Back / Next**, and "Show the whole circuit"
-3. **Test it (required):** the student plugs the board in and presses **Test**. CircuitPath compiles a
+3. **Test it (required):** the student plugs the board in and presses **Test**. ArduinoPath compiles a
    **test sketch generated for this project's parts** and the browser uploads it over USB, then
    listens on the Serial port (or it runs in the simulator in Simulator mode):
    - LEDs blink one at a time; RGB LEDs cycle red, green, blue; buzzers beep; servos sweep;
@@ -241,10 +254,10 @@ supports (tested in CI, §12).
 
 - **Parts art comes from the official Fritzing parts library** (`github.com/fritzing/fritzing-parts`,
   **CC BY-SA 3.0**). The teacher has the standard library, so nothing needs sending: a script
-  (`tools/import_fritzing.py` or `.go`) pulls just the parts CircuitPath uses (about 40) from the
+  (`tools/import_fritzing.py` or `.go`) pulls just the parts ArduinoPath uses (about 40) from the
   public repository: their **breadboard SVG**, **schematic SVG** and **connector positions** (from the
   `.fzp` file). Keep the attribution and licence in `content/parts/LICENSE-fritzing.md` and the About
-  box (share-alike applies to these SVGs, not to CircuitPath's own code).
+  box (share-alike applies to these SVGs, not to ArduinoPath's own code).
 - **One renderer for everything:** the wizard, the simulator, Free Play's wiring and the project
   cards all draw from the same part SVGs and the same connector data, on the same breadboard
   (Fritzing's half+ breadboard), with wires drawn as Fritzing-style bendable wires in standard
@@ -256,7 +269,7 @@ supports (tested in CI, §12).
   Students click buttons, drag pots / sliders (LDR light level, distance, temperature, humidity,
   soil moisture), wave at the PIR.
 - **How the simulator runs code:** ESP boards can't be emulated at chip level in a browser with free
-  tools, so CircuitPath has its own **Arduino interpreter in JavaScript** (the MakeCode approach): it
+  tools, so ArduinoPath has its own **Arduino interpreter in JavaScript** (the MakeCode approach): it
   parses the Arduino C++ subset students write (types, functions, `if`/`for`/`while`/`switch`,
   arrays, `String`, `#define`, `const`) and runs `setup()` / `loop()` in a Web Worker with a
   simulated clock, calling a **simulated Arduino API**: `pinMode`, `digitalWrite/Read`,
@@ -278,12 +291,12 @@ supports (tested in CI, §12).
 ## 7. Saving
 
 - **Autosave on the laptop:** code saves about a second after typing stops (and on Run / Upload /
-  leaving a project); progress saves at every step. If CircuitPath has closed, unsaved changes wait
+  leaving a project); progress saves at every step. If ArduinoPath has closed, unsaved changes wait
   in the browser (IndexedDB) and are sent when it's back, with a small "Saved ✓ / Saving... /
   Offline, will save when you're back" note.
 - **Changing laptops:** Save my work on one, Open my work on the other.
 - **Save files** (students' Settings): **Save my work** downloads
-  `<Name>_CircuitPath_<date>.circuit` (a zip: profile, progress, sketches; versioned), to take home
+  `<Name>_ArduinoPath_<date>.circuit` (a zip: profile, progress, sketches; versioned), to take home
   or keep. **Open my work** loads one (merging by project, newest wins, asking before replacing).
 - **Per-sketch export:** download the current sketch as `.ino` for the normal Arduino IDE.
 - **Everyone's work** on a laptop: Save everyone's work and WIPE are on the WIPE page (§4).
@@ -368,11 +381,11 @@ Classroom kits differ: keep a `content/kit.json` of what the school owns, so the
 
 ## 11. Rules for Claude Code
 
-1. **Local and private.** No calls to the internet from the web app or `CircuitPath.exe`; nothing
+1. **Local and private.** No calls to the internet from the web app or `ArduinoPath.exe`; nothing
    about students is ever sent. No telemetry, no cloud accounts, no CDN fonts or scripts. Student
    data stays on the laptop (and in save files students download).
 2. **No AI**, anywhere.
-3. **Nothing to install and no admin rights**: just `CircuitPath.exe` / `CircuitPath.app` and Edge / Chrome. Never
+3. **Nothing to install and no admin rights**: just `ArduinoPath.exe` / `ArduinoPath.app` and Edge / Chrome. Never
    require a console, an installer or settings changes on the laptop.
 4. **Content is data** (§8). A teacher can add a project without touching code.
 5. **Every project step has a `demo`** that passes its own checks in the simulator, and compiles
@@ -385,7 +398,7 @@ Classroom kits differ: keep a `content/kit.json` of what the school owns, so the
 10. **Keep it quick:** first screen in under 2 s, a project opens in under 0.5 s, the simulator runs
     smoothly at 60 fps with a dozen parts on a school laptop.
 13. **Security basics:** listen on localhost only and refuse other Host names; every write needs
-    the `X-CircuitPath` header; strict CSP; every API input validated; a profile's API calls only
+    the `X-ArduinoPath` header; strict CSP; every API input validated; a profile's API calls only
     touch that profile's work; save files are size-limited and checked; compiles (when added) run
     in a temporary folder with a time limit.
 11. **Keep the tests green** after every change.
@@ -398,8 +411,8 @@ Classroom kits differ: keep a `content/kit.json` of what the school owns, so the
 - **Go:** unit tests for the API, profiles, saves (migrations), save files, WIPE, the localhost /
   Host / cross-site guards, and the launcher (single instance, closing when idle).
 - **Windows and macOS (CI):** the Go tests on `windows-latest` and `macos-latest`, then
-  `tests/windows/smoke.ps1` / `tests/macos/smoke.sh` start the real `CircuitPath.exe` /
-  `CircuitPath.app` and use them (profile, autosave, cross-site refusal, second launch). Both are
+  `tests/windows/smoke.ps1` / `tests/macos/smoke.sh` start the real `ArduinoPath.exe` /
+  `ArduinoPath.app` and use them (profile, autosave, cross-site refusal, second launch). Both are
   kept as CI downloads, and the Release workflow runs the same tests before publishing.
 - **Interpreter + simulated API (JS):** unit tests run in headless Chromium (Playwright) or Node
   (dev-only tooling is fine; nothing runtime). Every project's every `demo` runs in the simulator
@@ -412,36 +425,37 @@ Classroom kits differ: keep a `content/kit.json` of what the school owns, so the
   → Save my work / Open my work → pick your name → the WIPE page, and saves screenshots at
   1366×768 and 1920×1080.
 - **Real hardware checklist** (`docs/hardware-test-checklist.md`): a no-admin Windows laptop in
-  Edge running `CircuitPath.exe`, a genuine Uno, a CH340 Nano clone, a NodeMCU and an ESP32 with
+  Edge running `ArduinoPath.exe`, a genuine Uno, a CH340 Nano clone, a NodeMCU and an ESP32 with
   the kit's parts.
 
 ---
 
 ## 13. Build order
 
-1. **Skeleton:** `CircuitPath.exe` (local server, SQLite, profiles, autosave, save files, WIPE), the
+1. **Skeleton:** `ArduinoPath.exe` (local server, SQLite, profiles, autosave, save files, WIPE), the
    Vista theme and window chrome, welcome → picker. **Done.**
 2. **Fritzing import** of the first parts (Uno, Nano, NodeMCU, ESP32, breadboard, LED, resistor,
    button, buzzer, pot, servo) and the **renderer** (breadboard + schematic, wires).
 3. **Interpreter + simulated API** for the Getting Started projects; Serial Monitor (simulated).
 4. **Wiring Wizard** with generated test sketches in the simulator.
-5. **Compiling for Upload** (decide how arduino-cli ships with the app) + the Coach on real
-   compiler errors; then **Web Serial upload** (Uno / Nano first, then ESP via esptool-js) and the
-   real Serial Monitor; the wizard's Test on real boards.
+5. **Compiling for Upload** (the board tools built into the app) + the Coach on real compiler
+   errors; uploading over USB from the app, and the real Serial Monitor. **Done** (the wizard's
+   Test on real boards waits for the Wiring Wizard).
 6. Getting Started projects, then Free Play, then the other tiers, then WiFi & IoT (phone panel).
 7. Adaptive coach, help levels, code review, curriculum in Settings.
 8. Hardware checklist on real laptops, then a classroom trial.
 
 ## 14. Decisions already made (don't relitigate without reason)
 
-- **An app on each student laptop** (`CircuitPath.exe` on Windows, `CircuitPath.app` on macOS), like PiPath: no server, no teacher
+- **An app on each student laptop** (`ArduinoPath.exe` on Windows, `ArduinoPath.app` on macOS, and
+  ArduinoPath for Raspberry Pi on a Pi the student sits at), like PiPath: no server, no teacher
   controls, works offline. (The Raspberry Pi server couldn't be reached on the school network; a
   cloud server was started and parked.)
-- **The web app in Edge / Chrome**, served by the exe on localhost: the same UI, and Web Serial for
-  Upload (localhost is a secure site).
+- **The web app in Edge / Chrome / Chromium**, served by the app on localhost; the app itself
+  compiles (built-in arduino-cli) and uploads over USB.
 - **Welcome screen with names** (first name(s) + school, no password); a **WIPE page** on the
   laptop, with Save everyone's work first.
-- **Work saved on the laptop** (`%LOCALAPPDATA%\CircuitPath`, or `~/Library/Application Support/CircuitPath`
+- **Work saved on the laptop** (`%LOCALAPPDATA%\ArduinoPath`, or `~/Library/Application Support/ArduinoPath`
   on a Mac) plus `.circuit` save files to move it.
 - **USB drivers** for clone boards are IT's job (or buy driver-free boards).
 - **Standard Fritzing parts library** for all part art (pulled from the public repository).

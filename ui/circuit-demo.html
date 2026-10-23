@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArduinoPath: circuit drawings (demo)</title>
+  <meta name="description" content="A developer page that draws a sample circuit on every board, with wiring steps and live controls.">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="circuit.css">
+  <link rel="stylesheet" href="js/circuit/demo.css">
+  <script type="module" src="js/circuit/demo.js"></script>
+</head>
+<body class="cp-demo">
+  <div class="window cp-demo-window">
+    <div class="titlebar"><span class="title">Circuit drawings: demo and test page</span></div>
+    <div class="toolbar cp-demo-toolbar">
+      <label>Board <select id="board" class="input"></select></label>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="btn" id="prev">◀ Back</button>
+      <span id="step-label" aria-live="polite">Step 1</span>
+      <button type="button" class="btn" id="next">Next ▶</button>
+      <button type="button" class="btn" id="all" aria-pressed="false">Show the whole circuit</button>
+      <span class="sep" aria-hidden="true"></span>
+      <label><input type="checkbox" id="live" checked> Run the demo</label>
+    </div>
+    <div class="window-body cp-demo-body">
+      <section class="cp-demo-pane" aria-label="Breadboard view"><div id="breadboard" class="cp-demo-view"></div></section>
+      <section class="cp-demo-pane cp-demo-side" aria-label="Schematic view">
+        <div id="schematic" class="cp-demo-view"></div>
+        <div class="cp-demo-info">
+          <h3>Last control</h3><p id="control-log" class="muted">Press the button, turn the knob…</p>
+          <h3>Circuit check</h3><ul id="problems"></ul>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

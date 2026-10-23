@@ -28,5 +28,271 @@
     "displays"
   ],
   "intro": "Check if a plant needs water. Show a happy or thirsty face on the screen.",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "soil",
+        "type": "soil-moisture",
+        "label": "soil sensor",
+        "offboard": {
+          "x": 345,
+          "y": -30
+        },
+        "step": 1
+      },
+      {
+        "id": "oled",
+        "type": "oled",
+        "label": "OLED screen",
+        "offboard": {
+          "x": 440,
+          "y": -30
+        },
+        "step": 2
+      },
+      {
+        "id": "led",
+        "type": "led",
+        "color": "green",
+        "label": "LED",
+        "at": "H6",
+        "step": 3
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E6",
+        "rotate": 270,
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:soil:vcc",
+        "to": "BP20",
+        "step": 1
+      },
+      {
+        "from": "part:soil:gnd",
+        "to": "BN21",
+        "step": 1
+      },
+      {
+        "from": "part:soil:sig",
+        "to": "pin:SOIL_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:oled:gnd",
+        "to": "BN22",
+        "step": 2
+      },
+      {
+        "from": "part:oled:vcc",
+        "to": "BP21",
+        "step": 2
+      },
+      {
+        "from": "part:oled:scl",
+        "to": "pin:SCL",
+        "step": 2
+      },
+      {
+        "from": "part:oled:sda",
+        "to": "pin:SDA",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J7",
+        "step": 3
+      },
+      {
+        "from": "A6",
+        "to": "BN5",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The soil sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the soil sensor's three pins with wires: VCC to the red (+) rail, GND to the blue (−) rail, and SIG to {{pin:SOIL_PIN}}."
+    },
+    {
+      "title": "The OLED screen",
+      "text": "Connect the OLED screen's four pins with wires: GND to the blue (−) rail, VCC to the red (+) rail, SCL to {{pin:SCL}} and SDA to {{pin:SDA}}. SCL and SDA are the board's I2C pins: lots of screens and sensors can share them."
+    },
+    {
+      "title": "The LED",
+      "text": "Push the LED into holes H6 and H7, with the long leg (+) in H7. Put a 220Ω resistor from G6 across the gap to E6. Add a wire from {{pin:LED_PIN}} to J7, and a black wire from A6 to the blue (−) rail at the bottom."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Read the soil",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int soil = analogRead(SOIL_PIN);\n  Serial.println(soil);\n  delay(500);\n}\n",
+      "text": "The soil sensor's two prongs measure how easily electricity flows through the soil. Water helps electricity flow, so wet and dry soil give different numbers.\n\n**Your task:** Run the code and open the **Serial Monitor**. Hold the sensor in the air, then dip the prongs in a glass of water. Write down both numbers: you'll need them! (In the simulator, use the slider.)",
+      "hints": [
+        "Only dip the prongs, not the electronics at the top.",
+        "Dry gives one number, wet gives a different one. Which is bigger?",
+        "Most sensors give a bigger number when dry."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "A dry reading",
+          "pattern": "(^|\\n)9\\d\\d\\r?\\n"
+        },
+        {
+          "type": "serial_regex",
+          "label": "A wet reading",
+          "pattern": "(^|\\n)[2-4]\\d\\d\\r?\\n"
+        },
+        {
+          "type": "confirm",
+          "label": "I wrote down my dry and wet numbers"
+        }
+      ],
+      "success": "Your board can feel the soil. Those two numbers let you turn readings into a percentage.",
+      "demo": "{{pins}}\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int soil = analogRead(SOIL_PIN);\n  Serial.println(soil);\n  delay(500);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "SOIL_PIN": 900
+            }
+          }
+        },
+        {
+          "at_ms": 1500,
+          "set": {
+            "analog": {
+              "SOIL_PIN": 300
+            }
+          }
+        }
+      ],
+      "sim_ms": 2500
+    },
+    {
+      "title": "Test the screen and LED",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(LED_PIN, OUTPUT);\n  digitalWrite(LED_PIN, ___);\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.clearDisplay();\n  screen.setTextSize(2);\n  screen.setTextColor(SSD1306_WHITE);\n  screen.setCursor(0, 0);\n  screen.println(\"Hi plant!\");\n  screen.display();\n}\n\nvoid loop() {\n}\n",
+      "text": "Before joining everything up, check the screen and the LED on their own. The screen shows a message and the LED lights up.\n\n**Your task:** fill in the blank so the LED turns on, then Run.",
+      "hints": [
+        "`HIGH` turns an LED on.",
+        "Put `HIGH` in the blank.",
+        "The line is `digitalWrite(LED_PIN, HIGH);`"
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "The screen says hello",
+          "text": "Hi plant!"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The LED lights up",
+          "pin": "LED_PIN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "I can see the message and the LED"
+        }
+      ],
+      "success": "Screen and LED both work. Now let's join them to the soil sensor.",
+      "demo": "{{pins}}\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(LED_PIN, OUTPUT);\n  digitalWrite(LED_PIN, HIGH);\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.clearDisplay();\n  screen.setTextSize(2);\n  screen.setTextColor(SSD1306_WHITE);\n  screen.setCursor(0, 0);\n  screen.println(\"Hi plant!\");\n  screen.display();\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 500
+    },
+    {
+      "title": "Plant buddy",
+      "support": "brief",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\n\n// Most soil sensors read HIGHER when the soil is DRIER.\n// Put your sensor in dry soil and in water, and write the numbers here.\nconst int DRY = 900;\nconst int WET = 300;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(LED_PIN, OUTPUT);\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.setTextColor(SSD1306_WHITE);\n}\n\nvoid loop() {\n  int soil = analogRead(SOIL_PIN);\n  int wetness = ___;  // turn soil into 0 to 100\n\n  screen.clearDisplay();\n  screen.setTextSize(1);\n  screen.setCursor(0, 0);\n  screen.println(\"Plant buddy\");\n  screen.setTextSize(2);\n  screen.setCursor(0, 20);\n  screen.print(wetness);\n  screen.println(\" % wet\");\n  // Water me! or Happy :)\n\n  screen.display();\n  delay(1000);\n}\n",
+      "text": "**Goal:** the screen shows how wet the soil is as a percentage (dry = 0 %, wet = 100 %), and says \"Water me!\" with the LED on when it's under 30 %. Otherwise it says \"Happy :)\".\n\nThe starter code has the screen set up. Use your dry and wet numbers from the last step.",
+      "hints": [
+        "`map(soil, DRY, WET, 0, 100)` turns DRY into 0 and WET into 100. `constrain` keeps it between 0 and 100.",
+        "Use `if (wetness < 30)` to choose the message, and turn the LED on or off too.",
+        "Use **Watch the goal** to see one way to do it."
+      ],
+      "checks": [
+        {
+          "type": "display_text",
+          "label": "It shows a percentage",
+          "text": "% wet"
+        },
+        {
+          "type": "display_text",
+          "label": "It asks for water when dry",
+          "text": "Water me!"
+        },
+        {
+          "type": "display_text",
+          "label": "It's happy when wet",
+          "text": "Happy :)"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The LED warns when dry",
+          "pin": "LED_PIN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "It says \"Water me!\" when the sensor is dry"
+        }
+      ],
+      "success": "Your plant has a buddy! Turning a raw reading into a percentage is called calibration.",
+      "demo": "{{pins}}\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 screen(128, 64, &Wire, -1);\n\n// Most soil sensors read HIGHER when the soil is DRIER.\n// Put your sensor in dry soil and in water, and write the numbers here.\nconst int DRY = 900;\nconst int WET = 300;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(LED_PIN, OUTPUT);\n  if (!screen.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {\n    Serial.println(\"Screen not found: check the wiring.\");\n  }\n  screen.setTextColor(SSD1306_WHITE);\n}\n\nvoid loop() {\n  int soil = analogRead(SOIL_PIN);\n  int wetness = map(soil, DRY, WET, 0, 100);  // as a percentage\n  wetness = constrain(wetness, 0, 100);\n\n  screen.clearDisplay();\n  screen.setTextSize(1);\n  screen.setCursor(0, 0);\n  screen.println(\"Plant buddy\");\n  screen.setTextSize(2);\n  screen.setCursor(0, 20);\n  screen.print(wetness);\n  screen.println(\" % wet\");\n  if (wetness < 30) {\n    screen.println(\"Water me!\");\n    digitalWrite(LED_PIN, HIGH);\n  } else {\n    screen.println(\"Happy :)\");\n    digitalWrite(LED_PIN, LOW);\n  }\n  screen.display();\n  delay(1000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "SOIL_PIN": 900
+            }
+          }
+        },
+        {
+          "at_ms": 1500,
+          "set": {
+            "analog": {
+              "SOIL_PIN": 300
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "910-data",
+    "78-user-experience",
+    "78-evaluate"
+  ],
+  "outro": "Your plant buddy looks after a plant: it reads the soil, turns the reading into a percentage, and tells you when to water. Real smart gardens work the same way.",
+  "stretch": [
+    "Show a happy or sad face on the screen, drawn with circles and lines.",
+    "Only water warnings in the daytime: add a light sensor and stay quiet at night.",
+    "Remember the driest reading of the day and show it."
+  ]
 }

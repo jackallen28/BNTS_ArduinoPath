@@ -102,5 +102,16 @@ export function codeEditor({ value = "", onChange = () => {}, onCursor = () => {
     get value() { return area.value; },
     set value(v) { area.value = v; refresh(); },
     focus() { area.focus(); },
+    /** Puts the cursor at the start of a line (from 1) and scrolls to it. */
+    goToLine(n) {
+      const lines = area.value.split("\n");
+      const row = Math.max(1, Math.min(n, lines.length));
+      const at = lines.slice(0, row - 1).reduce((sum, l) => sum + l.length + 1, 0);
+      area.focus();
+      area.setSelectionRange(at, at + lines[row - 1].length);
+      const lh = parseFloat(getComputedStyle(area).lineHeight) || 18;
+      area.scrollTop = Math.max(0, (row - 4) * lh);
+      refresh();
+    },
   };
 }

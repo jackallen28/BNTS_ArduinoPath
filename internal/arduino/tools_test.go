@@ -161,7 +161,7 @@ func TestPackAndExtract(t *testing.T) {
 
 func TestBundleAppendedToAProgram(t *testing.T) {
 	bundlePath := packBundle(t, fakeInstall(t, "cli"))
-	exe := filepath.Join(t.TempDir(), "CircuitPath.exe")
+	exe := filepath.Join(t.TempDir(), "ArduinoPath.exe")
 	os.WriteFile(exe, bytes.Repeat([]byte("MZprogram"), 1000), 0o755)
 	if _, err := OpenBundle(exe); err != ErrNoBundle {
 		t.Fatalf("a plain program: %v", err)
@@ -204,8 +204,8 @@ func TestExtractRefusesEscapingNames(t *testing.T) {
 }
 
 func TestParseDiagnostics(t *testing.T) {
-	out := `C:\Users\ava\AppData\Local\CircuitPath\arduino-x\sketches\ab\sketch\sketch.ino: In function 'void loop()':
-C:\Users\ava\AppData\Local\CircuitPath\arduino-x\sketches\ab\sketch\sketch.ino:7:3: error: expected ';' before '}' token
+	out := `C:\Users\ava\AppData\Local\ArduinoPath\arduino-x\sketches\ab\sketch\sketch.ino: In function 'void loop()':
+C:\Users\ava\AppData\Local\ArduinoPath\arduino-x\sketches\ab\sketch\sketch.ino:7:3: error: expected ';' before '}' token
    }
    ^
 /tmp/sketch/sketch.ino:3:10: fatal error: Servo2.h: No such file or directory
@@ -291,6 +291,8 @@ func TestToolsUnpackCompileUpload(t *testing.T) {
 	defer b.Close()
 	data := t.TempDir()
 	os.MkdirAll(filepath.Join(data, "arduino-oldversion1"), 0o755)
+	os.MkdirAll(filepath.Join(data, "tools-oldver02"), 0o755)
+	os.MkdirAll(filepath.Join(data, "students-work"), 0o755)
 	tools := NewTools(b, data, nil)
 	if st := tools.Status(); st["avr"].State != "packed" || st["esp32"].State != "packed" {
 		t.Fatalf("status = %+v", st)
@@ -335,8 +337,16 @@ func TestToolsUnpackCompileUpload(t *testing.T) {
 		t.Fatal("unpacked tools weren't remembered")
 	}
 	time.Sleep(100 * time.Millisecond)
-	if _, err := os.Stat(filepath.Join(data, "arduino-oldversion1")); err == nil {
-		t.Error("old tools weren't removed")
+	for _, old := range []string{"arduino-oldversion1", "tools-oldver02"} {
+		if _, err := os.Stat(filepath.Join(data, old)); err == nil {
+			t.Errorf("old tools %s weren't removed", old)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(data, "students-work")); err != nil {
+		t.Error("removed a folder that isn't board tools")
+	}
+	if filepath.Base(tools.env.Dir) != "tools-"+b.Manifest.Hash[:8] {
+		t.Errorf("tools folder %s", tools.env.Dir)
 	}
 	if _, err := tools.Compile(ctx, "x", "pico:rp2040:pico", nil, nil); err == nil {
 		t.Error("compiled for an unknown board")

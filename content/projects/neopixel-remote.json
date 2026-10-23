@@ -19,5 +19,190 @@
     "colour"
   ],
   "intro": "Slide sliders on a web page to change the colours of a NeoPixel strip.",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "strip",
+        "type": "neopixel-strip",
+        "label": "NeoPixel strip",
+        "offboard": {
+          "x": 60,
+          "y": -70
+        },
+        "step": 1
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "part:strip:din",
+        "to": "pin:NEOPIXEL_PIN",
+        "step": 1
+      },
+      {
+        "from": "part:strip:vcc",
+        "to": "BP20",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "part:strip:vcc",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "part:strip:gnd",
+        "to": "BN21",
+        "step": 1
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The NeoPixel strip",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Connect the strip's input end with three wires: DIN to {{pin:NEOPIXEL_PIN}}, GND to the blue (−) rail, and the power pin (4-7VDC) to power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Light the strip",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int NUM_PIXELS = 8;\nAdafruit_NeoPixel strip(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nvoid fillStrip(int r, int g, int b) {\n  for (int i = 0; i < NUM_PIXELS; i++) {\n    strip.setPixelColor(i, strip.Color(r, g, b));\n  }\n  strip.show();\n}\n\nvoid setup() {\n  strip.begin();\n  strip.setBrightness(40);  // up to 255: keep it low, NeoPixels are bright!\n  fillStrip(0, 0, 255);     // red, green, blue\n}\n\nvoid loop() {\n}\n",
+      "text": "A NeoPixel strip is a row of tiny lights. Each one mixes **red, green and blue**, from 0 (off) to 255 (full).\n\n**Your task:** change `fillStrip(0, 0, 255)` to make purple (lots of red and blue), then Run.",
+      "hints": [
+        "The three numbers are red, green and blue.",
+        "Purple is red and blue together.",
+        "Try `fillStrip(200, 0, 255);`"
+      ],
+      "checks": [
+        {
+          "type": "neopixel_lit",
+          "label": "The strip lights up",
+          "pin": "NEOPIXEL_PIN",
+          "count": 8
+        },
+        {
+          "type": "code_regex",
+          "label": "It's not plain blue any more",
+          "pattern": "fillStrip\\(\\s*[1-9]\\d*\\s*,"
+        },
+        {
+          "type": "confirm",
+          "label": "My strip is purple"
+        }
+      ],
+      "success": "Every colour on a screen is made by mixing red, green and blue, just like this.",
+      "demo": "{{pins}}\n#include <Adafruit_NeoPixel.h>\n\nconst int NUM_PIXELS = 8;\nAdafruit_NeoPixel strip(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nvoid fillStrip(int r, int g, int b) {\n  for (int i = 0; i < NUM_PIXELS; i++) {\n    strip.setPixelColor(i, strip.Color(r, g, b));\n  }\n  strip.show();\n}\n\nvoid setup() {\n  strip.begin();\n  strip.setBrightness(40);  // up to 255: keep it low, NeoPixels are bright!\n  fillStrip(200, 0, 255);   // purple\n}\n\nvoid loop() {\n}\n",
+      "sim_ms": 300
+    },
+    {
+      "title": "Sliders on your phone",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n#include <Adafruit_NeoPixel.h>\n\nconst int NUM_PIXELS = 8;\nAdafruit_NeoPixel strip(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nWebServer server(80);\n\nconst char PAGE[] = R\"(\n<!DOCTYPE html>\n<html>\n<head><meta name=\"viewport\" content=\"width=device-width\"></head>\n<body style=\"font-family: sans-serif; text-align: center\">\n  <h1>NeoPixel Remote</h1>\n  <form action=\"/colour\">\n    <p>Red <input type=\"range\" name=\"r\" min=\"0\" max=\"255\"></p>\n    <p>Green <input type=\"range\" name=\"g\" min=\"0\" max=\"255\"></p>\n    <p>Blue <input type=\"range\" name=\"b\" min=\"0\" max=\"255\"></p>\n    <p><button style=\"font-size: 2em\">Light up!</button></p>\n  </form>\n</body>\n</html>\n)\";\n\nvoid fillStrip(int r, int g, int b) {\n  for (int i = 0; i < NUM_PIXELS; i++) {\n    strip.setPixelColor(i, strip.Color(r, g, b));\n  }\n  strip.show();\n}\n\nvoid homePage() {\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setColour() {\n  int r = server.arg(\"r\").toInt();  // the number after r= in the address\n  int g = server.arg(\"___\").toInt();\n  int b = server.arg(\"___\").toInt();\n  fillStrip(r, g, b);\n  Serial.print(\"Colour: \");\n  Serial.print(r);\n  Serial.print(\", \");\n  Serial.print(g);\n  Serial.print(\", \");\n  Serial.println(b);\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  strip.begin();\n  strip.setBrightness(40);\n  strip.show();\n  WiFi.softAP(\"ArduinoPath-Lights\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.on(\"/colour\", setColour);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "text": "The page has three **sliders** in a **form**. Pressing **Light up!** opens an address like `/colour?r=255&g=0&b=100`. `server.arg(\"r\")` gets the number after `r=`.\n\nYour board makes its **own WiFi network** (a hotspot). On your phone, open WiFi settings, join the network with your board's name, then open **192.168.4.1** in the browser. In the simulator, use the **phone panel**.\n\n**Your task:** fill in the blanks to read green and blue too.",
+      "hints": [
+        "Each slider has a `name` in the HTML.",
+        "The names are `r`, `g` and `b`.",
+        "The blanks are `g` and `b`."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It reads all three sliders",
+          "text": "Colour: 255, 100, 0"
+        },
+        {
+          "type": "neopixel_lit",
+          "label": "The strip changes colour",
+          "pin": "NEOPIXEL_PIN",
+          "count": 8
+        },
+        {
+          "type": "confirm",
+          "label": "My phone changes the colour"
+        }
+      ],
+      "success": "A colour remote on your phone!",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n#include <Adafruit_NeoPixel.h>\n\nconst int NUM_PIXELS = 8;\nAdafruit_NeoPixel strip(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nWebServer server(80);\n\nconst char PAGE[] = R\"(\n<!DOCTYPE html>\n<html>\n<head><meta name=\"viewport\" content=\"width=device-width\"></head>\n<body style=\"font-family: sans-serif; text-align: center\">\n  <h1>NeoPixel Remote</h1>\n  <form action=\"/colour\">\n    <p>Red <input type=\"range\" name=\"r\" min=\"0\" max=\"255\"></p>\n    <p>Green <input type=\"range\" name=\"g\" min=\"0\" max=\"255\"></p>\n    <p>Blue <input type=\"range\" name=\"b\" min=\"0\" max=\"255\"></p>\n    <p><button style=\"font-size: 2em\">Light up!</button></p>\n  </form>\n</body>\n</html>\n)\";\n\nvoid fillStrip(int r, int g, int b) {\n  for (int i = 0; i < NUM_PIXELS; i++) {\n    strip.setPixelColor(i, strip.Color(r, g, b));\n  }\n  strip.show();\n}\n\nvoid homePage() {\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setColour() {\n  int r = server.arg(\"r\").toInt();  // the number after r= in the address\n  int g = server.arg(\"g\").toInt();\n  int b = server.arg(\"b\").toInt();\n  fillStrip(r, g, b);\n  Serial.print(\"Colour: \");\n  Serial.print(r);\n  Serial.print(\", \");\n  Serial.print(g);\n  Serial.print(\", \");\n  Serial.println(b);\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  strip.begin();\n  strip.setBrightness(40);\n  strip.show();\n  WiFi.softAP(\"ArduinoPath-Lights\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.on(\"/colour\", setColour);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "http": {
+            "method": "GET",
+            "path": "/colour",
+            "query": {
+              "r": "255",
+              "g": "100",
+              "b": "0"
+            }
+          }
+        }
+      ],
+      "sim_ms": 800
+    },
+    {
+      "title": "Party mode",
+      "support": "brief",
+      "text": "**Goal:** add a **Party** button on the page (a link to `/party`) that makes the strip flash 10 random colours, then go back to the last colour picked.",
+      "hints": [
+        "Keep the last colour in global variables, so `party()` can go back to it.",
+        "Add `server.on(\"/party\", party);` in `setup()`.",
+        "`random(256)` gives a number from 0 to 255."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "Party mode runs",
+          "text": "Party!"
+        },
+        {
+          "type": "code_contains",
+          "label": "There's a Party button",
+          "text": "/party"
+        },
+        {
+          "type": "confirm",
+          "label": "My strip parties!"
+        }
+      ],
+      "success": "Party mode! You added a whole new feature to your web page.",
+      "demo": "{{pins}}\n#include <WiFi.h>\n#include <WebServer.h>\n#include <Adafruit_NeoPixel.h>\n\nconst int NUM_PIXELS = 8;\nAdafruit_NeoPixel strip(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\n\nWebServer server(80);\nint lastR = 0, lastG = 0, lastB = 0;\n\nconst char PAGE[] = R\"(\n<!DOCTYPE html>\n<html>\n<head><meta name=\"viewport\" content=\"width=device-width\"></head>\n<body style=\"font-family: sans-serif; text-align: center\">\n  <h1>NeoPixel Remote</h1>\n  <form action=\"/colour\">\n    <p>Red <input type=\"range\" name=\"r\" min=\"0\" max=\"255\"></p>\n    <p>Green <input type=\"range\" name=\"g\" min=\"0\" max=\"255\"></p>\n    <p>Blue <input type=\"range\" name=\"b\" min=\"0\" max=\"255\"></p>\n    <p><button style=\"font-size: 2em\">Light up!</button></p>\n  </form>\n  <p><a href=\"/party\"><button style=\"font-size: 2em\">Party!</button></a></p>\n</body>\n</html>\n)\";\n\nvoid fillStrip(int r, int g, int b) {\n  for (int i = 0; i < NUM_PIXELS; i++) {\n    strip.setPixelColor(i, strip.Color(r, g, b));\n  }\n  strip.show();\n}\n\nvoid homePage() {\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid setColour() {\n  lastR = server.arg(\"r\").toInt();  // the number after r= in the address\n  lastG = server.arg(\"g\").toInt();\n  lastB = server.arg(\"b\").toInt();\n  fillStrip(lastR, lastG, lastB);\n  Serial.print(\"Colour: \");\n  Serial.print(lastR);\n  Serial.print(\", \");\n  Serial.print(lastG);\n  Serial.print(\", \");\n  Serial.println(lastB);\n  server.send(200, \"text/html\", PAGE);\n}\n\nvoid party() {\n  server.send(200, \"text/html\", PAGE);\n  for (int i = 0; i < 10; i++) {\n    fillStrip(random(256), random(256), random(256));\n    delay(200);\n  }\n  fillStrip(lastR, lastG, lastB);\n  Serial.println(\"Party!\");\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  strip.begin();\n  strip.setBrightness(40);\n  strip.show();\n  WiFi.softAP(\"ArduinoPath-Lights\", \"circuit123\");\n  server.on(\"/\", homePage);\n  server.on(\"/colour\", setColour);\n  server.on(\"/party\", party);\n  server.begin();\n  Serial.print(\"Open http://\");\n  Serial.println(WiFi.softAPIP());\n}\n\nvoid loop() {\n  server.handleClient();\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "http": {
+            "method": "GET",
+            "path": "/party",
+            "query": {}
+          }
+        }
+      ],
+      "sim_ms": 3000
+    }
+  ],
+  "curriculum": [
+    "910-networks",
+    "78-data-binary",
+    "910-programming",
+    "78-user-experience"
+  ],
+  "outro": "Your web page sends numbers to the board in the **address** (like `/colour?r=255&g=0&b=100`), and the board mixes them into light. Web forms everywhere work like this.",
+  "stretch": [
+    "Add a brightness slider.",
+    "Add a Rainbow button that runs a rainbow animation.",
+    "Remember the last colour and show it on the sliders when the page opens."
+  ]
 }

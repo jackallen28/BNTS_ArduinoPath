@@ -22,5 +22,289 @@
     "Servo library"
   ],
   "intro": "Turn a knob and a servo motor follows it, like a dial on a dashboard.",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "pot",
+        "type": "potentiometer",
+        "label": "knob",
+        "at": "E8",
+        "step": 1
+      },
+      {
+        "id": "servo",
+        "type": "servo",
+        "label": "servo",
+        "offboard": {
+          "x": 120,
+          "y": -115
+        },
+        "step": 2
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "A8",
+        "to": "BN7",
+        "step": 1
+      },
+      {
+        "from": "A10",
+        "to": "BP9",
+        "step": 1
+      },
+      {
+        "from": "pin:POT_PIN",
+        "to": "J9",
+        "step": 1
+      },
+      {
+        "from": "part:servo:signal",
+        "to": "pin:SERVO_PIN",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "BP17",
+        "when": "5v",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 2
+      },
+      {
+        "from": "part:servo:gnd",
+        "to": "BN19",
+        "step": 2
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The knob",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the potentiometer in so its two outside legs go in E8 and E10 and its middle leg in G9. Add a black wire from A8 to the blue (−) rail, a red wire from A10 to the red (+) rail, and a wire from {{pin:POT_PIN}} to J9 (the middle leg)."
+    },
+    {
+      "title": "The servo",
+      "text": "Plug three wires into the servo's plug. Brown (or black) goes to the blue (−) rail, orange (or yellow) goes to {{pin:SERVO_PIN}}, and red is power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Read the knob",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  Serial.println(knob);\n  delay(200);\n}\n",
+      "text": "A potentiometer (pot) is a knob that changes a voltage as you turn it. `analogRead(POT_PIN)` turns it into a number from 0 up to `ANALOG_MAX`.\n\n**Your task:** Run the code, open the **Serial Monitor**, and turn the knob all the way each way.",
+      "hints": [
+        "In the simulator, drag the knob on the potentiometer.",
+        "Turn it fully one way for the smallest number, and fully the other way for the biggest.",
+        "Try the Serial Plotter tab for a graph."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "Turned one way: 0",
+          "pattern": "(^|\\n)0\\r?\\n"
+        },
+        {
+          "type": "serial_regex",
+          "label": "Turned the other way: a big number",
+          "pattern": "(^|\\n)(10\\d\\d|[1-4]\\d\\d\\d)\\r?\\n"
+        },
+        {
+          "type": "confirm",
+          "label": "The number changes when I turn the knob"
+        }
+      ],
+      "success": "Your knob works. It gives a whole range of numbers: that's an analog input.",
+      "demo": "{{pins}}\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  Serial.println(knob);\n  delay(200);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "POT_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 600,
+          "set": {
+            "analog": {
+              "POT_PIN": "ANALOG_MAX"
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "Test the servo",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Servo.h>\n\nServo dial;\n\nvoid setup() {\n  dial.attach(SERVO_PIN);\n}\n\nvoid loop() {\n  dial.write(0);\n  delay(1000);\n  dial.write(90);\n  delay(1000);\n  dial.write(___);\n  delay(1000);\n}\n",
+      "text": "A servo is a motor that turns to the angle you ask for, from 0° to 180°. The **Servo** library does the hard work: `attach` connects it to a pin and `write(90)` turns it to 90°.\n\n**Your task:** fill in the blank so the servo turns to 180°, then Run.",
+      "hints": [
+        "A servo's biggest angle is 180.",
+        "Put 180 in the blank.",
+        "The line is `dial.write(180);`"
+      ],
+      "checks": [
+        {
+          "type": "servo_angle",
+          "label": "The servo turns to 0°",
+          "pin": "SERVO_PIN",
+          "angle": 0,
+          "tolerance": 3
+        },
+        {
+          "type": "servo_angle",
+          "label": "The servo turns to 180°",
+          "pin": "SERVO_PIN",
+          "angle": 180,
+          "tolerance": 3
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the servo turn"
+        }
+      ],
+      "success": "The servo works. 0°, 90°, 180°: it goes exactly where you tell it.",
+      "demo": "{{pins}}\n#include <Servo.h>\n\nServo dial;\n\nvoid setup() {\n  dial.attach(SERVO_PIN);\n}\n\nvoid loop() {\n  dial.write(0);\n  delay(1000);\n  dial.write(90);\n  delay(1000);\n  dial.write(180);\n  delay(1000);\n}\n",
+      "sim_ms": 3500
+    },
+    {
+      "title": "The knob turns the servo",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Servo.h>\n\nServo dial;\n\nvoid setup() {\n  dial.attach(SERVO_PIN);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  // Turn the knob reading (0 to ANALOG_MAX) into an angle (0 to 180).\n  int angle = map(knob, 0, ANALOG_MAX, 0, ___);\n  dial.write(___);\n  delay(15);\n}\n",
+      "text": "Join them: read the knob, turn it into an angle with `map()`, and send the servo there.\n\n**Your task:** fill in the blanks.",
+      "hints": [
+        "The servo's angles go from 0 up to what?",
+        "The first blank is 180. Then write the angle to the servo.",
+        "The blanks are `180` and `angle`."
+      ],
+      "checks": [
+        {
+          "type": "servo_angle",
+          "label": "Knob turned down: 0°",
+          "pin": "SERVO_PIN",
+          "angle": 0,
+          "tolerance": 3
+        },
+        {
+          "type": "servo_angle",
+          "label": "Knob turned up: 180°",
+          "pin": "SERVO_PIN",
+          "angle": 180,
+          "tolerance": 3
+        },
+        {
+          "type": "uses_function",
+          "label": "You used map()",
+          "name": "map"
+        },
+        {
+          "type": "confirm",
+          "label": "The servo follows the knob"
+        }
+      ],
+      "success": "Turn the knob and the servo follows. That's how remote-controlled cars steer!",
+      "demo": "{{pins}}\n#include <Servo.h>\n\nServo dial;\n\nvoid setup() {\n  dial.attach(SERVO_PIN);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  // Turn the knob reading (0 to ANALOG_MAX) into an angle (0 to 180).\n  int angle = map(knob, 0, ANALOG_MAX, 0, 180);\n  dial.write(angle);\n  delay(15);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "POT_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 600,
+          "set": {
+            "analog": {
+              "POT_PIN": "ANALOG_MAX"
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "A dashboard gauge",
+      "support": "brief",
+      "text": "**Goal:** the servo only moves when the knob really changes (by more than 2°), and each time it moves, the Serial Monitor shows `Angle: ` and the angle.",
+      "hints": [
+        "Remember the last angle in a variable made above `setup()`.",
+        "`abs(angle - lastAngle)` is how far it changed, ignoring plus or minus.",
+        "Inside the `if`: write to the servo, print the angle, then set `lastAngle = angle;`."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It prints the angle",
+          "text": "Angle: "
+        },
+        {
+          "type": "servo_angle",
+          "label": "The servo still follows the knob",
+          "pin": "SERVO_PIN",
+          "angle": 180,
+          "tolerance": 3
+        },
+        {
+          "type": "confirm",
+          "label": "The Serial Monitor shows the angle when I turn the knob"
+        }
+      ],
+      "success": "A smooth, quiet gauge. Ignoring tiny changes like this is called a dead band.",
+      "demo": "{{pins}}\n#include <Servo.h>\n\nServo dial;\nint lastAngle = -1;\n\nvoid setup() {\n  dial.attach(SERVO_PIN);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int knob = analogRead(POT_PIN);\n  int angle = map(knob, 0, ANALOG_MAX, 0, 180);\n  if (abs(angle - lastAngle) > 2) {  // only when it really moved\n    dial.write(angle);\n    Serial.print(\"Angle: \");\n    Serial.println(angle);\n    lastAngle = angle;\n  }\n  delay(15);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "analog": {
+              "POT_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 600,
+          "set": {
+            "analog": {
+              "POT_PIN": "ANALOG_MAX"
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-programming",
+    "910-data"
+  ],
+  "outro": "Your dial turns a knob into movement, like the needle on a car's dashboard. You read a **potentiometer**, used **map()**, and controlled a **servo** with a library.",
+  "stretch": [
+    "Make the needle move smoothly towards the knob, one degree at a time, instead of jumping.",
+    "Add a red LED that lights up when the needle is in the \"danger zone\" (over 150°).",
+    "Make it a speedometer: print a speed from 0 to 120 km/h to the Serial Monitor."
+  ]
 }

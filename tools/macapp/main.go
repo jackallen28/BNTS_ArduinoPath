@@ -1,13 +1,13 @@
-// Command macapp builds CircuitPath.app from two macOS builds of
-// cmd/circuitpath (Intel and Apple Silicon). It runs on any computer:
+// Command macapp builds ArduinoPath.app from two macOS builds of
+// cmd/arduinopath (Intel and Apple Silicon). It runs on any computer:
 //
-//	GOOS=darwin GOARCH=amd64 go build -o dist/circuitpath-amd64 ./cmd/circuitpath
-//	GOOS=darwin GOARCH=arm64 go build -o dist/circuitpath-arm64 ./cmd/circuitpath
-//	go run ./tools/macapp -version 0.3.0 -amd64 dist/circuitpath-amd64 -arm64 dist/circuitpath-arm64 -out dist
+//	GOOS=darwin GOARCH=amd64 go build -o dist/arduinopath-amd64 ./cmd/arduinopath
+//	GOOS=darwin GOARCH=arm64 go build -o dist/arduinopath-arm64 ./cmd/arduinopath
+//	go run ./tools/macapp -version 1.0.0 -amd64 dist/arduinopath-amd64 -arm64 dist/arduinopath-arm64 -out dist
 //
 // The app holds one universal program (both builds, so it runs natively on
 // every Mac), Info.plist, the icon and (with -boards) the board tools. Sign it afterwards (ad hoc at least:
-// Apple Silicon Macs only run signed code), e.g. codesign --force --deep -s - dist/CircuitPath.app
+// Apple Silicon Macs only run signed code), e.g. codesign --force --deep -s - dist/ArduinoPath.app
 package main
 
 import (
@@ -22,14 +22,14 @@ import (
 	"regexp"
 )
 
-const bundleID = "org.bnts.circuitpath"
+const bundleID = "org.bnts.arduinopath"
 
 func main() {
-	amd64 := flag.String("amd64", "", "the darwin/amd64 build of cmd/circuitpath")
-	arm64 := flag.String("arm64", "", "the darwin/arm64 build of cmd/circuitpath")
+	amd64 := flag.String("amd64", "", "the darwin/amd64 build of cmd/arduinopath")
+	arm64 := flag.String("arm64", "", "the darwin/arm64 build of cmd/arduinopath")
 	version := flag.String("version", "0.0.0", "the version (like 1.2.3)")
-	icon := flag.String("icon", "cmd/circuitpath/macos/CircuitPath.icns", "the app icon")
-	out := flag.String("out", "dist", "folder to put CircuitPath.app in")
+	icon := flag.String("icon", "cmd/arduinopath/macos/ArduinoPath.icns", "the app icon")
+	out := flag.String("out", "dist", "folder to put ArduinoPath.app in")
 	boards := flag.String("boards", "", "the board tools (boards.zip from tools/packboards) to build in")
 	flag.Parse()
 	if err := build(*amd64, *arm64, *version, *icon, *out, *boards); err != nil {
@@ -58,7 +58,7 @@ func build(amd64, arm64, version, icon, out, boards string) error {
 	if err != nil {
 		return err
 	}
-	app := filepath.Join(out, "CircuitPath.app")
+	app := filepath.Join(out, "ArduinoPath.app")
 	if err := os.RemoveAll(app); err != nil {
 		return err
 	}
@@ -69,8 +69,8 @@ func build(amd64, arm64, version, icon, out, boards string) error {
 	}{
 		{"Contents/Info.plist", []byte(infoPlist(version)), 0o644},
 		{"Contents/PkgInfo", []byte("APPL????"), 0o644},
-		{"Contents/MacOS/CircuitPath", fat, 0o755},
-		{"Contents/Resources/CircuitPath.icns", iconData, 0o644},
+		{"Contents/MacOS/ArduinoPath", fat, 0o755},
+		{"Contents/Resources/ArduinoPath.icns", iconData, 0o644},
 	}
 	if boards != "" {
 		// Copied, not read into memory: it's big.
@@ -154,9 +154,9 @@ func infoPlist(version string) string {
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>CircuitPath</string>
+	<string>ArduinoPath</string>
 	<key>CFBundleDisplayName</key>
-	<string>CircuitPath</string>
+	<string>ArduinoPath</string>
 	<key>CFBundleIdentifier</key>
 	<string>` + bundleID + `</string>
 	<key>CFBundleVersion</key>
@@ -166,9 +166,9 @@ func infoPlist(version string) string {
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleExecutable</key>
-	<string>CircuitPath</string>
+	<string>ArduinoPath</string>
 	<key>CFBundleIconFile</key>
-	<string>CircuitPath</string>
+	<string>ArduinoPath</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>LSMinimumSystemVersion</key>

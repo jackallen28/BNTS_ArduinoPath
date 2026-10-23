@@ -25,6 +25,115 @@
     "sequences"
   ],
   "intro": "Make an LED blink, then add two more and run them like real traffic lights.",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H5",
+        "step": 1
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E5",
+        "rotate": 270,
+        "step": 1
+      },
+      {
+        "id": "yellow",
+        "type": "led",
+        "color": "yellow",
+        "label": "yellow LED",
+        "at": "H10",
+        "step": 2
+      },
+      {
+        "id": "r-yellow",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E10",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green LED",
+        "at": "H15",
+        "step": 3
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E15",
+        "rotate": 270,
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J6",
+        "step": 1
+      },
+      {
+        "from": "A5",
+        "to": "BN5",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_YELLOW",
+        "to": "J11",
+        "step": 2
+      },
+      {
+        "from": "A10",
+        "to": "BN9",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J16",
+        "step": 3
+      },
+      {
+        "from": "A15",
+        "to": "BN13",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The red LED",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the red LED into holes H5 and H6, with the long leg (+) in H6. Put a 220Ω resistor from G5 across the gap to E5. Add a wire from {{pin:LED_RED}} to J6, and a black wire from A5 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The yellow LED",
+      "text": "Now the yellow LED, just like the red one. Push the yellow LED into holes H10 and H11, with the long leg (+) in H11. Put a 220Ω resistor from G10 across the gap to E10. Add a wire from {{pin:LED_YELLOW}} to J11, and a black wire from A10 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The green LED",
+      "text": "Last, the green LED. Push the green LED into holes H15 and H16, with the long leg (+) in H16. Put a 220Ω resistor from G15 across the gap to E15. Add a wire from {{pin:LED_GREEN}} to J16, and a black wire from A15 to the blue (−) rail at the bottom. Now you have traffic lights!"
+    }
+  ],
   "steps": [
     {
       "title": "Blink the red LED",

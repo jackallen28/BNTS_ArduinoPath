@@ -31,5 +31,357 @@
     "game state"
   ],
   "intro": "A game for 2 players. Wait for the light, then race to press your button first!",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "b1",
+        "type": "button",
+        "label": "player 1 button",
+        "at": "F2",
+        "step": 1
+      },
+      {
+        "id": "b2",
+        "type": "button",
+        "label": "player 2 button",
+        "at": "F26",
+        "step": 2
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green \"go\" LED",
+        "at": "H13",
+        "step": 3
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E13",
+        "rotate": 270,
+        "step": 3
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 4
+      },
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H7",
+        "step": 5
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E7",
+        "rotate": 270,
+        "step": 5
+      },
+      {
+        "id": "yellow",
+        "type": "led",
+        "color": "yellow",
+        "label": "yellow LED",
+        "at": "H21",
+        "step": 5
+      },
+      {
+        "id": "r-yellow",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E21",
+        "rotate": 270,
+        "step": 5
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_PIN",
+        "to": "J2",
+        "step": 1
+      },
+      {
+        "from": "A4",
+        "to": "BN4",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON2_PIN",
+        "to": "J26",
+        "step": 2
+      },
+      {
+        "from": "A28",
+        "to": "BN24",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J14",
+        "step": 3
+      },
+      {
+        "from": "A13",
+        "to": "BN11",
+        "step": 3
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 4
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 4
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J8",
+        "step": 5
+      },
+      {
+        "from": "A7",
+        "to": "BN6",
+        "step": 5
+      },
+      {
+        "from": "pin:LED_YELLOW",
+        "to": "J22",
+        "step": 5
+      },
+      {
+        "from": "A21",
+        "to": "BN18",
+        "step": 5
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "Player 1's button",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Press the player 1 button into the middle of the breadboard so it sits across the gap: its legs go in F2, F4, E2 and E4. Add a wire from {{pin:BUTTON_PIN}} to J2, and a black wire from A4 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "Player 2's button",
+      "text": "Press the player 2 button into the middle of the breadboard so it sits across the gap: its legs go in F26, F28, E26 and E28. Add a wire from {{pin:BUTTON2_PIN}} to J26, and a black wire from A28 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The green LED",
+      "text": "Push the green \"go\" LED into holes H13 and H14, with the long leg (+) in H14. Put a 220Ω resistor from G13 across the gap to E13. Add a wire from {{pin:LED_GREEN}} to J14, and a black wire from A13 to the blue (−) rail at the bottom."
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    },
+    {
+      "title": "The player LEDs",
+      "text": "Each player gets a light. Red is player 1's: Push the red LED into holes H7 and H8, with the long leg (+) in H8. Put a 220Ω resistor from G7 across the gap to E7. Add a wire from {{pin:LED_RED}} to J8, and a black wire from A7 to the blue (−) rail at the bottom. Yellow is player 2's: Push the yellow LED into holes H21 and H22, with the long leg (+) in H22. Put a 220Ω resistor from G21 across the gap to E21. Add a wire from {{pin:LED_YELLOW}} to J22, and a black wire from A21 to the blue (−) rail at the bottom."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Test both buttons",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(BUTTON_PIN, INPUT_PULLUP);   // player 1\n  pinMode(BUTTON2_PIN, INPUT_PULLUP);  // player 2\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    Serial.println(\"Player 1\");\n  }\n  if (digitalRead(BUTTON2_PIN) == LOW) {\n    Serial.println(\"Player 2\");\n  }\n  delay(100);\n}\n",
+      "text": "Two players, two buttons. First check both work.\n\n**Your task:** Run, open the **Serial Monitor**, and press each button.",
+      "hints": [
+        "In the simulator, click each button on the breadboard.",
+        "Hold a button and you'll see its name over and over.",
+        "If nothing shows, check each button's wires."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "Player 1's button works",
+          "text": "Player 1"
+        },
+        {
+          "type": "serial_contains",
+          "label": "Player 2's button works",
+          "text": "Player 2"
+        },
+        {
+          "type": "confirm",
+          "label": "Both buttons show up"
+        }
+      ],
+      "success": "Both buttons work.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(BUTTON_PIN, INPUT_PULLUP);   // player 1\n  pinMode(BUTTON2_PIN, INPUT_PULLUP);  // player 2\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTTON_PIN) == LOW) {\n    Serial.println(\"Player 1\");\n  }\n  if (digitalRead(BUTTON2_PIN) == LOW) {\n    Serial.println(\"Player 2\");\n  }\n  delay(100);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 500,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        },
+        {
+          "at_ms": 800,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "How fast are you?",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  Serial.println(\"Get ready...\");\n  delay(random(2000, 5000));      // a surprise wait\n  digitalWrite(LED_GREEN, HIGH);  // GO!\n  tone(BUZZER_PIN, 1000, 100);\n  unsigned long start = millis();\n\n  while (digitalRead(BUTTON_PIN) == HIGH) {\n    // wait for the press\n  }\n  unsigned long reaction = ___;\n  digitalWrite(LED_GREEN, LOW);\n  Serial.print(\"Reaction: \");\n  Serial.print(reaction);\n  Serial.println(\" ms\");\n  delay(3000);\n}\n",
+      "text": "`millis()` counts milliseconds since the board started, like a stopwatch that never stops. Take the time when the light comes on, and again when the button is pressed: the difference is your reaction time.\n\n**Your task:** fill in the blank to work out the reaction time.",
+      "hints": [
+        "The reaction time is the time now, take away the time the light came on.",
+        "The time now is `millis()`. The start time is in `start`.",
+        "The blank is `millis() - start`."
+      ],
+      "checks": [
+        {
+          "type": "serial_regex",
+          "label": "It prints your reaction time",
+          "pattern": "Reaction: \\d+ ms"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The GO light comes on",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "I saw my reaction time"
+        }
+      ],
+      "success": "Most people react in about 200 to 300 milliseconds. How fast are you?",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_GREEN, OUTPUT);\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  Serial.println(\"Get ready...\");\n  delay(random(2000, 5000));      // a surprise wait\n  digitalWrite(LED_GREEN, HIGH);  // GO!\n  tone(BUZZER_PIN, 1000, 100);\n  unsigned long start = millis();\n\n  while (digitalRead(BUTTON_PIN) == HIGH) {\n    // wait for the press\n  }\n  unsigned long reaction = millis() - start;\n  digitalWrite(LED_GREEN, LOW);\n  Serial.print(\"Reaction: \");\n  Serial.print(reaction);\n  Serial.println(\" ms\");\n  delay(3000);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 6000,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 6200,
+          "set": {
+            "digital": {
+              "BUTTON_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 7000
+    },
+    {
+      "title": "Race!",
+      "support": "brief",
+      "text": "**Goal:** a two-player race. After a surprise wait, the GO light comes on. The first player to press wins: their light comes on and the Serial Monitor says `Player 1 wins!` or `Player 2 wins!`. Pressing before GO is a false start: print `Too soon!`.",
+      "hints": [
+        "A `while (true)` loop can keep checking both buttons until one is pressed. `return` leaves `loop()` so the next round starts.",
+        "A function `winner(player, lightPin)` saves writing the winning code twice.",
+        "Check for a false start straight after the wait, before turning the GO light on."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "A winner is announced",
+          "text": "wins!"
+        },
+        {
+          "type": "pin_seen",
+          "label": "The winner's light comes on",
+          "pin": "LED_YELLOW",
+          "value": "HIGH"
+        },
+        {
+          "type": "code_contains",
+          "label": "False starts are caught",
+          "text": "Too soon"
+        },
+        {
+          "type": "confirm",
+          "label": "The fastest player wins"
+        }
+      ],
+      "success": "Game on! Get a friend and see who's fastest.",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(LED_GREEN, OUTPUT);   // the GO light\n  pinMode(LED_RED, OUTPUT);     // player 1's light\n  pinMode(LED_YELLOW, OUTPUT);  // player 2's light\n  pinMode(BUZZER_PIN, OUTPUT);\n  pinMode(BUTTON_PIN, INPUT_PULLUP);\n  pinMode(BUTTON2_PIN, INPUT_PULLUP);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid winner(int player, int lightPin) {\n  digitalWrite(LED_GREEN, LOW);\n  digitalWrite(lightPin, HIGH);\n  tone(BUZZER_PIN, 1500, 400);\n  Serial.print(\"Player \");\n  Serial.print(player);\n  Serial.println(\" wins!\");\n  delay(3000);\n  digitalWrite(lightPin, LOW);\n}\n\nvoid loop() {\n  Serial.println(\"Get ready...\");\n  delay(random(2000, 5000));\n  // Pressing before the light is a false start.\n  if (digitalRead(BUTTON_PIN) == LOW || digitalRead(BUTTON2_PIN) == LOW) {\n    Serial.println(\"Too soon! Try again.\");\n    tone(BUZZER_PIN, 200, 500);\n    delay(2000);\n    return;\n  }\n  digitalWrite(LED_GREEN, HIGH);\n  tone(BUZZER_PIN, 1000, 100);\n  while (true) {\n    if (digitalRead(BUTTON_PIN) == LOW) {\n      winner(1, LED_RED);\n      return;\n    }\n    if (digitalRead(BUTTON2_PIN) == LOW) {\n      winner(2, LED_YELLOW);\n      return;\n    }\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 6000,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 6200,
+          "set": {
+            "digital": {
+              "BUTTON2_PIN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 7000
+    }
+  ],
+  "curriculum": [
+    "78-algorithms",
+    "78-programming",
+    "910-testing",
+    "78-user-experience"
+  ],
+  "outro": "Your reaction game times people to the millisecond with **millis()**, picks a **random** wait so nobody can cheat, and decides a winner with **if / else**.",
+  "stretch": [
+    "Keep score over 5 rounds and announce the champion.",
+    "Print the winner's reaction time in milliseconds.",
+    "Add a third player with another button and LED."
+  ]
 }

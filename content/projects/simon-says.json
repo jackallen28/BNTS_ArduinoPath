@@ -31,5 +31,368 @@
     "loops"
   ],
   "intro": "Watch the pattern of lights and sounds, then copy it. It gets longer every round.",
-  "steps": []
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "red",
+        "type": "led",
+        "color": "red",
+        "label": "red LED",
+        "at": "H2",
+        "step": 1
+      },
+      {
+        "id": "r-red",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E2",
+        "rotate": 270,
+        "step": 1
+      },
+      {
+        "id": "b-red",
+        "type": "button",
+        "label": "red button",
+        "at": "F5",
+        "step": 1
+      },
+      {
+        "id": "yellow",
+        "type": "led",
+        "color": "yellow",
+        "label": "yellow LED",
+        "at": "H9",
+        "step": 2
+      },
+      {
+        "id": "r-yellow",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E9",
+        "rotate": 270,
+        "step": 2
+      },
+      {
+        "id": "b-yellow",
+        "type": "button",
+        "label": "yellow button",
+        "at": "F12",
+        "step": 2
+      },
+      {
+        "id": "green",
+        "type": "led",
+        "color": "green",
+        "label": "green LED",
+        "at": "H16",
+        "step": 3
+      },
+      {
+        "id": "r-green",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E16",
+        "rotate": 270,
+        "step": 3
+      },
+      {
+        "id": "b-green",
+        "type": "button",
+        "label": "green button",
+        "at": "F19",
+        "step": 3
+      },
+      {
+        "id": "blue",
+        "type": "led",
+        "color": "blue",
+        "label": "blue LED",
+        "at": "H23",
+        "step": 4
+      },
+      {
+        "id": "r-blue",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E23",
+        "rotate": 270,
+        "step": 4
+      },
+      {
+        "id": "b-blue",
+        "type": "button",
+        "label": "blue button",
+        "at": "F26",
+        "step": 4
+      },
+      {
+        "id": "bz",
+        "type": "buzzer",
+        "label": "buzzer",
+        "offboard": {
+          "x": 350,
+          "y": 0
+        },
+        "step": 5
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_RED",
+        "to": "J3",
+        "step": 1
+      },
+      {
+        "from": "A2",
+        "to": "BN2",
+        "step": 1
+      },
+      {
+        "from": "pin:BUTTON_RED",
+        "to": "J5",
+        "step": 1
+      },
+      {
+        "from": "A7",
+        "to": "BN6",
+        "step": 1
+      },
+      {
+        "from": "pin:LED_YELLOW",
+        "to": "J10",
+        "step": 2
+      },
+      {
+        "from": "A9",
+        "to": "BN8",
+        "step": 2
+      },
+      {
+        "from": "pin:BUTTON_YELLOW",
+        "to": "J12",
+        "step": 2
+      },
+      {
+        "from": "A14",
+        "to": "BN12",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_GREEN",
+        "to": "J17",
+        "step": 3
+      },
+      {
+        "from": "A16",
+        "to": "BN14",
+        "step": 3
+      },
+      {
+        "from": "pin:BUTTON_GREEN",
+        "to": "J19",
+        "step": 3
+      },
+      {
+        "from": "A21",
+        "to": "BN18",
+        "step": 3
+      },
+      {
+        "from": "pin:LED_BLUE",
+        "to": "J24",
+        "step": 4
+      },
+      {
+        "from": "A23",
+        "to": "BN20",
+        "step": 4
+      },
+      {
+        "from": "pin:BUTTON_BLUE",
+        "to": "J26",
+        "step": 4
+      },
+      {
+        "from": "A28",
+        "to": "BN24",
+        "step": 4
+      },
+      {
+        "from": "part:bz:positive",
+        "to": "pin:BUZZER_PIN",
+        "step": 5
+      },
+      {
+        "from": "part:bz:negative",
+        "to": "BN21",
+        "step": 5
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The red light and button",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the red LED into holes H2 and H3, with the long leg (+) in H3. Put a 220Ω resistor from G2 across the gap to E2. Add a wire from {{pin:LED_RED}} to J3, and a black wire from A2 to the blue (−) rail at the bottom. Press the red button into the middle of the breadboard so it sits across the gap: its legs go in F5, F7, E5 and E7. Add a wire from {{pin:BUTTON_RED}} to J5, and a black wire from A7 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The yellow light and button",
+      "text": "Push the yellow LED into holes H9 and H10, with the long leg (+) in H10. Put a 220Ω resistor from G9 across the gap to E9. Add a wire from {{pin:LED_YELLOW}} to J10, and a black wire from A9 to the blue (−) rail at the bottom. Press the yellow button into the middle of the breadboard so it sits across the gap: its legs go in F12, F14, E12 and E14. Add a wire from {{pin:BUTTON_YELLOW}} to J12, and a black wire from A14 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The green light and button",
+      "text": "Push the green LED into holes H16 and H17, with the long leg (+) in H17. Put a 220Ω resistor from G16 across the gap to E16. Add a wire from {{pin:LED_GREEN}} to J17, and a black wire from A16 to the blue (−) rail at the bottom. Press the green button into the middle of the breadboard so it sits across the gap: its legs go in F19, F21, E19 and E21. Add a wire from {{pin:BUTTON_GREEN}} to J19, and a black wire from A21 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The blue light and button",
+      "text": "Push the blue LED into holes H23 and H24, with the long leg (+) in H24. Put a 220Ω resistor from G23 across the gap to E23. Add a wire from {{pin:LED_BLUE}} to J24, and a black wire from A23 to the blue (−) rail at the bottom. Press the blue button into the middle of the breadboard so it sits across the gap: its legs go in F26, F28, E26 and E28. Add a wire from {{pin:BUTTON_BLUE}} to J26, and a black wire from A28 to the blue (−) rail. (The code turns on the pin's pull-up, so no resistor is needed.)"
+    },
+    {
+      "title": "The buzzer",
+      "text": "The buzzer sits beside the breadboard. Connect its + leg (the red wire, or the leg marked +) to {{pin:BUZZER_PIN}}, and its − leg (the black wire) to the blue (−) rail."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Lights and notes",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    flash(i);\n  }\n  delay(1000);\n}\n",
+      "text": "Four colours, each with its own light and note. Instead of writing everything four times, we keep the pins and notes in **arrays**: numbered lists. `LEDS[0]` is the first one (red), `LEDS[3]` the last (blue).\n\nThe `flash(colour)` function lights one colour and plays its note.\n\n**Your task:** Run it. Then change the notes to make your own tune.",
+      "hints": [
+        "Arrays start counting at 0, not 1.",
+        "Change the numbers in `NOTES` and Run again.",
+        "Bigger numbers are higher notes."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "Red flashes",
+          "pin": "LED_RED",
+          "value": "HIGH"
+        },
+        {
+          "type": "pin_seen",
+          "label": "Blue flashes",
+          "pin": "LED_BLUE",
+          "value": "HIGH"
+        },
+        {
+          "type": "tone_seen",
+          "label": "Notes play",
+          "pin": "BUZZER_PIN",
+          "min_hz": 100,
+          "max_hz": 4000
+        },
+        {
+          "type": "confirm",
+          "label": "All four lights flash, each with a note"
+        }
+      ],
+      "success": "Four colours, one function. That's the power of arrays.",
+      "demo": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    flash(i);\n  }\n  delay(1000);\n}\n",
+      "sim_ms": 2500
+    },
+    {
+      "title": "Press a colour",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    if (digitalRead(___) == LOW) {\n      flash(___);\n    }\n  }\n}\n",
+      "text": "Now each button flashes its own colour. One `for` loop checks all four buttons.\n\n**Your task:** fill in the blanks.",
+      "hints": [
+        "Use the array of buttons, with `i` to choose which one.",
+        "Flash the same colour number as the button.",
+        "The blanks are `BUTTONS[i]` and `i`."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The green button flashes green",
+          "pin": "LED_GREEN",
+          "value": "HIGH"
+        },
+        {
+          "type": "confirm",
+          "label": "Each button flashes its own colour"
+        }
+      ],
+      "success": "Every button works, with one loop.",
+      "demo": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    if (digitalRead(BUTTONS[i]) == LOW) {\n      flash(i);\n    }\n  }\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 300,
+          "set": {
+            "digital": {
+              "BUTTON_GREEN": 0
+            }
+          }
+        },
+        {
+          "at_ms": 700,
+          "set": {
+            "digital": {
+              "BUTTON_GREEN": null
+            }
+          }
+        }
+      ],
+      "sim_ms": 1500
+    },
+    {
+      "title": "Simon Says",
+      "support": "brief",
+      "text": "**Goal:** the full game. Each round, Simon adds a random colour to the pattern and plays the whole pattern. You copy it with the buttons. Get it right and the next round starts (print `Round 2`, `Round 3`...). Get it wrong and it's game over.",
+      "hints": [
+        "Keep the pattern in an array (`int pattern[100];`) and how long it is in `length`.",
+        "A function that waits for any button and returns which colour was pressed makes copying easy.",
+        "Use **Watch the goal**, then build it one function at a time."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "The game starts round 1",
+          "text": "Round 1"
+        },
+        {
+          "type": "code_regex",
+          "label": "The pattern is an array",
+          "pattern": "\\w+\\s*\\[\\s*\\d+\\s*\\]\\s*;"
+        },
+        {
+          "type": "uses_function",
+          "label": "Colours are random",
+          "name": "random"
+        },
+        {
+          "type": "confirm",
+          "label": "I played a few rounds"
+        }
+      ],
+      "success": "Simon Says! Your game remembers a growing list, just like you do.",
+      "demo": "{{pins}}\nconst int LEDS[4] = { LED_RED, LED_YELLOW, LED_GREEN, LED_BLUE };\nconst int BUTTONS[4] = { BUTTON_RED, BUTTON_YELLOW, BUTTON_GREEN, BUTTON_BLUE };\nconst int NOTES[4] = { 262, 330, 392, 523 };  // C, E, G and high C\n\nint pattern[100];\nint length = 0;\n\nvoid flash(int colour) {\n  digitalWrite(LEDS[colour], HIGH);\n  tone(BUZZER_PIN, NOTES[colour]);\n  delay(300);\n  digitalWrite(LEDS[colour], LOW);\n  noTone(BUZZER_PIN);\n  delay(100);\n}\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(LEDS[i], OUTPUT);\n    pinMode(BUTTONS[i], INPUT_PULLUP);\n  }\n  pinMode(BUZZER_PIN, OUTPUT);\n  Serial.begin(9600);\n  randomSeed(analogRead(0));\n}\n\n// Waits for a press and returns its colour (0 to 3).\nint waitForPress() {\n  while (true) {\n    for (int i = 0; i < 4; i++) {\n      if (digitalRead(BUTTONS[i]) == LOW) {\n        flash(i);\n        while (digitalRead(BUTTONS[i]) == LOW) { }  // wait for release\n        return i;\n      }\n    }\n  }\n}\n\nvoid gameOver() {\n  Serial.print(\"Game over! You reached round \");\n  Serial.println(length);\n  tone(BUZZER_PIN, 150, 800);\n  delay(2000);\n  length = 0;\n}\n\nvoid loop() {\n  // Simon adds a colour and shows the whole pattern.\n  pattern[length] = random(0, 4);\n  length++;\n  Serial.print(\"Round \");\n  Serial.println(length);\n  delay(500);\n  for (int i = 0; i < length; i++) {\n    flash(pattern[i]);\n  }\n  // Now you copy it.\n  for (int i = 0; i < length; i++) {\n    if (waitForPress() != pattern[i]) {\n      gameOver();\n      return;\n    }\n  }\n}\n",
+      "sim_ms": 2000
+    }
+  ],
+  "curriculum": [
+    "78-algorithms",
+    "910-algorithms",
+    "910-programming",
+    "910-testing"
+  ],
+  "outro": "You built Simon Says with **arrays**: lists of pins, notes and the growing pattern. Arrays and **for loops** let one piece of code handle all four colours.",
+  "stretch": [
+    "Make it speed up as the pattern gets longer.",
+    "Keep a high score and print it after each game.",
+    "Play a victory tune after every 5 rounds."
+  ]
 }

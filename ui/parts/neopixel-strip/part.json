@@ -1,0 +1,128 @@
+{
+  "type": "neopixel-strip",
+  "title": "NeoPixel Stick",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "contrib/adafruit_6530a5d9a89aa5dfd404e4335177b1a6_1_71.fzp",
+    "title": "NeoPixel Stick",
+    "breadboard": "svg/contrib/breadboard/adafruit_63ac9ae82a412ce2d647640ca7ab7795_1_breadboard_71.svg",
+    "schematic": "svg/contrib/schematic/adafruit_63ac9ae82a412ce2d647640ca7ab7795_1_schematic_71.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "neopixel",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "vcc",
+      "name": "4-7VDC (5V)",
+      "fritzing": "connector21"
+    },
+    {
+      "id": "din",
+      "name": "DIN (data in)",
+      "fritzing": "connector25"
+    },
+    {
+      "id": "dout",
+      "name": "DOUT (to the next strip)",
+      "fritzing": "connector20"
+    },
+    {
+      "id": "gnd",
+      "name": "GND",
+      "fritzing": "connector19"
+    }
+  ],
+  "footprint": null,
+  "options": {
+    "pixels": 8
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 207.37,
+    "height": 40,
+    "connectors": {
+      "din": {
+        "x": 1.97,
+        "y": 15
+      },
+      "dout": {
+        "x": 205.15,
+        "y": 15
+      },
+      "gnd": {
+        "x": 205.15,
+        "y": 5
+      },
+      "vcc": {
+        "x": 205.15,
+        "y": 25
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 120,
+    "height": 100,
+    "connectors": {
+      "din": {
+        "x": 0,
+        "y": 40,
+        "dir": "left"
+      },
+      "dout": {
+        "x": 120,
+        "y": 40,
+        "dir": "right"
+      },
+      "gnd": {
+        "x": 60,
+        "y": 100,
+        "dir": "down"
+      },
+      "vcc": {
+        "x": 60,
+        "y": 0,
+        "dir": "up"
+      }
+    }
+  },
+  "sim": {
+    "pixel_r": 6,
+    "pixels": [
+      {
+        "x": 12.96,
+        "y": 20
+      },
+      {
+        "x": 38.88,
+        "y": 20
+      },
+      {
+        "x": 64.8,
+        "y": 20
+      },
+      {
+        "x": 90.72,
+        "y": 20
+      },
+      {
+        "x": 116.65,
+        "y": 20
+      },
+      {
+        "x": 142.57,
+        "y": 20
+      },
+      {
+        "x": 168.49,
+        "y": 20
+      },
+      {
+        "x": 194.41,
+        "y": 20
+      }
+    ]
+  }
+}

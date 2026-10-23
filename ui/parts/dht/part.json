@@ -1,0 +1,80 @@
+{
+  "type": "dht",
+  "title": "DHT11 temperature and humidity module",
+  "art": "arduinopath",
+  "licence": "ArduinoPath's own art (drawn in the Fritzing style)",
+  "behaviour": "dht",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "data",
+      "name": "S: data"
+    },
+    {
+      "id": "vcc",
+      "name": "+: power"
+    },
+    {
+      "id": "gnd",
+      "name": "−: GND"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      2,
+      0
+    ]
+  ],
+  "options": {
+    "model": "DHT11"
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 70,
+    "height": 114,
+    "connectors": {
+      "data": {
+        "x": 25,
+        "y": 113
+      },
+      "gnd": {
+        "x": 45,
+        "y": 113
+      },
+      "vcc": {
+        "x": 35,
+        "y": 113
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 130,
+    "height": 40,
+    "connectors": {
+      "data": {
+        "x": 1,
+        "y": 10,
+        "dir": "left"
+      },
+      "gnd": {
+        "x": 1,
+        "y": 30,
+        "dir": "left"
+      },
+      "vcc": {
+        "x": 1,
+        "y": 20,
+        "dir": "left"
+      }
+    }
+  }
+}

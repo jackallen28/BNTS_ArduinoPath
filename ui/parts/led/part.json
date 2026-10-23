@@ -1,0 +1,83 @@
+{
+  "type": "led",
+  "title": "Red LED - 5mm",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/LED-generic-5mm_6852162_005.fzp",
+    "title": "Red LED - 5mm",
+    "breadboard": "svg/core/breadboard/LED-5mm-red-leg.svg",
+    "schematic": "svg/core/schematic/led.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "led",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "cathode",
+      "name": "cathode (−): the short leg, by the flat side",
+      "fritzing": "connector0"
+    },
+    {
+      "id": "anode",
+      "name": "anode (+): the long leg",
+      "fritzing": "connector1"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ]
+  ],
+  "colors": {
+    "blue": "#2367e0",
+    "green": "#22b33a",
+    "red": "#e8221b",
+    "white": "#eef2f5",
+    "yellow": "#f5cf1d"
+  },
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 21.47,
+    "height": 76.25,
+    "connectors": {
+      "anode": {
+        "x": 16.29,
+        "y": 74.75
+      },
+      "cathode": {
+        "x": 6.29,
+        "y": 74.75
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 15.2,
+    "height": 24.48,
+    "connectors": {
+      "anode": {
+        "x": 11,
+        "y": 0.24,
+        "dir": "up"
+      },
+      "cathode": {
+        "x": 11,
+        "y": 24.24,
+        "dir": "down"
+      }
+    }
+  },
+  "sim": {
+    "glow": {
+      "x": 10.73,
+      "y": 11.81,
+      "r": 24.69
+    }
+  }
+}

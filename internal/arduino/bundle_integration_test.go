@@ -5,22 +5,24 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	"circuitpath/internal/content"
+	"arduinopath/internal/content"
 )
 
-// TestRealBundle unpacks a real bundle (CI sets CIRCUITPATH_BOARDS to a
-// boards.zip or a CircuitPath.exe with the tools appended) and compiles for
+// TestRealBundle unpacks a real bundle (CI sets ARDUINOPATH_BOARDS to a
+// boards.zip or an ArduinoPath.exe with the tools appended) and compiles for
 // every board: a blink everywhere, the whole kit check (every library) on
 // the boards whose tools were trimmed when packing, and a broken sketch.
 func TestRealBundle(t *testing.T) {
-	path := os.Getenv("CIRCUITPATH_BOARDS")
+	path := os.Getenv("ARDUINOPATH_BOARDS")
 	if path == "" {
-		t.Skip("CIRCUITPATH_BOARDS isn't set")
+		t.Skip("ARDUINOPATH_BOARDS isn't set")
 	}
 	b, err := OpenBundle(path)
 	if err != nil {
@@ -31,8 +33,14 @@ func TestRealBundle(t *testing.T) {
 		t.Fatalf("the bundle has tools %s, this build pins %s", b.Manifest.Hash, Pinned().Hash())
 	}
 	data := t.TempDir()
-	tools := NewTools(b, data, nil)
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Minute)
+	// Where the app puts them (on Windows, a short folder in the home folder).
+	tools := NewTools(b, ToolsFolder(data), nil)
+	// As long as go test allows (-timeout), less a minute to report.
+	deadline, ok := t.Deadline()
+	if !ok {
+		deadline = time.Now().Add(50 * time.Minute)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline.Add(-time.Minute))
 	defer cancel()
 
 	type board struct {
@@ -132,9 +140,70 @@ func TestRealBundle(t *testing.T) {
 		}
 	}
 
+	compileDemos(ctx, t, tools, cat)
 	for fam, st := range tools.Status() {
 		t.Logf("%s: %s", fam, st.State)
 	}
+}
+
+// demoBoards are the boards every model answer is compiled for: one per
+// chip (the other boards of a family share its core and libraries).
+// GitHub's Windows machines give up partway through the ESP32 ones (they're
+// slow there), so Windows compiles every answer for the Uno and the NodeMCU
+// (whose compiler's paths are the longest), and the ESP32 boards get Blink
+// and the kit check above; Mac, Linux and the Pi compile them all.
+var demoBoards = func() []string {
+	if runtime.GOOS == "windows" {
+		return []string{"uno", "nodemcu"}
+	}
+	return []string{"uno", "nodemcu", "esp32", "esp32-c3"}
+}()
+
+// compileDemos compiles every step's model answer for every board its
+// project lists, with the pin header for that board. Boards compile side
+// by side, except on Windows, where parallel ESP32 builds can run CI's
+// machine out of memory; each board's sketches go one at a time (they share
+// a build folder).
+func compileDemos(ctx context.Context, t *testing.T, tools *Tools, cat *content.Catalogue) {
+	var wg sync.WaitGroup
+	for _, id := range demoBoards {
+		b, ok := cat.Board(id)
+		if !ok {
+			t.Errorf("no board %s", id)
+			continue
+		}
+		if runtime.GOOS == "windows" {
+			wg.Wait() // one board at a time (see above)
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			n, start := 0, time.Now()
+			for _, p := range cat.Projects {
+				if !p.Supports(b) {
+					continue
+				}
+				var full struct {
+					Steps []struct {
+						Title string `json:"title"`
+						Demo  string `json:"demo"`
+					} `json:"steps"`
+				}
+				json.Unmarshal(p.Raw, &full)
+				for i, s := range full.Steps {
+					code := content.ExpandPins(p, b, s.Demo)
+					res, err := tools.Compile(ctx, code, b.FQBN, b.BuildProperties, nil)
+					if err != nil || !res.OK {
+						t.Errorf("%s step %d (%s) on %s: %v\n%s", p.ID, i+1, s.Title, b.ID, err, CoachText(res.Diagnostics)+tail(res.Output, 15))
+						continue
+					}
+					n++
+				}
+			}
+			t.Logf("%s: %d model answers compiled in %s", b.ID, n, time.Since(start).Round(time.Second))
+		}()
+	}
+	wg.Wait()
 }
 
 func firstChars(s string, n int) string {

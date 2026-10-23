@@ -1,4 +1,4 @@
-module circuitpath
+module arduinopath
 
 go 1.24.0
 

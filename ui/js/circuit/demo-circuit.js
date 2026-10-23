@@ -1,0 +1,40 @@
+// The sample circuit on the demo page (and in the tests): traffic lights
+// (3 LEDs and 3 resistors), a button, a potentiometer, a servo and an OLED.
+
+export const demoCircuit = {
+  breadboard: "half",
+  parts: [
+    { id: "red", type: "led", color: "red", at: "H5", step: 1, label: "red LED" },
+    { id: "r1", type: "resistor-220", at: "E5", rotate: 270, step: 1, label: "220Ω" },
+    { id: "yellow", type: "led", color: "yellow", at: "H10", step: 2, label: "yellow LED" },
+    { id: "r2", type: "resistor-220", at: "E10", rotate: 270, step: 2, label: "220Ω" },
+    { id: "green", type: "led", color: "green", at: "H15", step: 3, label: "green LED" },
+    { id: "r3", type: "resistor-220", at: "E15", rotate: 270, step: 3, label: "220Ω" },
+    { id: "b1", type: "button", at: "F20", step: 4, label: "button" },
+    { id: "pot", type: "potentiometer", at: "E26", step: 5, label: "knob" },
+    { id: "servo", type: "servo", offboard: { x: 370, y: -40 }, step: 6, label: "servo" },
+    { id: "oled", type: "oled", offboard: { x: 380, y: 95 }, step: 7, label: "OLED" },
+  ],
+  wires: [
+    { from: "board:GND", to: "BN1", step: 1 },
+    { from: "board:VCC", to: "BP1", step: 1 },
+    { from: "pin:LED_RED", to: "J6", step: 1 },
+    { from: "A5", to: "BN4", step: 1 },
+    { from: "pin:LED_YELLOW", to: "J11", step: 2 },
+    { from: "A10", to: "BN8", step: 2 },
+    { from: "pin:LED_GREEN", to: "J16", step: 3 },
+    { from: "A15", to: "BN12", step: 3 },
+    { from: "pin:BUTTON_PIN", to: "J20", step: 4 },
+    { from: "A22", to: "BN18", step: 4 },
+    { from: "A26", to: "BN21", step: 5 },
+    { from: "A28", to: "BP23", step: 5 },
+    { from: "pin:POT_PIN", to: "J27", step: 5 },
+    { from: "part:servo:signal", to: "pin:SERVO_PIN", step: 6 },
+    { from: "part:servo:power", to: "BP25", step: 6 },
+    { from: "part:servo:gnd", to: "BN25", step: 6 },
+    { from: "part:oled:gnd", to: "BN24", step: 7 },
+    { from: "part:oled:vcc", to: "BP24", step: 7 },
+    { from: "part:oled:scl", to: "pin:SCL", step: 7 },
+    { from: "part:oled:sda", to: "pin:SDA", step: 7 },
+  ],
+};

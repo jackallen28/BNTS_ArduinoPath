@@ -1,0 +1,128 @@
+{
+  "type": "button",
+  "title": "Pushbutton",
+  "art": "fritzing",
+  "fritzing": {
+    "commit": "27535f2fd02097be9bed229b75aa8e9be282a4a0",
+    "fzp": "core/pushbutton_4_horizontal.fzp",
+    "title": "Pushbutton",
+    "breadboard": "svg/core/breadboard/basic_pbutton.svg",
+    "schematic": "svg/core/schematic/pushbutton4lead.svg"
+  },
+  "licence": "CC BY-SA 3.0 (Fritzing parts library)",
+  "behaviour": "button",
+  "unit": "0.01in",
+  "legs": [
+    {
+      "id": "1a",
+      "name": "left top leg (joined to the left bottom leg)",
+      "fritzing": "connector2"
+    },
+    {
+      "id": "1b",
+      "name": "left bottom leg",
+      "fritzing": "connector3"
+    },
+    {
+      "id": "2a",
+      "name": "right top leg (joined to the right bottom leg)",
+      "fritzing": "connector0"
+    },
+    {
+      "id": "2b",
+      "name": "right bottom leg",
+      "fritzing": "connector1"
+    }
+  ],
+  "footprint": [
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      2,
+      3
+    ]
+  ],
+  "buses": [
+    [
+      "2a",
+      "2b"
+    ],
+    [
+      "1a",
+      "1b"
+    ]
+  ],
+  "switch": [
+    [
+      "1a",
+      "2a"
+    ]
+  ],
+  "breadboard": {
+    "file": "breadboard.svg",
+    "width": 24.52,
+    "height": 33,
+    "connectors": {
+      "1a": {
+        "x": 2.11,
+        "y": 1.5
+      },
+      "1b": {
+        "x": 2.11,
+        "y": 31.5
+      },
+      "2a": {
+        "x": 22.11,
+        "y": 1.5
+      },
+      "2b": {
+        "x": 22.11,
+        "y": 31.5
+      }
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "width": 32,
+    "height": 20.85,
+    "connectors": {
+      "1a": {
+        "x": 0.47,
+        "y": 4.4,
+        "dir": "left"
+      },
+      "1b": {
+        "x": 0.47,
+        "y": 20.42,
+        "dir": "left"
+      },
+      "2a": {
+        "x": 31.4,
+        "y": 4.4,
+        "dir": "right"
+      },
+      "2b": {
+        "x": 31.45,
+        "y": 20.38,
+        "dir": "right"
+      }
+    }
+  },
+  "sim": {
+    "cap": {
+      "x": 12.28,
+      "y": 16.53,
+      "r": 6.13
+    }
+  }
+}
