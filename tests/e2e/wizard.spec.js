@@ -107,3 +107,33 @@ test("the run panel: watch the goal, the LED glows, serial shows, a button chang
   await page.getByRole("button", { name: "■ Stop" }).click();
   expect(problems).toEqual([]);
 });
+
+test("the wizard's test on a real board (the app's board API pretended)", async ({ page }) => {
+  const problems = watchErrors(page).filter(() => true);
+  let uploaded = null;
+  await page.route("**/api/ports", (r) => r.fulfill({ json: [{ port: "COM3", label: "COM3", chip: "CH340", board: "Arduino Uno", fqbn: "arduino:avr:uno" }] }));
+  await page.route("**/api/upload", (r) => { uploaded = r.request().postDataJSON(); return r.fulfill({ json: { id: "job1" } }); });
+  await page.route("**/api/jobs/job1", (r) => r.fulfill({ json: { state: "done", output: "Done uploading." } }));
+  await page.route("**/api/serial?*", (r) => r.fulfill({
+    status: 200, contentType: "text/event-stream",
+    body: 'event: open\ndata: {}\n\nevent: data\ndata: "HELLO\\r\\nTEST:led:ON\\r\\nREAD:b1:1\\r\\n"\n\nevent: data\ndata: "READ:b1:0\\r\\n"\n\n',
+  }));
+  await page.route("**/api/serial/close", (r) => r.fulfill({ status: 204 }));
+  await open(page, "project=button-night-light&board=uno&wizard=1");
+  const wiz = page.getByRole("dialog", { name: /Wiring Wizard/ });
+  await wiz.getByRole("button", { name: "Skip the introductions" }).click();
+  await wiz.getByRole("button", { name: "Next ▶" }).click();
+  await wiz.getByRole("button", { name: "Next ▶" }).click();
+  await wiz.getByLabel("On my real board").check();
+  await expect(wiz.getByLabel("USB port")).toHaveValue("COM3");
+  await wiz.getByRole("button", { name: "Test", exact: true }).click();
+  await expect(wiz.locator('[data-row="b1"]')).toContainText("Working!");
+  await expect(wiz.locator('[data-row="led"]')).toContainText("having its turn");
+  expect(uploaded.board).toBe("uno");
+  expect(uploaded.port).toBe("COM3");
+  expect(uploaded.code).toContain("Serial.begin(115200)");
+  await wiz.locator('[data-row="led"]').getByLabel("I saw it work").check();
+  await expect(wiz.getByRole("button", { name: "Start programming" })).toBeEnabled();
+  await page.screenshot({ path: "test-results/screenshots/wizard-real-board.png" });
+  expect(problems.filter((p) => !/EventSource|event-stream|net::/.test(p))).toEqual([]);
+});
