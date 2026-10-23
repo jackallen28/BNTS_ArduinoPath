@@ -137,3 +137,20 @@ test("the wizard's test on a real board (the app's board API pretended)", async 
   await page.screenshot({ path: "test-results/screenshots/wizard-real-board.png" });
   expect(problems.filter((p) => !/EventSource|event-stream|net::/.test(p))).toEqual([]);
 });
+
+test("the run panel's phone shows the sketch's web page, and its links reach the sketch", async ({ page }) => {
+  const problems = watchErrors(page);
+  await open(page, "project=phone-led&board=esp32&step=2");
+  await page.getByRole("button", { name: "Watch the goal" }).click();
+  const phone = page.getByRole("complementary", { name: "Phone" });
+  await expect(phone).toBeVisible({ timeout: 5000 });
+  const screen = page.frameLocator(".rp-phone-screen");
+  await expect(screen.getByRole("heading", { name: "My LED" })).toBeVisible();
+  await page.waitForTimeout(800); // the goal's own requests (/on, /off)
+  await screen.getByRole("link", { name: "ON" }).click();
+  await expect.poll(() => page.evaluate(() => window.rp.result().http.map((x) => x.request.path).join(" "))).toMatch(/\/on$/);
+  await expect(page.getByLabel("Serial Monitor output")).toContainText("LED on");
+  await page.screenshot({ path: "test-results/screenshots/wizard-runpanel-phone.png" });
+  // Playwright's own helper script can't run in the phone's script-free frame; that's the point of the sandbox.
+  expect(problems.filter((p) => !p.includes("Blocked script execution in 'about:srcdoc'"))).toEqual([]);
+});

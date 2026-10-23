@@ -192,12 +192,35 @@ export function createRunPanel({ board, project = null, circuit = null, onRuntim
     }
     phoneNote.textContent = `Page ${res.status === 200 ? "loaded" : `answered ${res.status}`}`;
     const html = /html/.test(res.type || "") ? res.body : `<pre>${String(res.body).replace(/[<&]/g, (c) => (c === "<" ? "&lt;" : "&amp;"))}</pre>`;
-    screen().srcdoc = html;
+    showPage(html);
   }
   // Links and forms on the phone's page become requests to the sketch.
+  // The app's Content-Security-Policy (which the phone's frame shares) blocks
+  // the page's <style> blocks and style="" attributes, so they're taken out
+  // here and put back with the CSSOM, which the policy allows. Scripts can't
+  // run on the phone.
+  let pageStyles = [];
+  function showPage(html) {
+    // Take the styles out as text first: even parsing them would trip the policy.
+    pageStyles = [];
+    html = String(html)
+      .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gi, (m, css) => { pageStyles.push(css); return ""; })
+      .replace(/(<[a-z][^>]*?\s)style\s*=\s*("[^"]*"|'[^']*')/gi, "$1data-ap-style=$2");
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    doc.querySelectorAll("script, link[rel=stylesheet]").forEach((x) => x.remove());
+    for (const e of doc.querySelectorAll("*")) {
+      for (const a of [...e.attributes]) if (/^on/i.test(a.name)) e.removeAttribute(a.name);
+    }
+    screen().srcdoc = "<!doctype html>" + doc.documentElement.outerHTML;
+  }
   function hookScreen() {
     const doc = phoneScreen.contentDocument;
     if (!doc) return;
+    try {
+      const sheets = pageStyles.map((t) => { const sh = new doc.defaultView.CSSStyleSheet(); sh.replaceSync(t); return sh; });
+      doc.adoptedStyleSheets = sheets;
+    } catch { /* an odd stylesheet: show the page plain */ }
+    for (const e of doc.querySelectorAll("[data-ap-style]")) e.style.cssText = e.getAttribute("data-ap-style");
     doc.addEventListener("click", (e) => {
       const a = e.target.closest?.("a[href]");
       if (!a) return;
