@@ -4,7 +4,7 @@ Keep experimental projects, prototypes, wiring diagrams and visual previews in t
 
 ## Current experiments
 
-- [Bin monitor dashboard and ESP32 wiring](bin-monitor/README.md) — original preview images from the existing bin-monitor prototype.
+- [Timber bin monitor, animation and ESP32 wiring](bin-monitor/README.md) — runnable prototype, browser-captured previews and hardware documentation.
 
 ## Working conventions
 

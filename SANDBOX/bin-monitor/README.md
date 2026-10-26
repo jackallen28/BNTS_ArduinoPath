@@ -1,14 +1,39 @@
-# Bin monitor preview
+# Timber bin monitor sandbox
 
-Original image exports from the existing BNTS bin-monitor SANDBOX prototype, using ArduinoPath’s framework and theme and the official school logo. These files are copied byte-for-byte from the original exports.
+The bin illustration follows the supplied timber-box CAD design and opening video: honey-coloured wooden panels, charcoal top/base frames, a rear servo and an independently hinged flap. The fill reading appears in a separate teal gauge so the wood remains opaque. ArduinoPath’s framework, theme and official school logo are retained.
+
+## Animated lid preview
+
+Actual browser-rendered frames from the dashboard, using simulation inputs. The preview shows the lid opening, closing and opening again around its fixed rear hinge.
+
+![Animated timber-bin lid](lid-animation.gif)
+
+[Open animated preview](lid-animation.gif)
 
 ## Dashboard
 
-This is an actual browser screenshot using simulated ESP32 HTTP telemetry. The visible live badge describes the mocked data connection; the yellow banner identifies the readings as simulated. This screenshot does not establish connectivity to a physical ESP32.
+These are actual browser screenshots with clearly labelled simulation readings. They are not image-generator mockups or evidence of a physical ESP32 connection.
 
-![Bin monitor dashboard with simulated ESP32 readings](dashboard.png)
+![Timber bin dashboard with lid open](dashboard.png)
 
-[Open dashboard image](dashboard.png)
+[Open lid screenshot](dashboard.png) · [Closed lid screenshot](dashboard-closed.png) · [Mobile screenshot](dashboard-mobile.png)
+
+## Run and develop
+
+The complete runnable prototype, tests, self-contained artwork and ESP32 firmware are in [dashboard/](dashboard/README.md).
+
+From the ArduinoPath repository root:
+
+```sh
+npm ci
+cd SANDBOX/bin-monitor/dashboard
+npm test
+npm start
+```
+
+The development server listens on port 8090. With the server running, `node tests/bin-view-browser.mjs` checks lid motion, fixed hinge, fill indicator, mobile fit and reduced-motion behaviour, and captures screenshots plus an animated GIF. Browser tests need Chromium at `/usr/bin/chromium` in this cloud environment. See the prototype README for Wi-Fi/USB checks and embedding the updated assets into the ESP32 firmware.
+
+The pictured servo is a visual reference to the prototype. The current firmware reports the lid switch; it does not command a servo or move the physical lid.
 
 ## ESP32 wiring
 

@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- ArduinoPath toolbar icons, drawn for ArduinoPath. 24x24, Vista-style with soft gradients and a shine. -->
+  <defs>
+    <linearGradient id="gi-teal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ff0f4"/><stop offset=".5" stop-color="#19c1ca"/><stop offset="1" stop-color="#047c83"/></linearGradient>
+    <linearGradient id="gi-purple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7a8dc"/><stop offset=".55" stop-color="#704988"/><stop offset="1" stop-color="#46285a"/></linearGradient>
+    <linearGradient id="gi-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd3ff"/><stop offset=".5" stop-color="#2f86d6"/><stop offset="1" stop-color="#14549a"/></linearGradient>
+    <linearGradient id="gi-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9f39a"/><stop offset=".5" stop-color="#3fb51f"/><stop offset="1" stop-color="#22770e"/></linearGradient>
+    <linearGradient id="gi-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb3a1"/><stop offset=".5" stop-color="#e0462a"/><stop offset="1" stop-color="#9c2410"/></linearGradient>
+    <linearGradient id="gi-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2a8"/><stop offset=".5" stop-color="#f5c22b"/><stop offset="1" stop-color="#c98a07"/></linearGradient>
+    <linearGradient id="gi-steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fa"/><stop offset=".5" stop-color="#a9b6c4"/><stop offset="1" stop-color="#5d6c7c"/></linearGradient>
+    <linearGradient id="gi-folder" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".6" stop-color="#f3c752"/><stop offset="1" stop-color="#d79a1c"/></linearGradient>
+    <linearGradient id="gi-shine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>
+
+  <symbol id="i-app" viewBox="0 0 24 24">
+    <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill="url(#gi-teal)" stroke="#06646a"/>
+    <path d="M6 17V12h5V7h7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="6" cy="17" r="2.2" fill="#fff"/><rect x="15.5" y="4.5" width="5" height="5" rx="1" fill="#704988" stroke="#fff"/>
+    <path d="M3 3.5h18v6c-6 1.5-12 1.5-18 0z" fill="url(#gi-shine)" opacity=".7"/>
+  </symbol>
+
+  <symbol id="i-settings" viewBox="0 0 24 24">
+    <path d="M10.3 1.8h3.4l.6 2.8 1.8.8 2.4-1.6 2.4 2.4-1.6 2.4.8 1.8 2.8.6v3.4l-2.8.6-.8 1.8 1.6 2.4-2.4 2.4-2.4-1.6-1.8.8-.6 2.8h-3.4l-.6-2.8-1.8-.8-2.4 1.6-2.4-2.4 1.6-2.4-.8-1.8-2.8-.6v-3.4l2.8-.6.8-1.8-1.6-2.4 2.4-2.4 2.4 1.6 1.8-.8z" fill="url(#gi-steel)" stroke="#4a5866" stroke-linejoin="round"/>
+    <circle cx="12" cy="12" r="3.6" fill="#fff" stroke="#4a5866"/><circle cx="12" cy="12" r="1.8" fill="url(#gi-blue)"/>
+  </symbol>
+
+  <symbol id="i-save" viewBox="0 0 24 24">
+    <path d="M3 15v5.5h18V15" fill="none" stroke="#3d5a73" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M9 2.5h6v7h4l-7 7.5-7-7.5h4z" fill="url(#gi-green)" stroke="#23700f" stroke-linejoin="round"/>
+    <path d="M9.8 3.3h4.4v4" fill="none" stroke="#fff" stroke-opacity=".7"/>
+  </symbol>
+
+  <symbol id="i-open" viewBox="0 0 24 24">
+    <path d="M2 5.5h7l2 2h10.5v12.5H2z" fill="url(#gi-folder)" stroke="#a6740c" stroke-linejoin="round"/>
+    <path d="M2 20l3-9h18.5l-3 9z" fill="#fde49a" stroke="#a6740c" stroke-linejoin="round"/>
+    <path d="M5.6 12h16.6" stroke="#fff" stroke-opacity=".8"/>
+  </symbol>
+
+  <symbol id="i-about" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10.5" fill="url(#gi-blue)" stroke="#0f4a87"/>
+    <ellipse cx="12" cy="7.5" rx="8" ry="5" fill="url(#gi-shine)"/>
+    <circle cx="12" cy="7" r="1.7" fill="#fff"/><path d="M10 10.5h3v7h1.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-logout" viewBox="0 0 24 24">
+    <rect x="3" y="2.5" width="11" height="19" rx="1.5" fill="url(#gi-steel)" stroke="#4a5866"/>
+    <circle cx="11.5" cy="12.5" r="1" fill="#4a5866"/>
+    <path d="M12 12h6.5M16 8.5l4 3.5-4 3.5" fill="none" stroke="#c0391b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-back" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10.5" fill="url(#gi-blue)" stroke="#0f4a87"/>
+    <ellipse cx="12" cy="7.5" rx="8" ry="5" fill="url(#gi-shine)"/>
+    <path d="M17 12H8M11.5 7.5L7 12l4.5 4.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-wiring" viewBox="0 0 24 24">
+    <path d="M3 19c4 0 4-12 9-12s5 8 9 8" fill="none" stroke="#c0391b" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M3 13c3 0 4-7 8-7" fill="none" stroke="#222" stroke-width="2.6" stroke-linecap="round" opacity=".85"/>
+    <rect x="1" y="17.5" width="4" height="4" rx="1" fill="url(#gi-steel)" stroke="#4a5866"/>
+    <rect x="19" y="13" width="4" height="4" rx="1" fill="url(#gi-steel)" stroke="#4a5866"/>
+  </symbol>
+
+  <symbol id="i-run" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10.5" fill="url(#gi-green)" stroke="#23700f"/>
+    <ellipse cx="12" cy="7.5" rx="8" ry="5" fill="url(#gi-shine)"/>
+    <path d="M9.5 7v10l8-5z" fill="#fff" stroke="#1d5e0c" stroke-width=".6" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-upload" viewBox="0 0 24 24">
+    <rect x="4" y="13" width="16" height="9" rx="1.5" fill="#1f4f57" stroke="#0e2f34"/>
+    <path d="M7 13v-2M10 13v-2M14 13v-2M17 13v-2M7 22v2M17 22v2" stroke="#9aa7b0" stroke-width="1.4"/>
+    <circle cx="8" cy="17.5" r="1.3" fill="#19c1ca"/>
+    <path d="M12 1.5l5 5h-3v4h-4v-4H7z" fill="url(#gi-purple)" stroke="#46285a" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-serial" viewBox="0 0 24 24">
+    <rect x="1.5" y="3" width="21" height="18" rx="2" fill="url(#gi-steel)" stroke="#4a5866"/>
+    <rect x="3" y="6.5" width="18" height="13" fill="#0c0c0c"/>
+    <path d="M5 10l3 2.5-3 2.5M10 16h5" fill="none" stroke="#c8f7c0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-download" viewBox="0 0 24 24">
+    <path d="M5 2.5h10l4.5 4.5v14.5H5z" fill="#fff" stroke="#5d6c7c" stroke-linejoin="round"/>
+    <path d="M15 2.5V7h4.5" fill="#e8eef4" stroke="#5d6c7c" stroke-linejoin="round"/>
+    <path d="M10.5 9h3v4.5H16l-4 4.5-4-4.5h2.5z" fill="url(#gi-blue)" stroke="#0f4a87" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-board" viewBox="0 0 24 24">
+    <rect x="2" y="4" width="20" height="16" rx="1.5" fill="#127f86" stroke="#06464b"/>
+    <rect x="8" y="9" width="8" height="6" fill="#222" stroke="#000"/>
+    <path d="M4 6.5h12M4 17.5h16M18 8v5" stroke="#bfe" stroke-width="1" stroke-dasharray="1.4 1.2"/>
+    <rect x="17" y="3" width="4" height="3" fill="url(#gi-steel)" stroke="#4a5866" stroke-width=".7"/>
+    <path d="M3 5h18v4c-6 1-12 1-18 0z" fill="url(#gi-shine)" opacity=".5"/>
+  </symbol>
+
+  <symbol id="i-freeplay" viewBox="0 0 24 24">
+    <path d="M12 1.5l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 15.7l-5.8 3.6 1.6-6.6-5.2-4.4 6.8-.5z" fill="url(#gi-gold)" stroke="#a46b00" stroke-linejoin="round"/>
+    <path d="M20 16.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8zM4 1.5l.6 1.4 1.4.6-1.4.6L4 5.5l-.6-1.4L2 3.5l1.4-.6z" fill="#19c1ca"/>
+  </symbol>
+
+  <symbol id="i-clock" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="#fff" stroke="#5d6c7c" stroke-width="1.6"/>
+    <path d="M12 6v6l4 2.5" fill="none" stroke="#2c3a48" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-parts" viewBox="0 0 24 24">
+    <path d="M7 12V7a5 5 0 0 1 10 0v5z" fill="url(#gi-red)" stroke="#8a1f0c"/>
+    <rect x="5.5" y="12" width="13" height="2.5" rx=".6" fill="#d9472b" stroke="#8a1f0c"/>
+    <path d="M10 14.5V22M14 14.5v5" stroke="#8a96a3" stroke-width="1.6"/>
+    <ellipse cx="10" cy="6.5" rx="1.8" ry="2.6" fill="#fff" opacity=".6"/>
+  </symbol>
+
+  <symbol id="i-check" viewBox="0 0 24 24">
+    <path d="M3.5 12.5l5 5L20.5 5.5" fill="none" stroke="#2a7a1f" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="i-warn" viewBox="0 0 24 24">
+    <path d="M12 2L23 21H1z" fill="url(#gi-gold)" stroke="#9a6400" stroke-linejoin="round"/>
+    <path d="M12 8.5v6" stroke="#222" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17.8" r="1.4" fill="#222"/>
+  </symbol>
+
+  <symbol id="i-error" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10.5" fill="url(#gi-red)" stroke="#8a1f0c"/>
+    <ellipse cx="12" cy="7.5" rx="8" ry="5" fill="url(#gi-shine)" opacity=".7"/>
+    <path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-user" viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4.5" fill="url(#gi-teal)" stroke="#06646a"/>
+    <path d="M3.5 22c0-5 3.8-8 8.5-8s8.5 3 8.5 8z" fill="url(#gi-purple)" stroke="#46285a"/>
+  </symbol>
+
+  <symbol id="i-plus" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10.5" fill="url(#gi-green)" stroke="#23700f"/>
+    <ellipse cx="12" cy="7.5" rx="8" ry="5" fill="url(#gi-shine)"/>
+    <path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="i-wifi" viewBox="0 0 24 24">
+    <path d="M2 9a14 14 0 0 1 20 0M5.5 12.5a9 9 0 0 1 13 0M9 16a4 4 0 0 1 6 0" fill="none" stroke="#0d8fb5" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="12" cy="19.5" r="1.8" fill="#0d8fb5"/>
+  </symbol>
+
+  <symbol id="i-users" viewBox="0 0 24 24">
+    <circle cx="8" cy="8" r="3.6" fill="url(#gi-teal)" stroke="#06646a"/>
+    <circle cx="16.5" cy="9" r="3.2" fill="url(#gi-purple)" stroke="#46285a"/>
+    <path d="M1.5 21c0-4 2.8-7 6.5-7s6.5 3 6.5 7z" fill="url(#gi-teal)" stroke="#06646a"/>
+    <path d="M12 21c.3-3.6 2.2-6 4.5-6 3 0 5.5 2.6 5.5 6z" fill="url(#gi-purple)" stroke="#46285a"/>
+  </symbol>
+</svg>

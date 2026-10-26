@@ -1,0 +1,596 @@
+/*
+ * ArduinoPath theme: Windows Vista (Aero) in the BNTS colours.
+ *
+ * Every colour, gradient, shadow and font lives here as a CSS variable, and
+ * the shared Vista pieces (glass windows, glossy buttons, toolbars, group
+ * boxes, tabs, balloons...) are styled here too. Screen layouts are in app.css.
+ */
+
+:root {
+  /* BNTS colours */
+  --bnts-teal: #19c1ca;
+  --bnts-teal-2: #04bbc1;
+  --bnts-purple: #704988;
+  --bnts-lilac: #cfc2e0;
+
+  /* Type: Segoe UI and Consolas are on every Windows laptop. */
+  --font-ui: "Segoe UI", "Segoe UI Variable Text", Tahoma, Verdana, sans-serif;
+  --font-code: Consolas, "Lucida Console", "Courier New", monospace;
+  --font-size: 13px;          /* about 10pt */
+  --font-size-small: 12px;    /* about 9pt */
+  --font-size-big: 16px;      /* about 12pt: Vista's "main instruction" */
+  --font-size-huge: 24px;
+
+  /* Text */
+  --text: #1b1b1b;
+  --text-muted: #5b5b66;
+  --text-on-glass: #000;
+  --text-glow: 0 0 10px rgba(255, 255, 255, 0.95), 0 0 2px #fff;
+  --instruction: #4b2a63;      /* Vista's blue "main instruction", in BNTS purple */
+  --link: #0a64a8;
+  --good: #2a7a1f;
+  --warn: #9a5b00;
+  --bad: #b3261e;
+
+  /* The desktop behind the windows: an Aero "aurora" in teal and purple */
+  --desktop:
+    radial-gradient(ellipse 80% 60% at 15% 110%, rgba(25, 193, 202, 0.55), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 85% -10%, rgba(207, 194, 224, 0.45), transparent 60%),
+    linear-gradient(160deg, transparent 30%, rgba(255, 255, 255, 0.12) 45%, transparent 46%,
+      transparent 52%, rgba(255, 255, 255, 0.08) 60%, transparent 61%),
+    linear-gradient(135deg, #0c4f63 0%, #1b6f86 30%, #3d4f86 65%, #4e2d66 100%);
+
+  /* Aero glass window frames */
+  --glass: linear-gradient(180deg, rgba(220, 245, 248, 0.78) 0%, rgba(176, 222, 230, 0.62) 28px,
+      rgba(150, 205, 215, 0.55) 60%, rgba(170, 160, 200, 0.55) 100%);
+  --glass-inactive: linear-gradient(180deg, rgba(235, 240, 245, 0.85), rgba(210, 220, 230, 0.8));
+  --glass-blur: blur(12px) saturate(140%);
+  --frame-border: rgba(18, 40, 55, 0.7);
+  --frame-highlight: inset 0 0 0 1px rgba(255, 255, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --window-shadow: 0 12px 38px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --window-radius: 8px;
+  --titlebar-height: 30px;
+
+  /* Toolbars, menu bars and status bars: soft blue-grey */
+  --toolbar: linear-gradient(180deg, #fdfeff 0%, #eef3f9 45%, #dfe8f2 46%, #e9eff7 100%);
+  --toolbar-border: #a7b9cd;
+  --separator-dark: #b9c6d6;
+  --separator-light: #fff;
+  --statusbar: linear-gradient(180deg, #f3f6fa, #dde5ef);
+
+  /* Content panels */
+  --panel: #fff;
+  --panel-frame: linear-gradient(180deg, #f5f8fb, #e7edf4);
+  --panel-border: #b4c3d3;
+  --nav-pane: linear-gradient(90deg, #f1f6fb, #e4edf6);
+  --groupbox-border: #d0d7e0;
+
+  /* Explorer-style hover and selection */
+  --hover-fill: linear-gradient(180deg, #f5fbfe, #e3f4fc);
+  --hover-border: #b8e2f7;
+  --select-fill: linear-gradient(180deg, #e5f6fd, #c5e9fa);
+  --select-border: #6cc2e8;
+
+  /* Ordinary Vista buttons */
+  --button: linear-gradient(180deg, #f2f2f2 0%, #ebebeb 49%, #dddddd 50%, #cfcfcf 100%);
+  --button-hover: linear-gradient(180deg, #eaf6fd 0%, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
+  --button-down: linear-gradient(180deg, #e5f4fc 0%, #c4e5f6 49%, #98d1ef 50%, #68b3db 100%);
+  --button-border: #707070;
+  --button-border-hover: #3c7fb1;
+  --button-border-down: #2c628b;
+
+  /* Glossy BNTS pills (main actions) */
+  --pill: linear-gradient(180deg, #b6f1f4 0%, #59d5dc 45%, #13b3bb 50%, #0aa8b0 75%, #39cbd2 100%);
+  --pill-hover: linear-gradient(180deg, #cff7f9 0%, #78e0e6 45%, #19c1ca 50%, #12b7c0 75%, #5ad9df 100%);
+  --pill-border: #0b7f86;
+  --pill-purple: linear-gradient(180deg, #d9c7e8 0%, #9d77b6 45%, #704988 50%, #63407a 75%, #8d66a6 100%);
+  --pill-purple-border: #4a2c5c;
+  --pill-red: linear-gradient(180deg, #f0b3a3 0%, #db7c62 45%, #c4391b 50%, #b8330f 75%, #d8714f 100%);
+  --pill-red-border: #7d2510;
+  --default-glow: 0 0 6px 2px rgba(25, 193, 202, 0.75);
+
+  /* Text boxes */
+  --input-border: #abadb3 #e2e3ea #e3e9ef #dbdfe6;
+  --input-focus: #3d7bad;
+  --input-focus-glow: 0 0 0 2px rgba(61, 123, 173, 0.18);
+
+  /* Balloon tips */
+  --balloon: linear-gradient(180deg, #ffffff 0%, #fffff2 40%, #fff9d6 100%);
+  --balloon-border: #767676;
+
+  /* Login screen (like Vista's welcome screen) */
+  --logon:
+    radial-gradient(ellipse 120% 70% at 50% 120%, rgba(25, 193, 202, 0.55), transparent 65%),
+    radial-gradient(ellipse 60% 40% at 50% -5%, rgba(207, 194, 224, 0.35), transparent 70%),
+    linear-gradient(180deg, #0b3d50 0%, #145a6e 45%, #2b4d78 75%, #3f2a5c 100%);
+  --tile-frame: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(214, 236, 242, 0.9) 50%,
+      rgba(178, 214, 226, 0.9) 51%, rgba(220, 238, 244, 0.95));
+
+  /* Code editor and Serial Monitor */
+  --editor-bg: #fff;
+  --editor-gutter: #f3f3f6;
+  --editor-gutter-text: #8a8f99;
+  --editor-line: linear-gradient(180deg, rgba(222, 240, 252, 0.7), rgba(200, 228, 248, 0.7));
+  --console-bg: #0c0c0c;
+  --console-text: #c0c0c0;
+
+  /* Project tiers */
+  --tier-getting-started: #3b9b2f;
+  --tier-sensors-sound: #e07b16;
+  --tier-displays-lights: var(--bnts-purple);
+  --tier-games: #d23a6a;
+  --tier-wifi-iot: #0d8fb5;
+  --tier-challenge: #5a5a66;
+}
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: var(--font-size); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  font-size: var(--font-size);
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--desktop) fixed;
+  background-color: #145a6e;
+  -webkit-font-smoothing: auto;
+}
+
+a { color: var(--link); }
+a:hover { color: #3399ff; }
+
+h1, h2, h3 { font-weight: normal; margin: 0 0 0.5em; }
+h1 { font-size: var(--font-size-huge); color: var(--instruction); }
+h2 { font-size: var(--font-size-big); color: var(--instruction); }
+h3 { font-size: var(--font-size); font-weight: 600; }
+
+p { margin: 0 0 0.75em; }
+
+code, kbd, pre, textarea.code { font-family: var(--font-code); }
+
+:focus-visible { outline: 1px dotted #000; outline-offset: 2px; }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.muted { color: var(--text-muted); }
+.small { font-size: var(--font-size-small); }
+
+svg.icon { width: 16px; height: 16px; flex: none; vertical-align: -3px; }
+svg.icon-24 { width: 24px; height: 24px; }
+svg.icon-32 { width: 32px; height: 32px; }
+svg.icon-48 { width: 48px; height: 48px; }
+
+/* ---------- Glass windows ---------- */
+
+.window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--frame-border);
+  border-radius: var(--window-radius) var(--window-radius) 4px 4px;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--frame-highlight), var(--window-shadow);
+  padding: 0 6px 6px;
+}
+
+/* The soft shine across the top of the glass */
+.window::before {
+  content: "";
+  position: absolute;
+  inset: 1px 1px auto 1px;
+  height: 22px;
+  border-radius: var(--window-radius) var(--window-radius) 50% 50% / var(--window-radius) var(--window-radius) 10px 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.05));
+  pointer-events: none;
+}
+
+.titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--titlebar-height);
+  padding: 0 2px 0 4px;
+  color: var(--text-on-glass);
+  text-shadow: var(--text-glow);
+  font-size: var(--font-size);
+  user-select: none;
+}
+
+.titlebar .title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.titlebar .app-icon { width: 18px; height: 18px; }
+
+.caption-buttons { display: flex; align-self: flex-start; margin-top: -1px; }
+
+.caption-close {
+  width: 43px;
+  height: 19px;
+  padding: 0;
+  border: 1px solid var(--pill-red-border);
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+  background: var(--pill-red);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  color: #fff;
+  font: bold 12px/1 var(--font-ui);
+  text-shadow: 0 0 3px rgba(80, 0, 0, 0.9);
+  cursor: pointer;
+}
+.caption-close:hover { filter: brightness(1.12) saturate(1.1); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 0 8px 2px rgba(255, 120, 80, 0.7); }
+.caption-close:active { filter: brightness(0.9); }
+
+.window-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- Dialogs ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(10, 30, 40, 0.35);
+  animation: fade-in 0.15s ease-out;
+}
+
+.dialog {
+  width: min(520px, 100%);
+  max-height: calc(100vh - 32px);
+  animation: dialog-in 0.18s ease-out;
+}
+.dialog.wide { width: min(720px, 100%); }
+.dialog .window-body { overflow: auto; padding: 16px 18px; }
+.dialog .dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 -18px -16px;
+  padding: 11px 12px;
+  border-top: 1px solid #dfdfdf;
+  background: #f0f0f0;
+}
+.dialog .instruction { font-size: var(--font-size-big); color: var(--instruction); margin-bottom: 10px; }
+
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes dialog-in { from { opacity: 0; transform: scale(0.96); } }
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 75px;
+  min-height: 23px;
+  padding: 2px 12px;
+  border: 1px solid var(--button-border);
+  border-radius: 3px;
+  background: var(--button);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.btn:hover:not(:disabled) { border-color: var(--button-border-hover); background: var(--button-hover); }
+.btn:active:not(:disabled) { border-color: var(--button-border-down); background: var(--button-down); box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.25); }
+.btn:disabled { color: #8d8d8d; border-color: #adb2b5; background: #f4f4f4; box-shadow: none; cursor: default; }
+
+/* The default button glows gently, like Vista's */
+.btn.default { border-color: #3c7fb1; animation: default-pulse 1.6s ease-in-out infinite alternate; }
+.btn.danger:not(:disabled) {
+  border-color: #8f1d1d;
+  background: linear-gradient(180deg, #f6a3a3 0%, #e05b5b 45%, #c53030 50%, #d94848 100%);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+.btn.danger:hover:not(:disabled) { border-color: #6f1414; background: linear-gradient(180deg, #f8b6b6 0%, #e86c6c 45%, #d03a3a 50%, #e25555 100%); }
+@keyframes default-pulse {
+  from { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 0 0 rgba(60, 127, 177, 0); }
+  to { box-shadow: inset 0 0 0 1px #9fd5f7, 0 0 4px 1px rgba(60, 160, 220, 0.55); }
+}
+
+/* Glossy pills for the big actions */
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 22px;
+  border: 1px solid var(--pill-border);
+  border-radius: 999px;
+  background: var(--pill);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font: 600 var(--font-size)/1.2 var(--font-ui);
+  text-shadow: 0 1px 2px rgba(0, 60, 70, 0.8);
+  cursor: pointer;
+  transition: box-shadow 0.15s, filter 0.15s;
+}
+.pill:hover:not(:disabled) { background: var(--pill-hover); box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 0 10px 2px rgba(25, 193, 202, 0.6); }
+.pill:active:not(:disabled) { filter: brightness(0.9); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35); }
+.pill:disabled { filter: grayscale(1) opacity(0.55); cursor: default; }
+.pill.purple { border-color: var(--pill-purple-border); background: var(--pill-purple); text-shadow: 0 1px 2px rgba(40, 10, 60, 0.8); }
+.pill.purple:hover:not(:disabled) { box-shadow: inset 0 1px 0 #fff, 0 0 10px 2px rgba(150, 100, 190, 0.6); }
+.pill.big { min-height: 40px; padding: 6px 30px; font-size: 15px; }
+.pill.default { animation: pill-pulse 1.6s ease-in-out infinite alternate; }
+@keyframes pill-pulse {
+  from { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 3px rgba(0, 0, 0, 0.3); }
+  to { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 12px 3px rgba(25, 193, 202, 0.65); }
+}
+
+/* Round "orb" buttons */
+.orb {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(0, 40, 50, 0.7);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 22%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(circle at 50% 75%, #5fe0e6, #0e9aa2 60%, #075f66);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+}
+.orb:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 14px 4px rgba(25, 193, 202, 0.7); }
+.orb:active { filter: brightness(0.88); }
+.orb svg { width: 22px; height: 22px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)); }
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- Toolbars and status bars ---------- */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-height: 34px;
+  padding: 3px 6px;
+  border: 1px solid var(--toolbar-border);
+  border-bottom-color: #8fa5bd;
+  border-radius: 3px 3px 0 0;
+  background: var(--toolbar);
+  box-shadow: inset 0 1px 0 #fff;
+}
+.toolbar .spacer { flex: 1; }
+.toolbar .separator {
+  width: 2px;
+  height: 22px;
+  margin: 0 4px;
+  border-left: 1px solid var(--separator-dark);
+  border-right: 1px solid var(--separator-light);
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tool:hover:not(:disabled) { border-color: #a8c8e6; background: linear-gradient(180deg, #fbfdff, #e6f1fb 49%, #d4e7f8 50%, #e5f1fc); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8); }
+.tool:active:not(:disabled), .tool[aria-pressed="true"] { border-color: #7aa3c8; background: linear-gradient(180deg, #d9e8f6, #c3dbf1); box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.18); }
+.tool:disabled { color: #8d8d8d; cursor: default; }
+.tool:disabled svg { filter: grayscale(1) opacity(0.5); }
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 24px;
+  padding: 2px 10px;
+  border: 1px solid var(--toolbar-border);
+  border-top-color: #c5d2e0;
+  border-radius: 0 0 3px 3px;
+  background: var(--statusbar);
+  color: #333;
+  font-size: var(--font-size-small);
+}
+.statusbar .cell { display: inline-flex; align-items: center; gap: 5px; }
+.statusbar .cell + .cell { padding-left: 14px; border-left: 1px solid var(--separator-dark); box-shadow: -1px 0 0 #fff; }
+.statusbar .grow { flex: 1; }
+
+/* ---------- Group boxes, tabs, fields ---------- */
+
+.groupbox {
+  margin: 0 0 14px;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--groupbox-border);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px #fff, 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+.groupbox > legend { padding: 0 4px; color: var(--instruction); }
+
+.tabs { display: flex; gap: 0; padding-left: 4px; margin-bottom: -1px; position: relative; z-index: 1; }
+.tab {
+  margin-right: -1px;
+  padding: 3px 12px;
+  border: 1px solid #898c95;
+  border-bottom-color: #898c95;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #f2f2f2, #ebebeb 49%, #dddddd 50%, #cfcfcf);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.tab:hover { background: var(--button-hover); border-color: #3c7fb1; }
+.tab[aria-selected="true"] {
+  position: relative;
+  padding-top: 5px;
+  margin-top: -2px;
+  border-bottom-color: #fff;
+  background: #fff;
+}
+.tab-panel { padding: 14px; border: 1px solid #898c95; background: #fff; }
+
+.field { display: grid; gap: 4px; margin-bottom: 12px; }
+.field > label, .field > .label { font-weight: 600; }
+
+.input, select.input, textarea.input {
+  width: 100%;
+  min-height: 25px;
+  padding: 3px 6px;
+  border: 1px solid;
+  border-color: var(--input-border);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:hover { border-color: #5794bf #b7d5ea #c7e2f1 #c5daed; }
+.input:focus { outline: none; border-color: var(--input-focus); box-shadow: var(--input-focus-glow); }
+.input.big { min-height: 32px; font-size: 15px; }
+
+input[type="checkbox"], input[type="radio"] { accent-color: var(--bnts-teal-2); width: 14px; height: 14px; }
+
+.check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+
+/* Explorer-like hover and selection for list items and option cards */
+.selectable {
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+.selectable:hover { border-color: var(--hover-border); background: var(--hover-fill); }
+.selectable[aria-checked="true"], .selectable[aria-selected="true"], .selectable.selected {
+  border-color: var(--select-border);
+  background: var(--select-fill);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- Badges, notes, balloons ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px 1px 7px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.06) 51%), var(--badge, #777);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+}
+
+.tier-getting-started { --badge: var(--tier-getting-started); }
+.tier-sensors-sound { --badge: var(--tier-sensors-sound); }
+.tier-displays-lights { --badge: var(--tier-displays-lights); }
+.tier-games { --badge: var(--tier-games); }
+.tier-wifi-iot { --badge: var(--tier-wifi-iot); }
+.tier-challenge { --badge: var(--tier-challenge); }
+
+.note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border: 1px solid #e4d9a0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fffef4, #fff8d8);
+}
+.note.info { border-color: #a9cfe9; background: linear-gradient(180deg, #f6fbff, #e3f1fb); }
+.note.error { border-color: #e7a9a1; background: linear-gradient(180deg, #fff8f6, #fde6e2); }
+.note.safety { border-color: #e9b46b; background: linear-gradient(180deg, #fffaf1, #fdebd0); }
+
+.balloon {
+  position: absolute;
+  z-index: 50;
+  max-width: 300px;
+  padding: 9px 12px 10px;
+  border: 1px solid var(--balloon-border);
+  border-radius: 8px;
+  background: var(--balloon);
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.35);
+  font-size: var(--font-size-small);
+  animation: fade-in 0.2s ease-out;
+}
+.balloon::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 22px;
+  width: 14px;
+  height: 14px;
+  border-left: 1px solid var(--balloon-border);
+  border-top: 1px solid var(--balloon-border);
+  background: #fff;
+  transform: rotate(45deg) skew(10deg, 10deg);
+}
+.balloon .balloon-title { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-weight: 600; }
+
+/* Vista's green progress bar */
+.progress {
+  height: 14px;
+  border: 1px solid #b2b2b2;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #f3f3f3, #e0e0e0);
+  overflow: hidden;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(180deg, #c4f2b0 0%, #61d33b 45%, #3db31d 50%, #57c837 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+/* The BNTS pixel squares, in a corner of the big screens */
+.bnts-pixels {
+  position: fixed;
+  right: 18px;
+  bottom: 14px;
+  width: 64px;
+  height: 64px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
