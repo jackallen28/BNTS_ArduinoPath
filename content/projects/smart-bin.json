@@ -65,8 +65,8 @@
         "type": "servo",
         "label": "lid servo",
         "offboard": {
-          "x": 350,
-          "y": -115
+          "x": 230,
+          "y": -130
         },
         "step": 2
       },
@@ -354,7 +354,7 @@
       "support": "brief",
       "starter_mode": "replace",
       "starter": "{{pins}}\n#include <Servo.h>\n\nServo lid;\n\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n  lid.attach(SERVO_PIN);\n  lid.write(90);   // start with the lid closed\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < 30) {   // a hand is close\n    // Turn the LED on here\n    lid.write(0);    // open\n    delay(5000);     // stay open for 5 seconds\n    lid.write(90);   // close\n    // Turn the LED off here\n    delay(1000);\n  }\n  delay(100);\n}\n",
-      "text": "**Goal:** the LED lights up while the lid is open, and goes off when it closes.\n\nThe LED's pin is already set up in `setup()`. Use `digitalWrite` where the comments are.",
+      "text": "**Goal:** the LED lights up while the lid is open, and goes off when it closes.\n\nThe LED's pin is already set up in `setup()`. Turn `LED_PIN` **HIGH** just before the lid opens, and **LOW** just after it closes. (In Text, the comments show where. In Blocks, look in **Pins**.)",
       "hints": [
         "`digitalWrite(LED_PIN, HIGH);` turns the LED on.",
         "Put the HIGH line before the lid opens, and a LOW line after it closes.",
