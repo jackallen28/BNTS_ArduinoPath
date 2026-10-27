@@ -19,7 +19,7 @@ for (const [, path, contentType, symbol] of header.matchAll(/\{"([^"]+)", "([^"]
   assert.ok(!assets.has(path), `asset route is unique: ${path}`);
   assets.set(path, { contentType, body: payloads.get(symbol) });
 }
-assert.equal(assets.size, 16, 'all embedded dashboard routes are present');
+assert.equal(assets.size, 18, 'all embedded dashboard routes are present');
 assert.deepEqual(assets.get('/').body, assets.get('/index.html').body, 'both index routes serve the same bytes');
 assert.match(assets.get('/app.js').contentType, /javascript/);
 assert.match(assets.get('/monitor.css').contentType, /text\/css/);
@@ -70,14 +70,16 @@ try {
   assert.equal(await page.locator('#percentage').textContent(), '42%');
   assert.equal(await page.locator('#fill').isDisabled(), true);
   assert.equal(await page.evaluate(() => window.usbRequests), 0);
-  const initialHeight = await page.locator('.fill').evaluate(el => parseFloat(getComputedStyle(el).height));
+  await page.waitForFunction(()=>document.querySelector('.bin').dataset.mediaReady==='true' && Number(document.querySelector('.bin').dataset.fillLevel)===42);
+  const initialCount=Number(await page.locator('.bin').getAttribute('data-paper-count'));
   reading = { fill: 82, lidOpen: true, sensorOk: true, ageMs: 0 };
   await page.waitForFunction(() => document.querySelector('#percentage').textContent === '82%');
   assert.equal(await page.locator('.bin').evaluate(el => el.classList.contains('open')), true);
   await page.waitForTimeout(1000);
   await page.waitForFunction(()=>document.querySelector('.bin').dataset.mediaReady==='true');
   assert.ok(Number(await page.locator('.bin').getAttribute('data-frame')) > 0, 'source animation follows the open command');
-  assert.ok(await page.locator('.fill').evaluate(el => parseFloat(getComputedStyle(el).height)) > initialHeight, 'fill graphic follows live telemetry');
+  await page.waitForFunction(()=>Number(document.querySelector('.bin').dataset.fillLevel)===82);
+  assert.ok(Number(await page.locator('.bin').getAttribute('data-paper-count'))>initialCount,'in-bin paper pile follows live telemetry');
   assert.match(await page.locator('.bin').getAttribute('data-source'),/User-supplied/);
 
   // Failed distance sensor keeps the last valid fill but must still animate lid.

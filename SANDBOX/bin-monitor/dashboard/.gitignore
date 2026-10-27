@@ -9,3 +9,9 @@ dashboard-closed.png
 dashboard-mobile.png
 lid-animation.gif
 __pycache__/
+
+.paper-fill-frames/
+paper-empty.png
+paper-half.png
+paper-full.png
+fill-animation.gif

@@ -12,6 +12,8 @@ ASSETS = [
     ('/app.js', 'app.js', 'text/javascript; charset=utf-8'),
     ('/model.js', 'model.js', 'text/javascript; charset=utf-8'),
     ('/bin-view.js', 'bin-view.js', 'text/javascript; charset=utf-8'),
+    ('/paper-fill.js', 'paper-fill.js', 'text/javascript; charset=utf-8'),
+    ('/assets/crumpled-paper.webp', 'assets/crumpled-paper.webp', 'image/webp'),
     ('/bin-view.css', 'bin-view.css', 'text/css; charset=utf-8'),
     ('/assets/bin-source-frames.json', 'assets/bin-source-frames.json', 'application/json'),
     ('/assets/bin-source-frames.webp', 'assets/bin-source-frames.webp', 'image/webp'),

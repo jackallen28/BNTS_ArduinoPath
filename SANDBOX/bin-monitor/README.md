@@ -21,17 +21,21 @@ The existing Uno pins stay D2 closure button (active HIGH), D3 servo, D7 Grove a
 
 ## Your model animation
 
-The dashboard uses actual frames from the user-supplied CAD opening video, not a replacement drawing or generated model. Opening plays those frames forward and holds the last frame; closing reverses the same frames and holds the first. It can reverse direction part-way through. The source MP4 is retained in `dashboard/assets/source/` with its checksum in the frame manifest. Inline GIF messages did not expose a downloadable original GIF; the tooling also accepts a source GIF when that file is available.
+The dashboard uses actual frames from the user-supplied CAD opening video, not a replacement drawing or generated model. Opening plays those frames forward and holds the last frame; closing reverses the same frames and holds the first. It can reverse direction part-way through. The timber panels are now translucent, with scrunched paper balls rising inside the bin as the live Uno fill reading increases. The external gauge is removed; the original frame, servo and lid stay opaque. The pile is a capacity illustration rather than a measured paper-ball count. The source MP4 is retained in `dashboard/assets/source/` with its checksum in the frame manifest. Inline GIF messages did not expose a downloadable original GIF; the tooling also accepts a source GIF when that file is available.
 
 ![Supplied model opening and reversing to close](lid-animation.gif)
 
-[Open animation](lid-animation.gif)
+[Open lid animation](lid-animation.gif) · [Watch the bin fill with paper](fill-animation.gif)
+
+![Paper filling the translucent bin](fill-animation.gif)
 
 ## Dashboard preview
 
 These are actual browser captures with simulation inputs, not proof of hardware connectivity.
 
 ![Dashboard using the supplied bin model](dashboard.png)
+
+[Empty bin](paper-empty.png) · [Half-full bin](paper-half.png) · [Full bin](paper-full.png)
 
 [Open image](dashboard.png) · [Closed image](dashboard-closed.png) · [Mobile layout](dashboard-mobile.png)
 
