@@ -1,0 +1,432 @@
+{
+  "$schema": "../schema/project.schema.json",
+  "id": "smart-bin",
+  "title": "Smart Bin",
+  "tier": "getting-started",
+  "order": 4,
+  "boards": [
+    "all"
+  ],
+  "parts": [
+    {
+      "type": "hc-sr04"
+    },
+    {
+      "type": "servo"
+    },
+    {
+      "type": "led"
+    },
+    {
+      "type": "resistor-220"
+    },
+    {
+      "type": "resistor-10k",
+      "count": 2,
+      "note": "only for 3.3V boards"
+    }
+  ],
+  "minutes": 60,
+  "concepts": [
+    "servo",
+    "distance sensor",
+    "if"
+  ],
+  "intro": "Build a bin that opens its lid by itself when a hand comes close: no touching!",
+  "circuit": {
+    "breadboard": "half",
+    "parts": [
+      {
+        "id": "sonar",
+        "type": "hc-sr04",
+        "label": "distance sensor",
+        "at": "J20",
+        "step": 1
+      },
+      {
+        "id": "div1",
+        "type": "resistor-10k",
+        "label": "10kΩ",
+        "at": "E22",
+        "rotate": 270,
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "id": "div2",
+        "type": "resistor-10k",
+        "label": "10kΩ",
+        "at": "D22",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "id": "servo",
+        "type": "servo",
+        "label": "lid servo",
+        "offboard": {
+          "x": 350,
+          "y": -115
+        },
+        "step": 2
+      },
+      {
+        "id": "led",
+        "type": "led",
+        "color": "green",
+        "label": "LED",
+        "at": "H2",
+        "step": 3
+      },
+      {
+        "id": "r-led",
+        "type": "resistor-220",
+        "label": "220Ω",
+        "at": "E2",
+        "rotate": 270,
+        "step": 3
+      }
+    ],
+    "wires": [
+      {
+        "from": "board:GND",
+        "to": "BN1",
+        "step": 1
+      },
+      {
+        "from": "board:VCC",
+        "to": "BP1",
+        "step": 1
+      },
+      {
+        "from": "F20",
+        "to": "BP17",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "F20",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "pin:TRIG_PIN",
+        "to": "G21",
+        "step": 1
+      },
+      {
+        "from": "pin:ECHO_PIN",
+        "to": "H22",
+        "when": "5v",
+        "step": 1
+      },
+      {
+        "from": "F23",
+        "to": "BN20",
+        "step": 1
+      },
+      {
+        "from": "pin:ECHO_PIN",
+        "to": "C22",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "A26",
+        "to": "BN22",
+        "when": "3v3",
+        "step": 1
+      },
+      {
+        "from": "part:servo:signal",
+        "to": "pin:SERVO_PIN",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "BP15",
+        "when": "5v",
+        "step": 2
+      },
+      {
+        "from": "part:servo:power",
+        "to": "board:5V",
+        "when": "3v3",
+        "step": 2
+      },
+      {
+        "from": "part:servo:gnd",
+        "to": "BN18",
+        "step": 2
+      },
+      {
+        "from": "pin:LED_PIN",
+        "to": "J3",
+        "step": 3
+      },
+      {
+        "from": "A2",
+        "to": "BN2",
+        "step": 3
+      }
+    ]
+  },
+  "wiring_steps": [
+    {
+      "title": "The distance sensor",
+      "text": "Unplug the USB cable before you change any wires. Plug it back in when you're done. Start with the power rails: a black wire from GND on your board to the blue (−) rail at the bottom of the breadboard, and a red wire from {{VCC}} to the red (+) rail. Push the distance sensor's four pins into J20 to J23, facing out from the breadboard. Wire {{pin:TRIG_PIN}} to G21 (Trig) and a black wire from F23 (Gnd) to the blue (−) rail. The sensor needs 5V: on a 5V board a red wire goes from F20 to the red (+) rail, and Echo goes straight to {{pin:ECHO_PIN}} from H22. ⚠ On an ESP board, the red wire goes from F20 to {{5V}}, and Echo's 5V would hurt the pin, so it goes through two 10kΩ resistors that halve it: one from G22 across the gap to E22, one from D22 to D26, a black wire from A26 to the blue (−) rail, and a wire from C22 to {{pin:ECHO_PIN}}."
+    },
+    {
+      "title": "The lid servo",
+      "text": "The servo is the motor that lifts the lid. Plug three wires into its plug. Brown (or black) goes to the blue (−) rail, orange (or yellow) goes to {{pin:SERVO_PIN}}, and red is power. This part needs 5V. On a 5V board (Uno, Nano, Mega) it uses the red (+) rail. On an ESP board the rail is only 3.3V, so its red wire goes straight to {{5V}} on the board."
+    },
+    {
+      "title": "The LED",
+      "text": "The LED shows when the lid is open. Push it into holes H2 and H3, with the long leg (+) in H3. Put a 220Ω resistor from G2 across the gap to E2. Add a wire from {{pin:LED_PIN}} to J3, and a black wire from A2 to the blue (−) rail at the bottom."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Move the lid",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Servo.h>\n\nServo lid;  // the motor that lifts the bin's lid\n\nvoid setup() {\n  lid.attach(SERVO_PIN);\n}\n\nvoid loop() {\n  lid.write(0);    // open\n  delay(2000);     // wait 2 seconds\n  lid.write(___);   // closed\n  delay(2000);\n}\n",
+      "text": "A servo is a motor that turns to the angle you ask for, from 0° to 180°. On the bin, **0°** lifts the lid open and **90°** puts it down.\n\n`lid.write(0)` opens the lid. **Your task:** fill in the blank so the lid closes again, then press **Run**.",
+      "hints": [
+        "The lid is closed at 90°.",
+        "The blank is the angle for closed.",
+        "Type `90` in the blank."
+      ],
+      "checks": [
+        {
+          "type": "compiles",
+          "label": "Your code has no clues (errors)"
+        },
+        {
+          "type": "servo_angle",
+          "label": "The lid opens (0°)",
+          "pin": "SERVO_PIN",
+          "angle": 0,
+          "tolerance": 3
+        },
+        {
+          "type": "servo_angle",
+          "label": "The lid closes (90°)",
+          "pin": "SERVO_PIN",
+          "angle": 90,
+          "tolerance": 3
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the lid open and close"
+        }
+      ],
+      "success": "Your bin can open and close its lid. Now it needs to know when to do it.",
+      "demo": "{{pins}}\n#include <Servo.h>\n\nServo lid;  // the motor that lifts the bin's lid\n\nvoid setup() {\n  lid.attach(SERVO_PIN);\n}\n\nvoid loop() {\n  lid.write(0);    // open\n  delay(2000);     // wait 2 seconds\n  lid.write(90);   // closed\n  delay(2000);\n}\n",
+      "sim_ms": 4500
+    },
+    {
+      "title": "Measure the distance",
+      "support": "guided",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  Serial.print(___);\n  Serial.println(\" cm\");\n  delay(300);\n}\n",
+      "text": "The distance sensor works like a bat: it sends a squeak too high for us to hear, and times how long the echo takes to come back.\n\nThe `measureCm()` function does the measuring, and saves the answer in `cm`. **Your task:** fill in the blank so the Serial Monitor shows `cm`, then Run and move your hand towards the sensor. (In the simulator, drag the distance slider.)",
+      "hints": [
+        "You want to print the distance.",
+        "The distance is saved in a variable called `cm`.",
+        "Type `cm` in the blank."
+      ],
+      "checks": [
+        {
+          "type": "serial_contains",
+          "label": "It measures 80 cm",
+          "text": "80 cm"
+        },
+        {
+          "type": "serial_contains",
+          "label": "It measures 10 cm",
+          "text": "10 cm"
+        },
+        {
+          "type": "confirm",
+          "label": "The distance changes when I move my hand"
+        }
+      ],
+      "success": "Your bin can measure how far away your hand is, with sound!",
+      "demo": "{{pins}}\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  Serial.begin(9600);\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  Serial.print(cm);\n  Serial.println(\" cm\");\n  delay(300);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 1740
+            }
+          }
+        },
+        {
+          "at_ms": 2000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        }
+      ],
+      "sim_ms": 3000
+    },
+    {
+      "title": "Open for a hand",
+      "support": "scaffolded",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Servo.h>\n\nServo lid;\n\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  lid.attach(SERVO_PIN);\n  lid.write(90);   // start with the lid closed\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < ___) {   // a hand is close\n    lid.write(0);    // open\n    delay(5000);     // stay open for 5 seconds\n    lid.write(90);   // close\n    delay(1000);\n  }\n  delay(100);\n}\n",
+      "text": "Now join them up. The bin measures, and **if** a hand is close it opens the lid, waits 5 seconds and closes it.\n\n**Your task:** fill in the blank so the lid opens when a hand is closer than **30 cm**.",
+      "hints": [
+        "How close should a hand be? 30 cm is about a ruler away.",
+        "`cm < 30` means \"closer than 30 cm\".",
+        "Type `30` in the blank."
+      ],
+      "checks": [
+        {
+          "type": "servo_angle",
+          "label": "The lid starts closed (90°)",
+          "pin": "SERVO_PIN",
+          "angle": 90,
+          "tolerance": 3
+        },
+        {
+          "type": "servo_angle",
+          "label": "A hand opens the lid (0°)",
+          "pin": "SERVO_PIN",
+          "angle": 0,
+          "tolerance": 3
+        },
+        {
+          "type": "code_regex",
+          "label": "It opens for a hand closer than 30 cm",
+          "pattern": "cm\\s*<\\s*30\\b"
+        },
+        {
+          "type": "confirm",
+          "label": "The lid opened when my hand came close"
+        }
+      ],
+      "success": "A hands-free bin! It decides for itself with **if**.",
+      "demo": "{{pins}}\n#include <Servo.h>\n\nServo lid;\n\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  lid.attach(SERVO_PIN);\n  lid.write(90);   // start with the lid closed\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < 30) {   // a hand is close\n    lid.write(0);    // open\n    delay(5000);     // stay open for 5 seconds\n    lid.write(90);   // close\n    delay(1000);\n  }\n  delay(100);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        },
+        {
+          "at_ms": 1500,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        }
+      ],
+      "sim_ms": 7500
+    },
+    {
+      "title": "Light while it's open",
+      "support": "brief",
+      "starter_mode": "replace",
+      "starter": "{{pins}}\n#include <Servo.h>\n\nServo lid;\n\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n  lid.attach(SERVO_PIN);\n  lid.write(90);   // start with the lid closed\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < 30) {   // a hand is close\n    // Turn the LED on here\n    lid.write(0);    // open\n    delay(5000);     // stay open for 5 seconds\n    lid.write(90);   // close\n    // Turn the LED off here\n    delay(1000);\n  }\n  delay(100);\n}\n",
+      "text": "**Goal:** the LED lights up while the lid is open, and goes off when it closes.\n\nThe LED's pin is already set up in `setup()`. Use `digitalWrite` where the comments are.",
+      "hints": [
+        "`digitalWrite(LED_PIN, HIGH);` turns the LED on.",
+        "Put the HIGH line before the lid opens, and a LOW line after it closes.",
+        "`digitalWrite(LED_PIN, LOW);` turns it off."
+      ],
+      "checks": [
+        {
+          "type": "pin_seen",
+          "label": "The LED turns on",
+          "pin": "LED_PIN",
+          "value": "HIGH",
+          "times": 1
+        },
+        {
+          "type": "pin_seen",
+          "label": "The LED turns off",
+          "pin": "LED_PIN",
+          "value": "LOW",
+          "times": 1
+        },
+        {
+          "type": "servo_angle",
+          "label": "The lid still opens",
+          "pin": "SERVO_PIN",
+          "angle": 0,
+          "tolerance": 3
+        },
+        {
+          "type": "confirm",
+          "label": "I saw the LED light up while the lid was open"
+        }
+      ],
+      "success": "Your smart bin opens for a hand and shows when it's open. Well done!",
+      "demo": "{{pins}}\n#include <Servo.h>\n\nServo lid;\n\nvoid setup() {\n  pinMode(TRIG_PIN, OUTPUT);\n  pinMode(ECHO_PIN, INPUT);\n  pinMode(LED_PIN, OUTPUT);\n  lid.attach(SERVO_PIN);\n  lid.write(90);   // start with the lid closed\n}\n\nlong measureCm() {\n  // Send a 10 microsecond ping...\n  digitalWrite(TRIG_PIN, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG_PIN, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG_PIN, LOW);\n  // ...and time how long the echo takes to come back.\n  long duration = pulseIn(ECHO_PIN, HIGH, 30000);\n  return duration / 58;  // sound travels 1 cm there and back in about 58 microseconds\n}\n\nvoid loop() {\n  long cm = measureCm();\n  if (cm > 0 && cm < 30) {   // a hand is close\n    digitalWrite(LED_PIN, HIGH);  // light on\n    lid.write(0);    // open\n    delay(5000);     // stay open for 5 seconds\n    lid.write(90);   // close\n    digitalWrite(LED_PIN, LOW);   // light off\n    delay(1000);\n  }\n  delay(100);\n}\n",
+      "sim_events": [
+        {
+          "at_ms": 0,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        },
+        {
+          "at_ms": 1000,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 580
+            }
+          }
+        },
+        {
+          "at_ms": 1500,
+          "set": {
+            "pulse": {
+              "ECHO_PIN": 4640
+            }
+          }
+        }
+      ],
+      "sim_ms": 7500
+    }
+  ],
+  "curriculum": [
+    "78-hardware",
+    "78-algorithms",
+    "78-programming"
+  ],
+  "outro": "You built a hands-free bin: a **distance sensor** to notice a hand, an **if** to decide, and a **servo** to lift the lid.",
+  "stretch": [
+    "Make the lid stay open while the hand is still there, and close 5 seconds after it goes.",
+    "Change the LED to blink while the lid is moving.",
+    "Add a buzzer that beeps when the lid opens."
+  ]
+}

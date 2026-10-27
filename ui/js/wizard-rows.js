@@ -6,6 +6,7 @@
 // tick themselves when a reading arrives that shows the student did the thing.
 
 import { parseTestLine } from "./wiring-test.js";
+import { activeItems } from "./circuit/netlist.js";
 
 /** Likely causes when a part doesn't work, for the wizard's Fix it screen. */
 export const FIXES = {
@@ -118,10 +119,11 @@ export class TestRows {
  * partsOnly (Free Play's mini wizard) keeps just those parts and their steps.
  * @returns {{kind: "meet"|"wire"|"test", type?, step?, title}[]}
  */
-export function wizardPages(project, partsOnly = null) {
+export function wizardPages(project, partsOnly = null, board = null) {
   const circuit = project?.circuit || { parts: [], wires: [] };
   const keep = (p) => !partsOnly || partsOnly.includes(p.id);
-  const parts = circuit.parts.filter(keep);
+  // With a board, only the parts it uses (no 3.3V-only resistors on an Uno).
+  const parts = (board ? activeItems(circuit, board).parts : circuit.parts).filter(keep);
   const pages = [];
   const types = [];
   for (const p of parts) if (!types.includes(p.type)) types.push(p.type);

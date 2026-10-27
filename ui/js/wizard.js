@@ -49,7 +49,7 @@ export async function saveWiringDone(projectId) {
 export function openWiringWizard({ project, board, pins, onDone = () => {}, onClose = () => {}, partsOnly = null, save = saveWiringDone, names = null }) {
   const resolve = typeof pins === "function" ? pins : defaultResolvePin(board, pins || pinOverrides(project.pins, board));
   const circuit = project.circuit || { breadboard: "none", parts: [], wires: [] };
-  const pages = wizardPages(project, partsOnly);
+  const pages = wizardPages(project, partsOnly, board);
   let at = 0, done = false, cleanup = [], fixFor = null, catalogue = null, info = names;
   let showAll = false, schematic = false, mode = "sim";
   let rows = null, rp = null, serial = null, testRunning = false;

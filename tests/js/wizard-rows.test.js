@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TestRows, wizardPages, FIXES } from "../../ui/js/wizard-rows.js";
 import { KIND } from "../../ui/js/wiring-test.js";
-import { projects } from "./circuit/helpers.js";
+import { projects, boards } from "./circuit/helpers.js";
 
 const rows = () => new TestRows([
   { id: "red", label: "red LED", type: "led", kind: "output" },
@@ -45,4 +45,12 @@ test("pages: meet each kind of part, each wiring step, then the test", () => {
 
 test("every testable part type has fix-it tips", () => {
   for (const type of Object.keys(KIND)) assert.ok(FIXES[type]?.length, type);
+});
+
+test("pages: a 5V board doesn't meet the parts only 3.3V boards need", () => {
+  const bin = projects().find((p) => p.id === "smart-bin");
+  const board = (id) => boards().find((b) => b.id === id);
+  const meets = (b) => wizardPages(bin, null, b).filter((x) => x.kind === "meet").map((x) => x.type);
+  assert.deepEqual(meets(board("uno")), ["hc-sr04", "servo", "led", "resistor-220"]);
+  assert.ok(meets(board("nodemcu")).includes("resistor-10k"));
 });
