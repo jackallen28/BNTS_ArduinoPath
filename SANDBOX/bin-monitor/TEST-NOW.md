@@ -30,10 +30,11 @@ Test in this order: each step checks one thing, so a problem shows up where it s
 
 **Flash it**, either way:
 
-- **In Chrome or Edge, no installing:** go to https://espressif.github.io/esptool-js/, press **Connect** and
-  pick the C3's port. If no port appears, hold the **BOOT** button while plugging the C3 in. Set
-  **Flash Address** to `0x0`, choose `esp32_c3_wifi_bridge-flash-at-0x0.bin`, and press **Program**. When
-  it finishes, press the C3's **RESET** button (or unplug it and plug it back in).
+- **In Chrome or Edge, no installing:** go to https://espressif.github.io/esptool-js/. Set **Baudrate**
+  to `115200`, press **Connect** and pick the C3's port. If no port appears, hold the **BOOT** button
+  while plugging the C3 in. Press **Erase Flash** and wait for it to finish. Then set **Flash Address**
+  to `0x0`, choose `esp32_c3_wifi_bridge-flash-at-0x0.bin`, and press **Program**. When it finishes,
+  press the C3's **RESET** button (or unplug it and plug it back in).
 - **Arduino IDE** (with Espressif's *esp32* boards package installed): open
   `firmware/esp32_c3_wifi_bridge/esp32_c3_wifi_bridge.ino`. Choose board **ESP32C3 Dev Module**, set
   **USB CDC On Boot: Enabled** and **Partition Scheme: Huge APP (3MB No OTA)**, then upload.
@@ -72,6 +73,7 @@ cables is fine).
 | ArduinoPath / IDE upload to the Uno fails | Unplug the wire on D1, upload, then plug it back in. |
 | The lid sweeps but never stops (LED stays on, then 90°) | The closed button on D2: it must read HIGH when the lid is shut (a 10k pull-down to GND, button to 5 V). |
 | No `@{...}` lines from the Uno | The Serial Monitor speed must be **115200**. |
+| Web flasher: "Failed to leave compressed flash mode" (status 196) | Writing to the C3's flash failed. Unplug the C3, hold **BOOT** while plugging it back in, press **Connect** at 115200, **Erase Flash**, then **Program** again. Use a short data cable straight into the computer (no hub). |
 | No Wi-Fi network | The C3's Serial Monitor: "Wi-Fi FAILED" means press RESET; nothing at all means flash it again. |
 | The page won't open | Stay joined to BNTS-Bin-Monitor, mobile data off, and type `http://192.168.4.1` exactly. |
 | C3 says "Nothing on GPIO4" | The D1 → 2.2k → GPIO4 wire, and the shared GND. Is the Uno powered and running? |

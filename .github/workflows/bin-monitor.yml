@@ -71,7 +71,15 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/flash"
           cp "$RUNNER_TEMP"/out/uno/uno_bin_controller.ino.hex "$RUNNER_TEMP/flash/uno_bin_controller.hex"
-          cp "$RUNNER_TEMP"/out/c3/esp32_c3_wifi_bridge.ino.merged.bin "$RUNNER_TEMP/flash/esp32_c3_wifi_bridge-flash-at-0x0.bin"
+          # The merged image is padded with blank (0xFF) bytes to the full 4 MB. Writing all of it
+          # makes the web flasher slow and can fail at the end, so drop the blank tail.
+          python3 - "$RUNNER_TEMP/out/c3/esp32_c3_wifi_bridge.ino.merged.bin" "$RUNNER_TEMP/flash/esp32_c3_wifi_bridge-flash-at-0x0.bin" <<'PY'
+          import sys
+          data = open(sys.argv[1], "rb").read().rstrip(b"\xff")
+          data += b"\xff" * (-len(data) % 4096)
+          open(sys.argv[2], "wb").write(data)
+          print(f"C3 image: {len(data):,} bytes (was 4 MB with padding)")
+          PY
           cp firmware/uno_single_file/uno_single_file.ino "$RUNNER_TEMP/flash/"
           cp ../TEST-NOW.md "$RUNNER_TEMP/flash/"
           ls -l "$RUNNER_TEMP/flash"
