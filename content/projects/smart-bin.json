@@ -65,8 +65,8 @@
         "type": "servo",
         "label": "lid servo",
         "offboard": {
-          "x": 230,
-          "y": -130
+          "x": 340,
+          "y": 70
         },
         "step": 2
       },
