@@ -307,7 +307,7 @@ if (blocks) {
   await s.caption("Mia finds <b>turn pin</b> in <b>Pins</b>: LED_PIN HIGH just before the lid opens…");
   await insertStatement("Pins", "ap_digital_write", 0, "ap_servo_write", 1, { before: true });
   await s.caption("…and LED_PIN LOW just after it closes.");
-  await insertStatement("Pins", "ap_digital_write", 0, "ap_servo_write", 2, { before: false, editWord: "LOW" });
+  await insertStatement("Pins", "ap_digital_write", 1, "ap_servo_write", 2, { before: false });
 } else {
   await s.caption("Mia writes the two lines herself, where the comments say.");
   const editor = page.locator(".editor-text");

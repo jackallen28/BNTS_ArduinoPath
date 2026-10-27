@@ -126,7 +126,8 @@ const txt = (t) => ({ shadow: { type: "text", fields: { TEXT: t } } });
  * servos ready to drag in.
  */
 export function toolbox({ pins = [], variables = [], servos = [] } = {}) {
-  const pin = pins[0] || "LED_PIN";
+  // Outputs default to a light (LED_PIN, LED_RED...) when the project has one.
+  const pin = pins.find((p) => /^LED/.test(p)) || pins[0] || "LED_PIN";
   const servo = servos[0] || "myServo";
   const cat = (name, colour, contents) => ({ kind: "category", name, colour, contents });
   const block = (type, extra = {}) => ({ kind: "block", type, ...extra });
@@ -141,6 +142,7 @@ export function toolbox({ pins = [], variables = [], servos = [] } = {}) {
       cat("Pins", COLOURS.pins, [
         block("ap_pin_mode", { inputs: { PIN: word(pin) } }),
         block("ap_digital_write", { inputs: { PIN: word(pin), VALUE: word("HIGH") } }),
+        block("ap_digital_write", { inputs: { PIN: word(pin), VALUE: word("LOW") } }),
         block("ap_digital_read", { inputs: { PIN: word(pin) } }),
         block("ap_analog_read", { inputs: { PIN: word(pin) } }),
         block("ap_analog_write", { inputs: { PIN: word(pin), VALUE: num(128) } }),
