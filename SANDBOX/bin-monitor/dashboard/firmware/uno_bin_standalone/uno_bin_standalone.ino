@@ -41,8 +41,11 @@ const int HAND_DISTANCE_CM = 30;           // a hand closer than this opens it
 
 // The fill level: distance from the sensor inside the bin, in mm.
 // Measure them with bin_calibration.ino. EMPTY must be bigger than FULL.
-const int BIN_EMPTY_MM = 220;  // the bin is empty (0 %)
-const int BIN_FULL_MM = 200;   // the bin is full (100 %)
+// Measured on the bin: 203-210 mm when empty, 5-9 mm when full. Anything
+// at or beyond BIN_EMPTY_MM reads 0 %, anything at or under BIN_FULL_MM 100 %.
+const int BIN_EMPTY_MM = 203;  // the bin is empty (0 %)
+const int BIN_FULL_MM = 9;     // the bin is full (100 %)
+const int FILL_MIN_MM = 2;     // closer than this is a bad reading
 
 // ---------------- Pins ----------------
 const int BUTTON_PIN = 2;
@@ -193,7 +196,7 @@ void readHandSensor() {
 void readFillSensor() {
   const unsigned long duration = pingGrove(FILL_SENSOR_PIN);
   const long mm = duration * 10 / 58;
-  if (duration == 0 || mm < 20 || mm > 600) {
+  if (duration == 0 || mm < FILL_MIN_MM || mm > 600) {
     forgetFill();  // no echo, or a silly distance: keep the last good fill
     return;
   }

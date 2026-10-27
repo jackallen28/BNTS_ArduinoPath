@@ -31,7 +31,7 @@ opens too far), `OPEN_TIME_MS`, `HAND_DISTANCE_CM`, and `BIN_EMPTY_MM` / `BIN_FU
 ### Calibrate the fill level
 
 The bin program says **0 %** when the fill sensor reads `BIN_EMPTY_MM` and **100 %** at `BIN_FULL_MM`
-(now **220 mm** empty and **200 mm** full). To check or change them:
+(now **203 mm** empty and **9 mm** full, measured on the bin). To check or change them:
 
 1. Upload `bin_calibration.ino` (Free Play or the IDE). Open the Serial Monitor at **9600**.
 2. Close the lid with the bin empty: note the distance. That's EMPTY.
@@ -40,8 +40,7 @@ The bin program says **0 %** when the fill sensor reads `BIN_EMPTY_MM` and **100
 5. Put the same numbers into `BIN_EMPTY_MM` / `BIN_FULL_MM` near the top of `uno_bin_standalone.ino`
    and upload the bin program again.
 
-The sensor reads to about ±5 mm, so with only 20 mm between empty and full the percentage
-jumps in steps. The calibration sketch shows how steady the reading is ("last 3 s: from ... to ...").
+Readings wobble by a few mm (203-210 mm empty), so anything past EMPTY counts as 0 % and anything under FULL as 100 %. The calibration sketch shows how steady the reading is ("last 3 s: from ... to ...").
 
 ## 2. The ESP32-C3 on its own
 

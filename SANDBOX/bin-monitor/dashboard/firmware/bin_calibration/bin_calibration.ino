@@ -19,8 +19,8 @@
 //  The lid servo and the hand sensor are not used: the lid stays still.
 // =====================================================================
 
-const uint16_t BIN_EMPTY_MM = 220; // reading with the bin empty = 0 %
-const uint16_t BIN_FULL_MM = 200;  // reading when it's full = 100 %
+const uint16_t BIN_EMPTY_MM = 203; // reading with the bin empty = 0 % (measured 203-210)
+const uint16_t BIN_FULL_MM = 9;    // reading when it's full = 100 % (measured 5-9)
 
 // Same sensor setting as the bin program: 0 = Grove ultrasonic SIG on D6,
 // 1 = four-pin HC-SR04 with TRIG on D5 and ECHO on D6.
@@ -45,7 +45,7 @@ uint16_t measureMm(bool &valid) {
   const unsigned long duration = pulseIn(CAPACITY_GROVE_PIN, HIGH, ECHO_TIMEOUT_US);
   const unsigned long mm = duration * 10UL / 58UL;
 #endif
-  valid = duration != 0 && mm >= 20 && mm <= 5000;
+  valid = duration != 0 && mm >= 2 && mm <= 5000;
   return valid ? (uint16_t)mm : 0;
 }
 

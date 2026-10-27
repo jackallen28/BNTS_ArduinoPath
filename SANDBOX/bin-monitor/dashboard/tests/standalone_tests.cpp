@@ -23,7 +23,7 @@ int main() {
   arduinostub::reset();
   // The lid shuts (button HIGH) when the sweep reaches 120 degrees.
   arduinostub::echoes[HAND_SENSOR_PIN] = 2320;  // 40 cm: no hand
-  arduinostub::echoes[FILL_SENSOR_PIN] = 1218;  // 210 mm: half full
+  arduinostub::echoes[FILL_SENSOR_PIN] = 615;   // 106 mm: half full
   setup();
   int lowest = 999;
   for (; arduinostub::now <= 4000; ++arduinostub::now) {
@@ -32,7 +32,16 @@ int main() {
   }
   expect(state == READY && !lidServo.attached(), "power-up sweep finds the button and lets the servo go limp");
   expect(lidServo.angle_ == 120 && !lidFault, "the lid stops where the button pressed");
-  expect(fillOk && fillPercent == 50, "210 mm reads 50 % with EMPTY 220 / FULL 200");
+  expect(fillOk && fillPercent == 50, "106 mm reads 50 % with EMPTY 203 / FULL 9");
+  // Empty readings 203-210 mm read 0 %; full readings 5-9 mm read 100 %.
+  const struct { unsigned long echo; int percent; const char *what; } cases[] = {
+    {1218, 0, "210 mm (empty) reads 0 %"}, {1178, 0, "203 mm (empty) reads 0 %"},
+    {53, 100, "9 mm (full) reads 100 %"}, {30, 100, "5 mm (full) reads 100 %"}};
+  for (const auto &c : cases) {
+    arduinostub::echoes[FILL_SENSOR_PIN] = c.echo;
+    for (uint32_t end = arduinostub::now + 1000; arduinostub::now <= end; ++arduinostub::now) loop();
+    expect(fillOk && fillPercent == c.percent, c.what);
+  }
 
   // A hand at 20 cm opens it; it stays open 5 s whatever the hand does.
   arduinostub::echoes[HAND_SENSOR_PIN] = 1160;
