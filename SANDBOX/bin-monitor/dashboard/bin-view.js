@@ -82,7 +82,7 @@ export function createBinView() {
     positions=[0];
     for(let i=0;i<manifest.openFrame;i++)positions.push(positions.at(-1)+manifest.durationsMs[i]);
     end=positions.at(-1);fill=fillTarget=requestedFill();
-    root.dataset.frameCount=String(manifest.frameCount);root.dataset.source=manifest.source;
+    root.dataset.frameCount=String(manifest.frameCount);root.dataset.openFrame=String(manifest.openFrame);root.dataset.source=manifest.source;
     ready=true;root.dataset.mediaReady='true';message.remove();draw();followState();
   })().catch(()=>{message.textContent='Supplied bin animation unavailable. Check the local media files.';root.dataset.mediaReady='error';});
   return root;

@@ -7,18 +7,42 @@ let fill = 35, lidOpen = false, demo = null, port = null, reader = null;
 let mode = 'simulation', lastReading = 0, connecting = false;
 let wifiTimer = null, wifiAbort = null, wifiGeneration = 0;
 let hasLiveFill = false;
+let liveMoving = false, lidKnown = true; // Uno lidMoving/homing flags; false lidKnown = no Uno link yet
 const log = h('ol', { 'aria-label': 'Recent events' });
 function record(message) {
   log.prepend(h('li', {}, `${new Date().toLocaleTimeString('en-AU')} · ${message}`));
   while (log.children.length > 15) log.lastChild.remove();
 }
 const percentage = h('strong', { id: 'percentage' });
-const fillValue = h('strong', {}), lidValue = h('strong', {});
+const lidValue = h('span', { id: 'lid-detail' });
+const lidState = h('div', { class: 'lid-state closed', id: 'lid-state', role: 'status', 'aria-live': 'polite', text: 'CLOSED' });
+const fillBar = h('div', { class: 'fill-bar' });
+const fillMeter = h('div', { class: 'fill-meter', role: 'meter', 'aria-label': 'Fill level', 'aria-valuemin': '0', 'aria-valuemax': '100' }, fillBar);
 const status = h('p', { role: 'status', 'aria-live': 'polite' });
 const controllerStatus = h('p', { class: 'hint', id: 'controller-status', role: 'status', text: 'Simulation · no controller connected.' });
 const source = h('span', { class: 'badge', text: 'Simulation' });
 const connection = h('p', { class: 'connection', role: 'status', text: 'Simulation is ready. No board required.' });
 const bin = createBinView();
+// Green when empty, through yellow and orange, to red when full.
+export function fillColour(percent) {
+  return `hsl(${Math.round(120 * (1 - Math.max(0, Math.min(100, percent)) / 100))} 72% 42%)`;
+}
+function showFill(percent) {
+  fillBar.style.width = `${percent}%`;
+  fillBar.style.background = fillColour(percent);
+  fillMeter.setAttribute('aria-valuenow', String(percent));
+}
+// OPEN (blue), CLOSED (green) or MOVING (orange): moving while the Uno says so
+// or until the picture of the lid has reached the open or closed position.
+function refreshLid() {
+  const frame = bin.dataset.frame;
+  const animating = bin.dataset.mediaReady === 'true' && frame !== (lidOpen ? bin.dataset.openFrame : '0');
+  const kind = !lidKnown ? 'unknown' : liveMoving || animating ? 'moving' : lidOpen ? 'open' : 'closed';
+  const word = { open: 'OPEN', closed: 'CLOSED', moving: 'MOVING', unknown: 'WAITING' }[kind];
+  if (lidState.textContent !== word) { lidState.textContent = word; lidState.className = `lid-state ${kind}`; }
+  if (mode === 'simulation') lidValue.textContent = kind === 'moving' ? (lidOpen ? 'Opening…' : 'Closing…') : lidOpen ? 'Lid is open' : 'Lid is closed';
+}
+new MutationObserver(refreshLid).observe(bin, { attributes: true, attributeFilter: ['class', 'data-frame', 'data-media-ready'] });
 const slider = h('input', { id: 'fill', type: 'range', min: 0, max: 100, value: fill, oninput: e => update(Number(e.target.value), lidOpen) });
 const button = (text, onclick) => h('button', { type: 'button', class: 'btn', text, onclick });
 const lidButton = button('Open lid', () => { update(fill, !lidOpen); record(lidOpen ? 'Lid opened' : 'Lid closed'); });
@@ -36,15 +60,16 @@ function update(nextFill, nextLid) {
   fill = nextFill; lidOpen = nextLid;
   bin.style.setProperty('--fill', `${fill}%`);
   bin.classList.toggle('open', lidOpen); bin.classList.toggle('full', fill >= 90);
-  percentage.textContent = `${fill}%`; fillValue.textContent = `${fill}%`;
-  lidValue.textContent = lidOpen ? 'Open' : 'Closed';
+  percentage.textContent = `${fill}%`; showFill(fill);
   status.textContent = fillStatus(fill); status.classList.toggle('alert', fill >= 90);
   slider.value = fill; lidButton.textContent = lidOpen ? 'Close lid' : 'Open lid';
   lidButton.setAttribute('aria-pressed', String(lidOpen));
   if (previous !== fillStatus(fill)) record(fillStatus(fill));
+  refreshLid();
 }
 function setMode(next) {
   mode = next;
+  if (mode === 'simulation') { liveMoving = false; lidKnown = true; }
   for (const control of [slider, lidButton, emptyButton, addButton, demoButton]) control.disabled = mode !== 'simulation';
   connectButton.disabled = mode !== 'simulation' || connecting;
   wifiButton.disabled = mode !== 'simulation' || connecting;
@@ -55,10 +80,12 @@ function setMode(next) {
 }
 function beginLive(next) {
   stopDemo(); hasLiveFill = false; lastReading = 0; setMode(next);
-  percentage.textContent = '—'; fillValue.textContent = 'Waiting'; lidValue.textContent = 'Waiting';
+  percentage.textContent = '—'; lidValue.textContent = 'Waiting for the Uno';
+  lidKnown = false; liveMoving = false; showFill(0);
   bin.style.setProperty('--fill', '0%');
   bin.classList.remove('open', 'full');
   status.textContent = 'Waiting for sensor readings';
+  refreshLid();
 }
 function markUnavailable(message, badge = 'Uno · no recent data') {
   source.textContent = badge;
@@ -69,10 +96,12 @@ function applyReading(reading, transport) {
   if (reading.relayConnected === false || (reading.receivedAgeMs !== undefined && reading.receivedAgeMs > 2000)) {
     markUnavailable('No recent Uno data. Check Uno power, TX signal, divider and common ground.', 'Uno · relay waiting');
     lidValue.textContent = 'Unknown · no Uno link';
+    lidKnown = false; refreshLid();
     controllerStatus.textContent = 'Closure switch status unknown: no recent Uno link.';
     return;
   }
   lastReading = Date.now(); // Even an invalid capacity reading can carry a fresh lid command.
+  lidKnown = true; liveMoving = reading.lidMoving === true || reading.homing === true;
   const usable = reading.sensorOk !== false && (reading.ageMs === undefined || reading.ageMs <= 5000);
   if (usable) {
     update(reading.fill, reading.lidOpen); hasLiveFill = true;
@@ -91,6 +120,7 @@ function applyReading(reading, transport) {
     controllerStatus.classList.toggle('alert', reading.lidFault === true);
     if (reading.lidFault) source.textContent = 'Uno · lid warning';
   }
+  refreshLid();
 }
 const connectButton = button('Connect Uno via USB', connect);
 const wifiButton = button('Connect via Wi-Fi', connectWifi);
@@ -176,16 +206,32 @@ setInterval(() => {
     markUnavailable('No recent telemetry. Check the sketch, USB cable and sensor wiring.');
   }
 }, 1000);
-const stat = (name, value) => h('div', { class: 'stat' }, h('span', { text: name }), value);
+const tabs = {};
+const panels = {};
+function showTab(name) {
+  for (const [key, tab] of Object.entries(tabs)) {
+    tab.setAttribute('aria-selected', String(key === name));
+    tab.tabIndex = key === name ? 0 : -1;
+    panels[key].hidden = key !== name;
+  }
+}
+for (const [key, label] of [['bin', 'Bin'], ['settings', 'Settings']]) {
+  tabs[key] = h('button', { class: 'tab', type: 'button', role: 'tab', id: `tab-${key}`, 'aria-controls': `panel-${key}`, text: label, onclick: () => showTab(key) });
+}
+panels.bin = h('div', { class: 'dashboard', role: 'tabpanel', id: 'panel-bin', 'aria-labelledby': 'tab-bin' },
+  h('section', { class: 'scene', 'aria-label': 'Animated bin' }, h('h2', { text: 'TIMBER BIN / 01' }), bin),
+  h('div', { class: 'readouts' },
+    h('section', { class: 'panel' }, h('h2', { text: 'Lid' }), lidState, h('p', { class: 'lid-detail' }, lidValue), controllerStatus),
+    h('section', { class: 'panel' }, h('h2', { text: 'Fill level' }), h('div', { class: 'fill-number' }, percentage), fillMeter, status)));
+panels.settings = h('div', { class: 'settings', role: 'tabpanel', id: 'panel-settings', 'aria-labelledby': 'tab-settings' },
+  h('section', { class: 'panel' }, h('h2', { text: 'Uno + ESP32-C3 relay' }), connection, h('div', { class: 'actions' }, wifiButton, connectButton, disconnectButton), h('p', { class: 'hint' }, 'Wi-Fi: join ', h('strong', { text: 'BNTS-Bin-Monitor' }), ', then open ', h('a', { href: 'http://192.168.4.1', text: 'http://192.168.4.1' }), '. No internet or USB data needed after flashing. ', h('a', { href: 'README.md', text: 'Setup guide' }), ' · ', h('a', { href: 'assets/uno-c3-wiring.svg', text: 'Wiring diagram' }))),
+  h('section', { class: 'panel' }, h('h2', { text: 'Simulation controls' }), h('label', { for: 'fill', text: 'Fill level (%)' }), slider, h('div', { class: 'actions' }, addButton, emptyButton, lidButton, demoButton), h('p', { class: 'hint', text: 'Try filling the bin past 70% and 90%. Live mode takes readings from the Uno and locks these controls.' })),
+  h('section', { class: 'panel log' }, h('h2', { text: 'Activity' }), log));
 const body = h('main', {},
   h('header', { class: 'brand' }, h('img', { src: 'assets/school-logo.png', alt: 'Banyule Nillumbik Tech School' }), h('div', {}, h('h1', { text: 'Bin Monitor' }), h('p', { text: 'A little smarter. A little less waste.' })), source),
-  h('div', { class: 'dashboard' },
-    h('section', { class: 'scene', 'aria-label': 'Animated bin' }, h('h2', { text: 'TIMBER BIN / 01' }), bin, h('div', { class: 'scene-output' }, percentage, status)),
-    h('div', {},
-      h('section', { class: 'panel' }, h('h2', { text: 'Bin at a glance' }), h('div', { class: 'stats' }, stat('Fill level', fillValue), stat('Lid command', lidValue)), controllerStatus),
-      h('section', { class: 'panel' }, h('h2', { text: 'Simulation controls' }), h('label', { for: 'fill', text: 'Fill level (%)' }), slider, h('div', { class: 'actions' }, addButton, emptyButton, lidButton, demoButton), h('p', { class: 'hint', text: 'Try filling the bin past 70% and 90%. Live mode takes readings from the Uno and locks these controls.' })),
-      h('section', { class: 'panel' }, h('h2', { text: 'Uno + ESP32-C3 relay' }), connection, h('div', { class: 'actions' }, wifiButton, connectButton, disconnectButton), h('p', { class: 'hint' }, 'Wi-Fi: join ', h('strong', { text: 'BNTS-Bin-Monitor' }), ', then open ', h('a', { href: 'http://192.168.4.1', text: 'http://192.168.4.1' }), '. No internet or USB data needed after flashing. ', h('a', { href: 'README.md', text: 'Setup guide' }), ' · ', h('a', { href: 'assets/uno-c3-wiring.svg', text: 'Wiring diagram' }))))),
-  h('section', { class: 'log' }, h('h2', { text: 'Activity' }), log));
+  h('div', { class: 'tab-row' }, h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Bin Monitor' }, tabs.bin, tabs.settings)),
+  panels.bin, panels.settings);
+showTab('bin');
 document.querySelector('#app').append(appWindow({ title: 'Bin Monitor', body, status: ['BNTS · ArduinoPath framework · Uno control · ESP32-C3 Wi-Fi relay'] }));
 loadSprites(['assets/icons.svg']); update(fill, lidOpen); record('Simulation ready');
 if (location.hostname === '192.168.4.1') connectWifi();

@@ -1,6 +1,7 @@
 // Protocol-level Wi-Fi browser test. Requests to 192.168.4.1 are intercepted;
 // this does not verify a physical access point, RF, firmware upload or sensors.
 const { chromium } = await import('playwright').catch(() => import('../../BNTS_ArduinoPath/node_modules/playwright/index.mjs'));
+// Controls sit on the Settings tab: tests press them there while the Bin tab stays on screen.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -24,7 +25,7 @@ assert.deepEqual(assets.get('/').body, assets.get('/index.html').body, 'both ind
 assert.match(assets.get('/app.js').contentType, /javascript/);
 assert.match(assets.get('/monitor.css').contentType, /text\/css/);
 assert.equal(assets.get('/assets/school-logo.png').contentType, 'image/png');
-const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH, headless: true, args: ['--no-sandbox'] });
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
   const errors = [], externalRequests = [], missingAssets = [];
@@ -121,11 +122,11 @@ try {
   assert.notEqual(await page.locator('.badge').textContent(), 'Simulation');
   assert.equal(await page.locator('#fill').isDisabled(), true);
 
-  await page.getByRole('button', { name: 'Return to simulation', exact: true }).click();
+  await page.getByRole('button',{name: 'Return to simulation', exact: true,includeHidden:true}).evaluate(b=>b.click());
   await page.getByText('Simulation', { exact: true }).waitFor();
   assert.equal(await page.locator('#fill').isDisabled(), false);
   failRequests = false;
-  await page.getByRole('button', { name: 'Connect via Wi-Fi', exact: true }).click();
+  await page.getByRole('button',{name: 'Connect via Wi-Fi', exact: true,includeHidden:true}).evaluate(b=>b.click());
   await page.getByText('Uno · Wi-Fi live', { exact: true }).waitFor();
   assert.equal(await page.locator('#percentage').textContent(), '72%');
   assert.equal(await page.evaluate(() => window.usbRequests), 0);
