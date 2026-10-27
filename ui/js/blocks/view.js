@@ -7,7 +7,7 @@
 //   view.el                        // put it on the page
 
 import { h } from "../dom.js";
-import { toBlocks, toCode } from "./cpp.js";
+import { toBlocks, toCode, MEASURE_CM } from "./cpp.js";
 import { defineBlocks, toolbox } from "./defs.js";
 import { pinPlan, rolesIn } from "../sim/pins.js";
 
@@ -61,7 +61,9 @@ export function namesIn(code, project, board) {
   const plan = project && board ? pinPlan(project, board) : {};
   const fromCircuit = (project?.circuit?.wires || []).flatMap((w) => [w.from, w.to]).filter((e) => /^pin:/.test(e || "")).map((e) => e.slice(4));
   const pins = [...new Set([...fromCircuit, ...rolesIn(code, plan)])];
-  const variables = [...new Set([...code.matchAll(/\b(?:int|long|float|double|bool|byte|String|unsigned long)\s+(\w+)\s*=/g)].map((m) => m[1]))];
+  // (not the ones inside the distance block's own helper)
+  const own = code.replace(MEASURE_CM, "");
+  const variables = [...new Set([...own.matchAll(/\b(?:int|long|float|double|bool|byte|String|unsigned long)\s+(\w+)\s*=/g)].map((m) => m[1]))];
   const servos = [...new Set([...code.matchAll(/\bServo\s+(\w+)\s*;/g)].map((m) => m[1]))];
   return { pins, variables, servos };
 }

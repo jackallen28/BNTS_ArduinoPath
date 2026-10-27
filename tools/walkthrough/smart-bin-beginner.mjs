@@ -74,7 +74,15 @@ async function fillBlank(answer) {
 /** Blocks: drag a block from a toolbox category into an empty gap, then type its value. */
 async function dropIntoGap(category, blockType, index, gapType, gapInput, value) {
   await s.click(page.locator(".blocklyToolboxCategory, .blocklyTreeRow").filter({ hasText: category }).first(), { pause: 700 });
-  const from = await flyoutBlockPoint(page, blockType, index);
+  // index: which one of that type, or for a word block, the word itself
+  const from = typeof index === "string"
+    ? await page.evaluate(([type, word]) => {
+      const ws = globalThis.Blockly.getMainWorkspace();
+      const b = ws.getToolbox().getFlyout().getWorkspace().getTopBlocks(true).find((x) => x.type === type && x.getFieldValue("NAME") === word);
+      const r = b.getSvgRoot().getBoundingClientRect();
+      return { x: r.left + 6, y: r.top + r.height / 2 };
+    }, [blockType, index])
+    : await flyoutBlockPoint(page, blockType, index);
   const to = await gapPoint(page, gapType, gapInput);
   await s.drag(from, { x: to.x + 6, y: to.y }, { ms: 1100, pause: 700 });
   if (value != null) {
@@ -247,7 +255,7 @@ await s.caption("Step 2 adds the next part on its own: the distance sensor. The 
 if (blocks) {
   await s.pointAt(page.locator(".blocks-area"), { dx: 0.5, dy: 0.6 });
   await s.caption("The gap is in the <b>Serial Monitor: print</b> block. The distance is saved in a variable called <b>cm</b>.");
-  await dropIntoGap("Variables", "ap_word", 0, "ap_serial_print", "VALUE", null);
+  await dropIntoGap("Variables", "ap_word", "cm", "ap_serial_print", "VALUE", null);
 } else {
   await s.caption("The distance is saved in a variable called <b>cm</b>, so that goes in the blank.");
   await fillBlank("cm");
