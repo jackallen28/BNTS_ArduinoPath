@@ -1,0 +1,77 @@
+# Builds the bin monitor's two programs with the exact Arduino tools
+# ArduinoPath uses: the Uno controller and the ESP32-C3 Wi-Fi relay. Keeps
+# the ready-to-flash files (Uno .hex, C3 single .bin) as a download.
+name: Bin monitor
+
+on:
+  push:
+    paths:
+      - "SANDBOX/bin-monitor/**"
+      - ".github/workflows/bin-monitor.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: SANDBOX/bin-monitor/dashboard
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore the board tools
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/cp/arduino
+          key: arduino-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('internal/arduino/requirements.json') }}
+
+      - name: Install the board tools (as ArduinoPath does)
+        working-directory: .
+        run: go run ./cmd/arduinopath -data "$RUNNER_TEMP/cp" -install-arduino
+
+      - name: Tests on this computer (logic, framing, dashboard)
+        run: |
+          npm test
+          npm run test:firmware
+          python3 tools/embed_dashboard.py --check
+
+      - name: Compile the Uno controller
+        run: |
+          cli() { "$RUNNER_TEMP/cp/arduino/bin/arduino-cli" --config-file "$RUNNER_TEMP/cp/arduino/arduino-cli.yaml" "$@"; }
+          cli compile --fqbn arduino:avr:uno --warnings default --output-dir "$RUNNER_TEMP/out/uno" firmware/uno_bin_controller
+
+      - name: Compile the ESP32-C3 Wi-Fi relay
+        run: |
+          cli() { "$RUNNER_TEMP/cp/arduino/bin/arduino-cli" --config-file "$RUNNER_TEMP/cp/arduino/arduino-cli.yaml" "$@"; }
+          cli compile --fqbn "esp32:esp32:esp32c3:CDCOnBoot=cdc,PartitionScheme=huge_app" --warnings default \
+            --output-dir "$RUNNER_TEMP/out/c3" firmware/esp32_c3_wifi_bridge
+          # Does it also fit the default layout (1.25 MB for programs)?
+          cli compile --fqbn "esp32:esp32:esp32c3:CDCOnBoot=cdc" firmware/esp32_c3_wifi_bridge \
+            && echo "Fits the default partition layout too." \
+            || echo "::notice::Too big for the default layout: flash with Partition Scheme 'Huge APP (3MB No OTA)'."
+
+      - name: Pack the ready-to-flash files
+        run: |
+          mkdir -p "$RUNNER_TEMP/flash"
+          cp "$RUNNER_TEMP"/out/uno/uno_bin_controller.ino.hex "$RUNNER_TEMP/flash/uno_bin_controller.hex"
+          cp "$RUNNER_TEMP"/out/c3/esp32_c3_wifi_bridge.ino.merged.bin "$RUNNER_TEMP/flash/esp32_c3_wifi_bridge-flash-at-0x0.bin"
+          cp FLASHING.md "$RUNNER_TEMP/flash/" 2>/dev/null || true
+          ls -l "$RUNNER_TEMP/flash"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bin-monitor-firmware
+          path: ${{ runner.temp }}/flash
+          retention-days: 30
