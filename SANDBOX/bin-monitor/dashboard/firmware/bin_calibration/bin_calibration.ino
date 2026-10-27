@@ -13,8 +13,8 @@
 //      piece of card there). Note the distance: that's FULL.
 //   4. Put both numbers into BIN_EMPTY_MM and BIN_FULL_MM here, upload
 //      again, and check the fill reads 0 % empty and 100 % full.
-//   5. Copy the same two numbers into uno_bin_controller (or
-//      uno_single_file) and upload the bin program again.
+//   5. Copy the same two numbers into uno_bin_standalone.ino and upload
+//      the bin program again.
 //
 //  The lid servo and the hand sensor are not used: the lid stays still.
 // =====================================================================

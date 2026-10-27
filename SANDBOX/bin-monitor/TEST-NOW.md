@@ -4,7 +4,7 @@ Two programs, two boards:
 
 | Board | Program | What it does |
 |---|---|---|
-| **Arduino Uno** | `uno_bin_controller` | Runs the bin: opens the lid for a hand, closes it, measures how full it is, and sends the readings out of TX (D1). |
+| **Arduino Uno** | `uno_bin_standalone.ino` (one file) | Runs the bin: opens the lid for a hand, closes it, measures how full it is, and sends the readings out of TX (D1). |
 | **ESP32-C3** | `esp32_c3_wifi_bridge` | Makes the Wi-Fi network **BNTS-Bin-Monitor** and shows the readings on a web page at **http://192.168.4.1**. It does not control the bin. |
 
 Test in this order: each step checks one thing, so a problem shows up where it starts.
@@ -14,9 +14,11 @@ Test in this order: each step checks one thing, so a problem shows up where it s
 **Upload it**, either way:
 
 - **ArduinoPath:** open **Free Play**, select all the code and delete it, then paste in all of
-  `uno_single_file.ino`. In **Settings**, choose **Arduino Uno**. Plug in the Uno and press **Upload**.
-- **Arduino IDE:** open `firmware/uno_bin_controller/uno_bin_controller.ino` (its two `.h` files open as
-  tabs), choose **Arduino Uno**, and upload.
+  `uno_bin_standalone.ino`. In **Settings**, choose **Arduino Uno**. Plug in the Uno and press **Upload**.
+- **Arduino IDE:** open `uno_bin_standalone.ino` (it needs no other files), choose **Arduino Uno**, and upload.
+
+The settings are at the top of the file: `OPEN_ANGLE` (how far the lid opens: make it bigger if it
+opens too far), `OPEN_TIME_MS`, `HAND_DISTANCE_CM`, and `BIN_EMPTY_MM` / `BIN_FULL_MM`.
 
 **Check it:**
 
@@ -35,7 +37,7 @@ The bin program says **0 %** when the fill sensor reads `BIN_EMPTY_MM` and **100
 2. Close the lid with the bin empty: note the distance. That's EMPTY.
 3. Put rubbish (or a flat card) where full should be: note the distance. That's FULL.
 4. Put both numbers at the top of `bin_calibration.ino` and upload it again: check it says 0 % and 100 %.
-5. Put the same numbers into `BIN_EMPTY_MM` / `BIN_FULL_MM` near the top of `uno_single_file.ino`
+5. Put the same numbers into `BIN_EMPTY_MM` / `BIN_FULL_MM` near the top of `uno_bin_standalone.ino`
    and upload the bin program again.
 
 The sensor reads to about ±5 mm, so with only 20 mm between empty and full the percentage
@@ -86,6 +88,7 @@ cables is fine).
 | What you see | What to check |
 |---|---|
 | ArduinoPath / IDE upload to the Uno fails | Unplug the wire on D1, upload, then plug it back in. |
+| The lid opens too far | Make `OPEN_ANGLE` bigger (closer to where the lid closes), and upload again. |
 | The lid sweeps but never stops (LED stays on, then 90°) | The closed button on D2: it must read HIGH when the lid is shut (a 10k pull-down to GND, button to 5 V). |
 | No `@{...}` lines from the Uno | The Serial Monitor speed must be **115200**. |
 | Web flasher: "Failed to leave compressed flash mode" (status 196) | Writing to the C3's flash failed. Unplug the C3, hold **BOOT** while plugging it back in, press **Connect** at 115200, **Erase Flash**, then **Program** again. Use a short data cable straight into the computer (no hub). |
