@@ -42,7 +42,7 @@ inline void sketchIntegrationTests() {
   frameLength = frameOffset = 0; sequence = 0;
   arduinostub::inputs[BUTTON_PIN] = HIGH;
   arduinostub::echoes[APPROACH_GROVE_PIN] = 2320; //40cm, no opening.
-  arduinostub::echoes[CAPACITY_GROVE_PIN] = 1305; //225mm capacity.
+  arduinostub::echoes[CAPACITY_GROVE_PIN] = 1218; // 210 mm: halfway between BIN_EMPTY_MM 220 and BIN_FULL_MM 200.
   arduinostub::txFree = 0;
   setup();
   expect(arduinostub::modes[BUTTON_PIN] == INPUT, "original active-HIGH external pull-down switch wiring is retained");

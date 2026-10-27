@@ -26,6 +26,21 @@ Test in this order: each step checks one thing, so a problem shows up where it s
       `@{"fill":0,"lidOpen":false,"sensorOk":true,...}*1A2B`. That's what the ESP32-C3 will receive.
       `sensorOk:false` is normal for about a second after the lid closes, and whenever the lid is open.
 
+### Calibrate the fill level
+
+The bin program says **0 %** when the fill sensor reads `BIN_EMPTY_MM` and **100 %** at `BIN_FULL_MM`
+(now **220 mm** empty and **200 mm** full). To check or change them:
+
+1. Upload `bin_calibration.ino` (Free Play or the IDE). Open the Serial Monitor at **9600**.
+2. Close the lid with the bin empty: note the distance. That's EMPTY.
+3. Put rubbish (or a flat card) where full should be: note the distance. That's FULL.
+4. Put both numbers at the top of `bin_calibration.ino` and upload it again: check it says 0 % and 100 %.
+5. Put the same numbers into `BIN_EMPTY_MM` / `BIN_FULL_MM` near the top of `uno_single_file.ino`
+   and upload the bin program again.
+
+The sensor reads to about ±5 mm, so with only 20 mm between empty and full the percentage
+jumps in steps. The calibration sketch shows how steady the reading is ("last 3 s: from ... to ...").
+
 ## 2. The ESP32-C3 on its own
 
 **Flash it**, either way:
@@ -78,6 +93,6 @@ cables is fine).
 | The page won't open | Stay joined to BNTS-Bin-Monitor, mobile data off, and type `http://192.168.4.1` exactly. |
 | C3 says "Nothing on GPIO4" | The D1 → 2.2k → GPIO4 wire, and the shared GND. Is the Uno powered and running? |
 | C3 says "Bytes arrive but no good readings" | The Uno program (115200 baud), and the divider resistors (2.2k and 3.3k, not swapped). |
-| Fill shows "unknown" | Normal while the lid is open or moving. If it stays unknown with the lid shut, check the D6 sensor and set `emptyDistanceMm` / `fullDistanceMm` in `bin_controller.h` to your bin. |
+| Fill shows "unknown" | Normal while the lid is open or moving. If it stays unknown with the lid shut, check the D6 sensor with `bin_calibration.ino`, and set `BIN_EMPTY_MM` / `BIN_FULL_MM` to your bin. |
 
 The full wiring, the safety notes and how the readings are checked are in `dashboard/README.md`.

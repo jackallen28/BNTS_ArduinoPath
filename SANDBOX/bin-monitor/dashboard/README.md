@@ -43,7 +43,7 @@ Power the servo from a suitable regulated 5 V supply sized for its starting/stal
 
 ## Capacity calibration
 
-Mount the capacity sensor inside the bin facing the contents. Set the Uno configuration's empty and full distances to real measurements (defaults 400 mm empty, 50 mm full). The Uno computes and filters the percentage, retains the last valid value on a sensor timeout, and marks it invalid while the lid is open/moving or not confirmed closed. It waits for the closed lid to settle and collects fresh samples before trusting capacity again. The dashboard displays last-known or unknown fill instead of pretending a timeout means empty.
+Mount the capacity sensor inside the bin facing the contents. Set `BIN_EMPTY_MM` and `BIN_FULL_MM` at the top of the Uno sketch to real measurements (now 220 mm empty, 200 mm full); `firmware/bin_calibration` shows the live distance to measure them. The Uno computes and filters the percentage, retains the last valid value on a sensor timeout, and marks it invalid while the lid is open/moving or not confirmed closed. It waits for the closed lid to settle and collects fresh samples before trusting capacity again. The dashboard displays last-known or unknown fill instead of pretending a timeout means empty.
 
 The closure button detects the closed stop; it does not measure the complete lid angle. `lidOpen` is the Uno's command, `closedSwitch` is the button input, and `lidFault` identifies a failed home or failed release check. Check servo direction, mechanical travel, switch placement and fallback behaviour before unattended operation. Proximity control is not safety-certified obstruction detection.
 

@@ -22,8 +22,8 @@
 //
 //  Upload with board "Arduino Uno". Unplug the wire on D1 if an upload
 //  fails, then plug it back in afterwards.
-//  Settings to check: CAPACITY_USE_HCSR04 below, and the empty/full
-//  distances (emptyDistanceMm, fullDistanceMm) in bin_controller.h.
+//  Settings to check: BIN_EMPTY_MM / BIN_FULL_MM and CAPACITY_USE_HCSR04
+//  below. Use bin_calibration.ino to measure your bin's distances.
 // =====================================================================
 
 #include <Servo.h>
@@ -35,6 +35,13 @@ const uint8_t BUTTON_PIN = 2;  // Original external pull-down: HIGH=physically c
 const uint8_t SERVO_PIN = 3;
 const uint8_t APPROACH_GROVE_PIN = 7;
 const uint8_t LED_PIN = 8;
+
+// ---- Fill level calibration (distance from the fill sensor, in mm) ----
+// BIN_EMPTY_MM: the reading with the bin empty (the sensor to the base) = 0 %.
+// BIN_FULL_MM:  the reading when the rubbish is this close = 100 % full.
+// Measure both with bin_calibration.ino. EMPTY must be bigger than FULL.
+const uint16_t BIN_EMPTY_MM = 220;
+const uint16_t BIN_FULL_MM = 200;
 
 // Default second sensor is a Grove SINGLE SIGNAL ultrasonic on D6.
 // Set to 1 only when the capacity sensor is a four-pin HC-SR04: TRIG D5, ECHO D6.
@@ -51,7 +58,6 @@ const unsigned long TELEMETRY_BAUD = 115200;
 // Original lid defaults: open at 0 deg; close by sweeping 0..180 deg in 15 ms
 // steps until the button is hit (fallback 90 deg); settle 300 ms then detach;
 // release check at 400 ms; hold open 5 s; cool down 2 s.
-// Capacity defaults: empty 400 mm, full 50 mm. Calibrate to your actual bin.
 bincontrol::Config settings;
 bincontrol::Controller controller(settings);
 Servo myServo;
@@ -147,7 +153,9 @@ void setup() {
   pinMode(CAPACITY_TRIG, OUTPUT); digitalWrite(CAPACITY_TRIG, LOW);
   pinMode(CAPACITY_ECHO, INPUT);
 #endif
-  // Edit settings above or assign calibration fields here BEFORE begin().
+  // The fill calibration must be set BEFORE begin().
+  settings.emptyDistanceMm = BIN_EMPTY_MM;
+  settings.fullDistanceMm = BIN_FULL_MM;
   Serial.begin(TELEMETRY_BAUD); // Changed from the original 9600 for the C3 bridge.
   const uint32_t now = millis();
   controller.begin(now, digitalRead(BUTTON_PIN) == HIGH);

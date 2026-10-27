@@ -56,6 +56,7 @@ jobs:
           cli compile --fqbn arduino:avr:uno --warnings default --output-dir "$RUNNER_TEMP/out/uno1" firmware/uno_single_file
           cmp "$RUNNER_TEMP/out/uno/uno_bin_controller.ino.hex" "$RUNNER_TEMP/out/uno1/uno_single_file.ino.hex" \
             && echo "The one-file version builds exactly the same program."
+          cli compile --fqbn arduino:avr:uno --warnings default firmware/bin_calibration
 
       - name: Compile the ESP32-C3 Wi-Fi relay
         run: |
@@ -81,6 +82,7 @@ jobs:
           print(f"C3 image: {len(data):,} bytes (was 4 MB with padding)")
           PY
           cp firmware/uno_single_file/uno_single_file.ino "$RUNNER_TEMP/flash/"
+          cp firmware/bin_calibration/bin_calibration.ino "$RUNNER_TEMP/flash/"
           cp ../TEST-NOW.md "$RUNNER_TEMP/flash/"
           ls -l "$RUNNER_TEMP/flash"
 
