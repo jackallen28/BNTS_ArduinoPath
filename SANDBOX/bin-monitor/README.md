@@ -1,52 +1,44 @@
-# Timber bin monitor sandbox
+# Uno bin controller and ESP32-C3 Wi-Fi relay
 
-The bin illustration follows the supplied timber-box CAD design and opening video: honey-coloured wooden panels, charcoal top/base frames, a rear servo and an independently hinged flap. The fill reading appears in a separate teal gauge so the wood remains opaque. ArduinoPath’s framework, theme and official school logo are retained.
+The Uno runs the complete bin using the supplied working Grove-ultrasonic program, with an added internal capacity sensor. The ESP32-C3-Zero only receives and relays the Uno’s completed readings. The original pins, button homing, fixed five-second opening cycle and servo relaxation are preserved.
 
-## Animated lid preview
+## The two programs
 
-Actual browser-rendered frames from the dashboard, using simulation inputs. The preview shows the lid opening, closing and opening again around its fixed rear hinge.
+- [Uno controller sketch](dashboard/firmware/uno_bin_controller/uno_bin_controller.ino) — original lid control plus internal capacity sensing. Keep its supporting headers in the same sketch folder.
+- [Uno setup and calibration](dashboard/firmware/uno_bin_controller/README.md).
+- [ESP32-C3-Zero Wi-Fi relay sketch](dashboard/firmware/esp32_c3_wifi_bridge/esp32_c3_wifi_bridge.ino) — RX-only UART, checked data forwarding, access point and dashboard server. Keep its headers alongside it.
+- [Complete wiring, flashing, protocol and test guide](dashboard/README.md).
 
-![Animated timber-bin lid](lid-animation.gif)
+## One data signal and common ground
 
-[Open animated preview](lid-animation.gif)
+Uno D1/TX → 2.2 kΩ → C3 GPIO4 junction; junction → 3.3 kΩ → common ground. Join Uno and C3 grounds. No C3 TX connection is needed. Never connect the Uno’s 5 V TX directly to the C3. Power and common ground are still required in addition to the one data signal.
 
-## Dashboard
+The existing Uno pins stay D2 closure button (active HIGH), D3 servo, D7 Grove approach sensor and D8 LED. Add a Grove capacity sensor on D6. A configurable HC-SR04 capacity alternative uses D5 TRIG and D6 ECHO.
 
-These are actual browser screenshots with clearly labelled simulation readings. They are not image-generator mockups or evidence of a physical ESP32 connection.
+![Uno, both sensors and C3 wiring](wiring.png)
 
-![Timber bin dashboard with lid open](dashboard.png)
+[Open wiring PNG](wiring.png) · [Scalable SVG](wiring.svg)
 
-[Open lid screenshot](dashboard.png) · [Closed lid screenshot](dashboard-closed.png) · [Mobile screenshot](dashboard-mobile.png)
+## Your model animation
 
-## Run and develop
+The dashboard uses actual frames from the user-supplied CAD opening video, not a replacement drawing or generated model. Opening plays those frames forward and holds the last frame; closing reverses the same frames and holds the first. It can reverse direction part-way through. The source MP4 is retained in `dashboard/assets/source/` with its checksum in the frame manifest. Inline GIF messages did not expose a downloadable original GIF; the tooling also accepts a source GIF when that file is available.
 
-The complete runnable prototype, tests, self-contained artwork and ESP32 firmware are in [dashboard/](dashboard/README.md).
+![Supplied model opening and reversing to close](lid-animation.gif)
 
-From the ArduinoPath repository root:
+[Open animation](lid-animation.gif)
 
-```sh
-npm ci
-cd SANDBOX/bin-monitor/dashboard
-npm test
-npm start
-```
+## Dashboard preview
 
-The development server listens on port 8090. With the server running, `node tests/bin-view-browser.mjs` checks lid motion, fixed hinge, fill indicator, mobile fit and reduced-motion behaviour, and captures screenshots plus an animated GIF. Browser tests need Chromium at `/usr/bin/chromium` in this cloud environment. See the prototype README for Wi-Fi/USB checks and embedding the updated assets into the ESP32 firmware.
+These are actual browser captures with simulation inputs, not proof of hardware connectivity.
 
-The pictured servo is a visual reference to the prototype. The current firmware reports the lid switch; it does not command a servo or move the physical lid.
+![Dashboard using the supplied bin model](dashboard.png)
 
-## ESP32 wiring
+[Open image](dashboard.png) · [Closed image](dashboard-closed.png) · [Mobile layout](dashboard-mobile.png)
 
-Connection schematic for a classic ESP32 DevKit, HC-SR04 ultrasonic distance sensor and reed-switch lid sensor. Check your board’s pin labels; this is not a physical pinout.
+## Validation and hardware limits
 
-![ESP32 bin monitor wiring diagram](wiring.png)
+Passed JavaScript telemetry tests, browser tests for source-frame playback and Uno/Wi-Fi data handling, and host C++ tests of the actual controller and relay code. Host tests include the original lid sequence, invalid capacity readings, serial corruption, stale data and an unplugged radio.
 
-[Open wiring image](wiring.png) · [Scalable SVG](wiring.svg)
+AVR/ESP32-C3 target compilation is not yet verified: this cloud environment blocked the required board-package downloads. Real testing is still needed for flashing, startup/closing servo calibration and switch polarity, sensor cross-talk/capacity calibration, voltage divider and grounding, power stability and C3 Wi-Fi/HTTP. Follow the flash-partition guidance for the embedded display assets.
 
-The HC-SR04 ECHO signal is 5 V. It must pass through the shown divider: ECHO → 1 kΩ → GPIO18 junction; junction → 2 kΩ → GND. Never connect 5 V ECHO directly to ESP32 GPIO. GPIO5 drives TRIG; GPIO19 reads the switch to ground, closed when the lid is closed.
-
-## Validation status
-
-Browser checks passed for simulation controls, Wi-Fi polling through intercepted HTTP, fill and lid animation, stale/invalid readings, reconnect, school-logo loading and mobile layout. The dashboard assets were checked against the firmware-embedded payload.
-
-Still unverified: firmware target compilation/upload, actual phone/laptop association with the ESP32 Wi-Fi network, on-board HTTP serving, power stability, divider voltage, physical sensor calibration and lid-switch operation. Cloud firmware compilation was blocked by package-download network restrictions. After flashing, the intended Wi-Fi flow is to power the board, join BNTS-Bin-Monitor, stay connected despite no internet, and manually open http://192.168.4.1. USB data is not required for that flow.
+After flashing, join BNTS-Bin-Monitor and open http://192.168.4.1. The Uno controls the bin without Wi-Fi; dashboard simulation controls never command the real hardware.

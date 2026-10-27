@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 // Decode the exact bytes shipped in the firmware, not source-tree substitutes.
-const header = await readFile(resolve(root, 'firmware/bin_monitor/dashboard_assets.h'), 'utf8');
+const header = await readFile(resolve(root, 'firmware/esp32_c3_wifi_bridge/dashboard_assets.h'), 'utf8');
 const payloads = new Map();
 for (const [, symbol, bytes] of header.matchAll(/static const uint8_t (dashboard_asset_\d+)\[\] PROGMEM = \{([\s\S]*?)\};/g)) {
   payloads.set(symbol, Buffer.from([...bytes.matchAll(/0x([0-9a-f]{2})/gi)].map(match => parseInt(match[1], 16))));
@@ -19,7 +19,7 @@ for (const [, path, contentType, symbol] of header.matchAll(/\{"([^"]+)", "([^"]
   assert.ok(!assets.has(path), `asset route is unique: ${path}`);
   assets.set(path, { contentType, body: payloads.get(symbol) });
 }
-assert.equal(assets.size, 14, 'all embedded dashboard routes are present');
+assert.equal(assets.size, 16, 'all embedded dashboard routes are present');
 assert.deepEqual(assets.get('/').body, assets.get('/index.html').body, 'both index routes serve the same bytes');
 assert.match(assets.get('/app.js').contentType, /javascript/);
 assert.match(assets.get('/monitor.css').contentType, /text\/css/);
@@ -31,6 +31,7 @@ try {
   const assetRequests = new Set();
   let reading = { fill: 42, lidOpen: false, sensorOk: true, ageMs: 0 };
   let failRequests = false, malformedResponse = false, telemetryRequests = 0;
+  let connected = true, receivedAgeMs = 10, emptyRelay = false;
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => {
     window.usbRequests = 0;
@@ -54,7 +55,7 @@ try {
     if (pathname === '/api/telemetry') {
       telemetryRequests++;
       if (failRequests) return route.abort('connectionfailed');
-      return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'Cache-Control': 'no-store' }, body: malformedResponse ? '{bad json' : JSON.stringify(reading) });
+      return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'Cache-Control': 'no-store' }, body: malformedResponse ? '{bad json' : JSON.stringify({connected,receivedAgeMs: emptyRelay ? null : receivedAgeMs,telemetry:emptyRelay ? null : {...reading,seq:12,closedSwitch:!reading.lidOpen,lidFault:false,homing:false}}) });
     }
     const asset = assets.get(pathname);
     if (!asset) {
@@ -65,7 +66,7 @@ try {
     await route.fulfill({ status: 200, contentType: asset.contentType, body: asset.body });
   });
   await page.goto('http://192.168.4.1');
-  await page.getByText('ESP · Wi-Fi live', { exact: true }).waitFor();
+  await page.getByText('Uno · Wi-Fi live', { exact: true }).waitFor();
   assert.equal(await page.locator('#percentage').textContent(), '42%');
   assert.equal(await page.locator('#fill').isDisabled(), true);
   assert.equal(await page.evaluate(() => window.usbRequests), 0);
@@ -74,37 +75,47 @@ try {
   await page.waitForFunction(() => document.querySelector('#percentage').textContent === '82%');
   assert.equal(await page.locator('.bin').evaluate(el => el.classList.contains('open')), true);
   await page.waitForTimeout(1000);
-  const openTransform = await page.locator('.lid').evaluate(el => getComputedStyle(el).transform);
-  assert.notEqual(openTransform, 'none');
+  await page.waitForFunction(()=>document.querySelector('.bin').dataset.mediaReady==='true');
+  assert.ok(Number(await page.locator('.bin').getAttribute('data-frame')) > 0, 'source animation follows the open command');
   assert.ok(await page.locator('.fill').evaluate(el => parseFloat(getComputedStyle(el).height)) > initialHeight, 'fill graphic follows live telemetry');
-  assert.ok(await page.locator('.lid').evaluate(el => parseFloat(getComputedStyle(el).transitionDuration) > 0), 'lid has a transition');
+  assert.match(await page.locator('.bin').getAttribute('data-source'),/User-supplied/);
 
   // Failed distance sensor keeps the last valid fill but must still animate lid.
   reading = { fill: 0, lidOpen: false, sensorOk: false, ageMs: 100 };
   await page.waitForFunction(() => !document.querySelector('.bin').classList.contains('open'));
   assert.equal(await page.locator('#percentage').textContent(), '82%');
-  assert.notEqual(await page.locator('.badge').textContent(), 'ESP · Wi-Fi live');
+  assert.notEqual(await page.locator('.badge').textContent(), 'Uno · Wi-Fi live');
   assert.match(await page.locator('.connection').textContent(), /sensor|reading/i);
 
   reading = { fill: 20, lidOpen: true, sensorOk: true, ageMs: 6000 };
   await page.waitForTimeout(1000);
   assert.equal(await page.locator('#percentage').textContent(), '82%');
-  assert.notEqual(await page.locator('.badge').textContent(), 'ESP · Wi-Fi live');
+  assert.notEqual(await page.locator('.badge').textContent(), 'Uno · Wi-Fi live');
   assert.match(await page.locator('.connection').textContent(), /stale|recent|old/i);
 
   reading = { fill: 72, lidOpen: true, sensorOk: true, ageMs: 0 };
-  await page.getByText('ESP · Wi-Fi live', { exact: true }).waitFor();
+  await page.getByText('Uno · Wi-Fi live', { exact: true }).waitFor();
   await page.waitForFunction(() => document.querySelector('#percentage').textContent === '72%');
+  connected = false; receivedAgeMs = 3000;
+  await page.getByText('Uno · relay waiting', {exact:true}).waitFor();
+  assert.equal(await page.locator('#percentage').textContent(), '72%');
+  assert.equal(await page.locator('#fill').isDisabled(), true);
+  assert.match(await page.locator('#controller-status').textContent(), /unknown/i);
+  emptyRelay = true;
+  await page.waitForTimeout(600);
+  assert.equal(await page.locator('#percentage').textContent(), '72%');
+  emptyRelay = false; connected = true; receivedAgeMs = 10;
+  await page.getByText('Uno · Wi-Fi live', {exact:true}).waitFor();
   malformedResponse = true;
   await page.waitForTimeout(1000);
   assert.equal(await page.locator('#percentage').textContent(), '72%');
-  assert.notEqual(await page.locator('.badge').textContent(), 'ESP · Wi-Fi live');
+  assert.notEqual(await page.locator('.badge').textContent(), 'Uno · Wi-Fi live');
   malformedResponse = false;
-  await page.getByText('ESP · Wi-Fi live', { exact: true }).waitFor();
+  await page.getByText('Uno · Wi-Fi live', { exact: true }).waitFor();
   failRequests = true;
   await page.waitForTimeout(1200);
   assert.equal(await page.locator('#percentage').textContent(), '72%');
-  assert.notEqual(await page.locator('.badge').textContent(), 'ESP · Wi-Fi live');
+  assert.notEqual(await page.locator('.badge').textContent(), 'Uno · Wi-Fi live');
   assert.notEqual(await page.locator('.badge').textContent(), 'Simulation');
   assert.equal(await page.locator('#fill').isDisabled(), true);
 
@@ -113,13 +124,13 @@ try {
   assert.equal(await page.locator('#fill').isDisabled(), false);
   failRequests = false;
   await page.getByRole('button', { name: 'Connect via Wi-Fi', exact: true }).click();
-  await page.getByText('ESP · Wi-Fi live', { exact: true }).waitFor();
+  await page.getByText('Uno · Wi-Fi live', { exact: true }).waitFor();
   assert.equal(await page.locator('#percentage').textContent(), '72%');
   assert.equal(await page.evaluate(() => window.usbRequests), 0);
   assert.equal(await page.locator('.brand img').evaluate(img => img.complete && img.naturalWidth > 0), true);
   await page.evaluate(() => {
     const banner = document.createElement('div');
-    banner.textContent = 'Wi-Fi preview · simulated ESP32 readings';
+    banner.textContent = 'Wi-Fi preview · simulated Uno readings via C3 relay';
     banner.style.cssText = 'padding:12px 20px;margin:0 auto 18px;max-width:1110px;background:#fff1c7;color:#573b00;border:1px solid #dfbe6f;border-radius:6px;font:600 14px Segoe UI,sans-serif;text-align:center';
     document.body.prepend(banner);
   });

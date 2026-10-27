@@ -4,7 +4,7 @@ Keep experimental projects, prototypes, wiring diagrams and visual previews in t
 
 ## Current experiments
 
-- [Timber bin monitor, animation and ESP32 wiring](bin-monitor/README.md) — runnable prototype, browser-captured previews and hardware documentation.
+- [Uno bin controller, C3 relay and supplied-model animation](bin-monitor/README.md) — runnable prototype, browser-captured previews and hardware documentation.
 
 ## Working conventions
 

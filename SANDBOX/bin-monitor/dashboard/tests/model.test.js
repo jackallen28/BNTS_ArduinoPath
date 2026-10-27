@@ -24,3 +24,24 @@ test('Wi-Fi telemetry includes explicit sensor health and reading age', async ()
   assert.deepEqual(parseWifiTelemetry('{"fill":42,"lidOpen":true,"sensorOk":false,"ageMs":9000}'), {fill:42,lidOpen:true,sensorOk:false,ageMs:9000});
   for (const data of [{fill:42,lidOpen:true}, {fill:42,lidOpen:true,sensorOk:'yes',ageMs:0}, {fill:42,lidOpen:true,sensorOk:true,ageMs:-1}, {fill:42,lidOpen:true,sensorOk:true,ageMs:'0'}]) assert.throws(() => parseWifiTelemetry(JSON.stringify(data)));
 });
+
+test('relay envelopes distinguish Uno link health from sensor readings', async () => {
+  const {parseWifiTelemetry} = await import('../model.js');
+  const telemetry = {fill:42,lidOpen:false,sensorOk:true,ageMs:90,seq:12,closedSwitch:true,lidFault:false,homing:false};
+  const result = parseWifiTelemetry(JSON.stringify({connected:true,receivedAgeMs:10,telemetry}));
+  assert.equal(result.fill,42); assert.equal(result.relayConnected,true); assert.equal(result.closedSwitch,true); assert.equal(result.source,'uno');
+  assert.deepEqual(parseWifiTelemetry('{"connected":false,"receivedAgeMs":null,"telemetry":null}'),{relayConnected:false,receivedAgeMs:null,source:'uno'});
+  assert.equal(parseWifiTelemetry(JSON.stringify({connected:false,receivedAgeMs:3000,telemetry})).relayConnected,false);
+  for (const bad of [{connected:true,receivedAgeMs:0,telemetry:null},{connected:false,receivedAgeMs:-1,telemetry},{connected:'yes',receivedAgeMs:0,telemetry},{connected:true,receivedAgeMs:null,telemetry}]) assert.throws(()=>parseWifiTelemetry(JSON.stringify(bad)));
+});
+
+test('direct Uno serial validates CRC and preserves controller metadata', async () => {
+  const {parseSerialTelemetry,crc16Ccitt} = await import('../model.js');
+  assert.equal(crc16Ccitt('123456789'),0x29b1);
+  const json = '{"fill":42,"lidOpen":false,"sensorOk":true,"ageMs":90,"seq":12,"closedSwitch":true,"lidFault":false,"homing":false}';
+  const frame = '@'+json+'*'+crc16Ccitt(json).toString(16).padStart(4,'0').toUpperCase();
+  assert.equal(parseSerialTelemetry(frame).fill,42); assert.equal(parseSerialTelemetry(frame).source,'uno');
+  assert.throws(()=>parseSerialTelemetry(frame.replace('42','43')));
+  assert.throws(()=>parseSerialTelemetry('@'+json+'*NOPE'));
+  assert.throws(()=>parseSerialTelemetry('@'+json+'*0000'));
+});

@@ -13,13 +13,15 @@ ASSETS = [
     ('/model.js', 'model.js', 'text/javascript; charset=utf-8'),
     ('/bin-view.js', 'bin-view.js', 'text/javascript; charset=utf-8'),
     ('/bin-view.css', 'bin-view.css', 'text/css; charset=utf-8'),
+    ('/assets/bin-source-frames.json', 'assets/bin-source-frames.json', 'application/json'),
+    ('/assets/bin-source-frames.webp', 'assets/bin-source-frames.webp', 'image/webp'),
     ('/monitor.css', 'monitor.css', 'text/css; charset=utf-8'),
     ('/vendor/theme.css', 'vendor/theme.css', 'text/css; charset=utf-8'),
     ('/vendor/js/dom.js', 'vendor/js/dom.js', 'text/javascript; charset=utf-8'),
     ('/vendor/js/widgets/window.js', 'vendor/js/widgets/window.js', 'text/javascript; charset=utf-8'),
     ('/assets/icons.svg', 'assets/icons.svg', 'image/svg+xml'),
     ('/assets/school-logo.png', 'assets/school-logo.png', 'image/png'),
-    ('/assets/esp32-wiring.svg', 'assets/esp32-wiring.svg', 'image/svg+xml'),
+    ('/assets/uno-c3-wiring.svg', 'assets/uno-c3-wiring.svg', 'image/svg+xml'),
     ('/README.md', 'README.md', 'text/plain; charset=utf-8'),
 ]
 
@@ -53,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('--check', action='store_true', help='fail if firmware assets are out of date')
     args = parser.parse_args()
     content, total = generate()
-    target = ROOT / 'firmware/bin_monitor/dashboard_assets.h'
+    target = ROOT / 'firmware/esp32_c3_wifi_bridge/dashboard_assets.h'
     if args.check:
         if not target.exists() or target.read_text() != content:
             sys.exit('Firmware dashboard assets are stale. Run python3 tools/embed_dashboard.py')

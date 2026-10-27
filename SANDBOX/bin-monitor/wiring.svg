@@ -1,75 +1,107 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1050" viewBox="0 0 1440 1050" role="img" aria-labelledby="title desc">
-<title id="title">BNTS smart bin: ESP32 DevKit wiring</title>
-<desc id="desc">Schematic connection guide. HC-SR04 VCC to 5V, TRIG to GPIO5, ECHO through a 1 kiloohm resistor to GPIO18 with a 2 kiloohm resistor from that node to ground. Lid reed switch between GPIO19 and ground. All grounds common.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1610" viewBox="0 0 1800 1610" role="img" aria-labelledby="title desc">
+<title id="title">BNTS smart bin — original Uno pins with added capacity sensor and ESP32-C3-Zero relay</title>
+<desc id="desc">Original Uno pins preserved: D7 Grove ultrasonic approach sensor single signal, D3 servo, D2 active high fully closed switch with external ten kiloohm pulldown, D8 status LED through a resistor. Added Grove capacity sensor uses D6. Optional HC-SR04 capacity sensor uses D5 trigger and D6 echo. Uno TX D1 connects through 2.2 kiloohms to ESP32-C3-Zero GPIO4 RX; 3.3 kiloohms connects that node to shared ground. Servo has separate suitable regulated 5 volt power.</desc>
 <defs><style>
-text{font-family:Arial,Helvetica,sans-serif;fill:#203642}.title{font-size:34px;font-weight:700;fill:#704988}.sub{font-size:19px;fill:#506773}.heading{font-size:25px;font-weight:700}.label{font-size:21px}.small{font-size:17px}.note{font-size:19px}.pin{font-size:21px;font-family:Consolas,monospace;font-weight:700}.wire{fill:none;stroke-width:4;stroke-linejoin:round;stroke-linecap:round}.resistor{fill:#fff;stroke:#704988;stroke-width:3}.ground{stroke:#203642;stroke-width:3;fill:none}.dot{fill:#203642}
-</style></defs>
-<rect width="1440" height="1050" fill="#f4f8fa"/>
-<rect x="0" y="0" width="1440" height="12" fill="#19c1ca"/>
-<text x="50" y="68" class="title">Smart bin · ESP32 wiring</text>
-<text x="50" y="105" class="sub">Schematic connection guide · classic ESP32 DevKit · pin positions are illustrative</text>
-<rect x="50" y="128" width="1340" height="60" rx="9" fill="#fff2df" stroke="#d79538"/>
-<text x="72" y="166" class="label" font-weight="700">HC-SR04 ECHO is 5 V. Use the divider shown — never connect it directly to an ESP32 GPIO.</text>
+text{font-family:Arial,Helvetica,sans-serif;fill:#203642}.title{font-size:35px;font-weight:700;fill:#704988}.sub{font-size:20px;fill:#506773}.heading{font-size:24px;font-weight:700}.label{font-size:20px}.small{font-size:17px}.tiny{font-size:15px}.pin{font-family:Consolas,monospace;font-size:21px;font-weight:700}.wire{fill:none;stroke-width:4;stroke-linejoin:round;stroke-linecap:round}.panel{fill:#fff;stroke:#b6c9d2;stroke-width:2}.signal{stroke:#178e9b}.uart{stroke:#704988}.ground{stroke:#344d59;fill:none;stroke-width:4}.resistor{fill:#fff;stroke:#704988;stroke-width:3}.muted{fill:#526d79}
+</style><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#704988"/></marker></defs>
+<rect width="1800" height="1610" fill="#f4f8fa"/><rect width="1800" height="12" fill="#19c1ca"/>
+<text x="55" y="66" class="title">Smart bin · Uno controller + ESP32-C3-Zero Wi-Fi relay</text>
+<text x="55" y="103" class="sub">Original working Uno pins preserved · schematic connections, not a physical board pinout</text>
+<rect x="55" y="125" width="1690" height="63" rx="10" fill="#fff2df" stroke="#d79538"/>
+<text x="78" y="163" class="label" font-weight="700">One DATA signal wire, plus essential common GND and separate power. Never connect Uno 5 V TX directly to C3 GPIO.</text>
 
-<rect x="70" y="225" width="340" height="435" rx="14" fill="#e7f7f8" stroke="#208e99" stroke-width="3"/>
-<text x="100" y="270" class="heading">ESP32 DevKit</text>
-<text x="100" y="300" class="small">3.3 V GPIO logic</text>
-<rect x="110" y="330" width="140" height="190" rx="8" fill="#d6e3e8" stroke="#72929e"/>
-<text x="180" y="424" text-anchor="middle" class="label" fill="#506773">ESP32</text>
-<text x="390" y="287" text-anchor="end" class="pin">5V / VIN</text>
-<text x="390" y="357" text-anchor="end" class="pin">GPIO5</text>
-<text x="390" y="437" text-anchor="end" class="pin">GPIO18</text>
-<text x="390" y="547" text-anchor="end" class="pin">GPIO19</text>
-<text x="390" y="627" text-anchor="end" class="pin">GND</text>
-<rect x="180" y="600" width="80" height="45" rx="4" fill="#fff" stroke="#7795a1"/>
-<text x="220" y="628" text-anchor="middle" class="small">USB</text>
+<!-- Uno: original pins are deliberately retained. -->
+<rect x="70" y="250" width="360" height="985" rx="16" fill="#e7f7f8" stroke="#208e99" stroke-width="3"/>
+<text x="100" y="294" class="heading">Arduino Uno</text>
+<text x="100" y="325" class="small">5 V controller · all bin decisions</text>
+<text x="410" y="387" class="pin" text-anchor="end">D7</text>
+<text x="410" y="557" class="pin" text-anchor="end">D6</text>
+<text x="410" y="737" class="pin" text-anchor="end">D3</text>
+<text x="410" y="937" class="pin" text-anchor="end">D2</text>
+<text x="410" y="1112" class="pin" text-anchor="end">D8</text>
+<text x="410" y="1197" class="pin" text-anchor="end">TX / D1</text>
+<rect x="105" y="405" width="105" height="400" rx="10" fill="#cce9ec" stroke="#7fa8b0"/>
+<text x="157" y="586" text-anchor="middle" class="heading">UNO</text>
+<text x="157" y="617" text-anchor="middle" class="small">ATmega328P</text>
+<text x="108" y="855" class="small">5 V → both Grove VCC pins</text>
+<text x="108" y="885" class="small">GND → both sensor GND pins</text>
+<text x="108" y="1018" class="small">USB power / programming</text>
+<text x="108" y="1048" class="small">No new pins for existing parts.</text>
+<text x="155" y="1218" class="pin">GND</text>
 
-<rect x="1070" y="225" width="300" height="335" rx="14" fill="#e7f7f8" stroke="#208e99" stroke-width="3"/>
-<text x="1175" y="267" class="heading">HC-SR04</text>
-<text x="1150" y="545" class="small">Distance sensor</text>
-<circle cx="1190" cy="360" r="33" fill="#d6e3e8" stroke="#72929e" stroke-width="3"/>
-<circle cx="1290" cy="360" r="33" fill="#d6e3e8" stroke="#72929e" stroke-width="3"/>
-<text x="1090" y="287" class="pin">VCC</text>
-<text x="1090" y="357" class="pin">TRIG</text>
-<text x="1090" y="437" class="pin">ECHO</text>
-<text x="1090" y="517" class="pin">GND</text>
+<!-- Three-pin Grove sensors use a single bidirectional signal each. -->
+<rect x="680" y="300" width="450" height="150" rx="12" class="panel"/>
+<text x="705" y="335" class="heading">Grove ultrasonic · approach</text>
+<text x="700" y="387" class="pin">SIG</text>
+<text x="830" y="377" class="small">VCC → Uno 5 V</text><text x="830" y="407" class="small">GND → common GND</text>
+<text x="705" y="435" class="tiny">Original sensor: one signal pin triggers and reads the echo.</text>
+<path d="M430 380H680" class="wire signal"/><text x="468" y="368" class="small muted">Existing single SIG</text>
 
-<!-- Supply and trigger -->
-<path d="M410 280 H1070" class="wire" stroke="#c75249"/>
-<text x="655" y="264" class="small" fill="#a73530">5 V supply</text>
-<path d="M410 350 H1070" class="wire" stroke="#149ca8"/>
-<text x="645" y="334" class="small">Trigger signal</text>
+<rect x="680" y="470" width="450" height="150" rx="12" class="panel"/>
+<text x="705" y="505" class="heading">Grove ultrasonic · capacity</text>
+<text x="700" y="557" class="pin">SIG</text>
+<text x="830" y="547" class="small">VCC → Uno 5 V</text><text x="830" y="577" class="small">GND → common GND</text>
+<text x="705" y="605" class="tiny">New inside sensor: one signal pin; point down into the bin.</text>
+<path d="M430 550H680" class="wire signal"/><text x="468" y="538" class="small muted">New single SIG</text>
 
-<!-- ECHO divider: upper 1k, lower 2k -->
-<path d="M410 430 H815 M955 430 H1070" class="wire" stroke="#704988"/>
-<rect x="815" y="416" width="140" height="28" class="resistor"/>
-<text x="885" y="405" text-anchor="middle" class="label" fill="#704988">R1 · 1 kΩ</text>
-<circle cx="720" cy="430" r="7" fill="#704988"/>
-<path d="M720 430 V515 M720 615 V720" class="wire" stroke="#704988"/>
-<rect x="706" y="515" width="28" height="100" class="resistor"/>
-<text x="752" y="557" class="label" fill="#704988">R2 · 2 kΩ</text>
-<text x="752" y="585" class="small">to common ground</text>
-<text x="488" y="464" class="small">≈ 3.3 V at GPIO18</text>
-<text x="856" y="474" class="small">5 V echo from sensor</text>
+<!-- Original D3 servo retained; power is separate from controller GPIO. -->
+<rect x="680" y="650" width="450" height="150" rx="12" fill="#fff7e9" stroke="#d6b173" stroke-width="2"/>
+<text x="705" y="685" class="heading">Lid servo</text><text x="700" y="737" class="pin">SIGNAL</text>
+<text x="850" y="722" class="small">Power → regulated 5 V</text><text x="850" y="752" class="small">GND → common GND</text>
+<text x="705" y="782" class="tiny">Supply must handle servo current. Never use ESP32 3.3 V.</text>
+<path d="M430 730H680" class="wire signal"/><text x="468" y="718" class="small muted">Original servo pin</text>
 
-<!-- Lid switch and common ground -->
-<path d="M410 540 H485 M565 540 H605 V720" class="wire" stroke="#d28530"/>
-<circle cx="485" cy="540" r="5" fill="#d28530"/>
-<circle cx="565" cy="540" r="5" fill="#d28530"/>
-<path d="M485 540 L558 518" class="wire" stroke="#d28530"/>
-<text x="447" y="592" class="small">Reed switch</text>
-<text x="445" y="616" class="small">(lid sensor)</text>
-<path d="M410 620 H435 V720 H1010 V510 H1070" class="wire" stroke="#314b58"/>
-<circle cx="605" cy="720" r="6" class="dot"/>
-<circle cx="720" cy="720" r="6" class="dot"/>
-<path d="M720 720 V748 M695 748 H745 M702 758 H738 M710 768 H730" class="ground"/>
-<text x="801" y="703" class="label">Common GND</text>
+<!-- Active-high switch input: explicit external pulldown; no INPUT_PULLUP. -->
+<rect x="680" y="845" width="450" height="200" rx="12" class="panel"/>
+<text x="705" y="880" class="heading">Fully closed position switch</text>
+<path d="M430 930H790V900H860 M930 900H1005" class="wire signal"/>
+<circle cx="790" cy="930" r="6" fill="#178e9b"/><circle cx="860" cy="900" r="5" fill="#178e9b"/><circle cx="930" cy="900" r="5" fill="#178e9b"/>
+<path d="M860 900 920 879" class="wire signal"/>
+<text x="1013" y="907" class="pin">5 V</text>
+<path d="M790 930V956 M790 1004V1015" class="wire ground"/>
+<rect x="778" y="956" width="24" height="48" class="resistor"/>
+<path d="M768 1015H812 M775 1025H805 M782 1035H798" class="ground"/>
+<text x="825" y="983" class="small">10 kΩ → GND</text>
+<text x="955" y="947" class="tiny">Closed → HIGH</text><text x="955" y="974" class="tiny">D2 uses INPUT</text>
+<text x="470" y="918" class="small muted">Original active-HIGH input</text>
 
-<rect x="50" y="800" width="1340" height="200" rx="10" fill="#fff" stroke="#c4d3dc"/>
-<text x="75" y="836" class="heading" fill="#704988">Before powering on</text>
-<text x="75" y="873" class="note">• Lid switch closes to GND when the lid is closed; GPIO19 uses the internal pull-up.</text>
-<text x="75" y="906" class="note">• Confirm your board’s 5V/VIN pin and GPIO labels. This is a connection schematic, not a physical pinout.</text>
-<text x="75" y="939" class="note">• Use USB power or a suitable regulated supply. Wi-Fi needs no USB data cable after the first upload.</text>
-<text x="75" y="972" class="note">• Do not combine external power and USB unless your board’s power circuit explicitly supports it.</text>
-<text x="50" y="1030" class="small">BNTS · Bin Monitor · Disconnect power before wiring · Real wiring, sensor calibration and Wi-Fi need hardware testing</text>
+<!-- Status LED: series resistor then LED anode, cathode common ground. -->
+<rect x="680" y="1050" width="450" height="110" rx="12" class="panel"/>
+<text x="705" y="1080" class="small">Original status LED</text>
+<path d="M430 1105H750 M820 1105H880 M920 1105H1060V1124" class="wire signal"/>
+<rect x="750" y="1094" width="70" height="22" class="resistor"/>
+<circle cx="900" cy="1105" r="20" fill="#ef8b77" stroke="#a1473e" stroke-width="2"/>
+<text x="900" y="1111" text-anchor="middle" class="tiny">LED</text>
+<path d="M1040 1124H1080 M1047 1134H1073 M1054 1144H1066" class="ground"/>
+<text x="747" y="1144" class="tiny">220–330 Ω</text><text x="852" y="1144" class="tiny">anode +</text><text x="957" y="1144" class="tiny">cathode −</text>
+
+<!-- ESP32-C3: just UART reception and Wi-Fi transport. -->
+<rect x="1320" y="300" width="410" height="450" rx="16" fill="#f0eaf6" stroke="#8e6da6" stroke-width="3"/>
+<text x="1350" y="343" class="heading">ESP32-C3-Zero</text>
+<text x="1350" y="374" class="small">Wi-Fi relay only · 3.3 V GPIO</text>
+<rect x="1440" y="398" width="175" height="123" rx="10" fill="#ddd5e8" stroke="#9d8aaf"/>
+<text x="1527" y="455" text-anchor="middle" class="heading">C3</text><text x="1527" y="485" text-anchor="middle" class="small">USB power / flash</text>
+<text x="1350" y="552" class="small">Receives the Uno’s calculated data.</text><text x="1350" y="579" class="small">No sensors or servo connect here.</text>
+<text x="1340" y="637" class="pin">GPIO4 / RX</text><text x="1340" y="707" class="pin">GND</text>
+<text x="1350" y="734" class="tiny">No C3 TX wire is required.</text>
+
+<!-- One data wire with a 5 V to nominal 3 V divider. -->
+<path d="M430 1190H850" class="wire uart"/><rect x="850" y="1175" width="140" height="30" class="resistor"/>
+<path d="M990 1190H1200V630H1320" class="wire uart" marker-end="url(#arrow)"/>
+<circle cx="1070" cy="1190" r="7" fill="#704988"/>
+<text x="500" y="1178" class="small">115200 baud · one-way UART</text><text x="920" y="1168" class="label" text-anchor="middle">R1 · 2.2 kΩ</text>
+<text x="1045" y="1230" class="small" text-anchor="end">~3.0 V at RX</text>
+<path d="M1070 1190V1260 M1070 1330V1390" class="wire uart"/><rect x="1055" y="1260" width="30" height="70" class="resistor"/>
+<text x="1100" y="1297" class="label">R2 · 3.3 kΩ</text>
+<path d="M180 1235V1390H1280V700H1320" class="ground"/><circle cx="1070" cy="1390" r="6" fill="#344d59"/>
+<path d="M800 1390V1410 M774 1410H826 M782 1421H818 M791 1432H809" class="ground"/>
+<text x="365" y="1376" class="label">COMMON GND · Uno + C3 + both sensors + servo supply + switch + LED</text>
+<text x="1350" y="955" class="small">One signal crosses between boards.</text><text x="1350" y="985" class="small">The common ground is essential.</text>
+<text x="1350" y="1040" class="small">Keep the Uno independent:</text><text x="1350" y="1070" class="small">lid control still works without Wi-Fi.</text>
+
+<rect x="55" y="1460" width="1690" height="105" rx="12" class="panel"/>
+<text x="78" y="1490" class="small">• Capacity default: Grove SIG on D6. Optional HC-SR04 capacity sensor: TRIG D5, ECHO D6; select that code option.</text>
+<text x="78" y="1519" class="small">• Switch closed → D2 HIGH; use the shown external 10 kΩ pulldown, not INPUT_PULLUP. Fully closed state is switch-measured; lid angle is commanded.</text>
+<text x="78" y="1548" class="small">• Use a servo-rated supply and common grounds. Check board power circuits before combining USB / external 5 V; avoid backfeeding.</text>
+<text x="55" y="1594" class="small">BNTS · Physical power, divider voltage, UART reliability, sensors, closure switch and servo still require hardware testing.</text>
 </svg>

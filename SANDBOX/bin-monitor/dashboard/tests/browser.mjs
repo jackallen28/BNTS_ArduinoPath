@@ -28,10 +28,16 @@ try {
       readable:new ReadableStream({start(controller){window.telemetry=controller;}})
     })}});
   });
-  await page.getByRole('button',{name:'Connect ESP via USB'}).click();
+  await page.getByRole('button',{name:'Connect Uno via USB'}).click();
   await page.evaluate(()=>window.telemetry.enqueue(new TextEncoder().encode('{"fill":82,"lidOpen":true}\n')));
-  await page.getByText('ESP · live',{exact:true}).waitFor();
+  await page.getByText('Uno · USB live',{exact:true}).waitFor();
   assert.equal(await page.locator('#percentage').textContent(),'82%');
+  const {crc16Ccitt} = await import('../model.js');
+  const payload = JSON.stringify({fill:63,lidOpen:false,sensorOk:true,ageMs:10,seq:4,closedSwitch:true,lidFault:false,homing:false});
+  const frame = '@'+payload+'*'+crc16Ccitt(payload).toString(16).padStart(4,'0')+'\n';
+  await page.evaluate(line=>window.telemetry.enqueue(new TextEncoder().encode(line)),frame);
+  await page.waitForFunction(()=>document.querySelector('#percentage').textContent==='63%');
+  assert.match(await page.locator('#controller-status').textContent(),/pressed/);
   assert.equal(await page.locator('#fill').isDisabled(),true);
   await page.getByRole('button',{name:'Return to simulation'}).click();
   await page.getByText('Simulation',{exact:true}).waitFor();

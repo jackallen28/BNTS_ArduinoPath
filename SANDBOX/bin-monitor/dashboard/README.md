@@ -1,57 +1,95 @@
-# BNTS Bin Monitor
+# Uno-controlled bin with an ESP32-C3-Zero Wi-Fi relay
 
-Existing SANDBOX dashboard, extended with Wi-Fi and a timber-box bin matching the supplied CAD reference. The illustration has honey-coloured wooden panels, charcoal top/base frames, a rear micro-servo and an independently hinged lid. It uses ArduinoPath's actual vanilla ES modules (`h`, `appWindow`), Vista theme and icon sprite, copied unchanged to `vendor/` from `BNTS_ArduinoPath/ui/`. The official school logo comes from `BNTS_PIPath/data/brand/logo_full_300.png`. The main ArduinoPath application stays separate from this experiment under SANDBOX.
+The Arduino Uno runs the entire bin: the original Grove approach sensor, closure-button homing, servo, LED and the added internal capacity sensor. The ESP32-C3-Zero receives completed Uno readings over a one-way UART and serves them, with this dashboard, over Wi-Fi. It has no sensor connections and makes no lid or capacity decisions. The Uno keeps working without the radio board, a phone or Wi-Fi.
 
-## Preview and simulation
+## Programs to upload
 
-From the ArduinoPath repository, run `cd SANDBOX/bin-monitor/dashboard` then `npm start` (Python 3). The cloud working copy at `/workspace/SANDBOX` supports the same commands. This serves the existing dashboard on port 8090 with no application dependency install. Use the fill slider, add waste, empty bin and open/close lid buttons. Auto demo updates every 1.5 seconds. The lid rotates continuously about its rear hinge rather than swapping open/closed images. A separate teal fill indicator visualises the reading while the timber walls stay opaque. The illustrated servo matches the reference hardware; the current sketch reports lid-switch state and does not actuate a servo. Warnings start at 70% and 90%; reduced-motion preferences disable transitions. The activity list keeps the latest 15 events in memory. No student data is stored.
+- **Uno:** `firmware/uno_bin_controller/uno_bin_controller.ino`. Select **Arduino Uno** and install the standard Arduino Servo library if needed. Keep the supporting headers in the sketch folder.
+- **ESP32-C3-Zero:** `firmware/esp32_c3_wifi_bridge/esp32_c3_wifi_bridge.ino`. Install Espressif's Arduino ESP32 core, select the correct ESP32-C3 board (commonly ESP32C3 Dev Module), and enable USB CDC On Boot for optional USB debug. Check your board vendor's flashing instructions. Keep `relay_protocol.h` and `dashboard_assets.h` beside the sketch. The display assets use flash space: choose a 4 MB flash layout with a sufficiently large application partition (for example a supported 3 MB/no-OTA layout); the exact menu depends on the board/core. Check the reported binary size before flashing. A default small OTA app partition may be too small.
 
-The generated `wifi-preview.png` shows this same dashboard with explicitly labeled **simulated ESP32 readings**. It is not proof of hardware connectivity.
+`firmware/legacy_esp32_monitor/` is the archived earlier single-ESP32 experiment. It is not the program for this two-board wiring.
 
-## Wi-Fi: open the dashboard directly from the ESP32
+The new Uno program preserves the supplied working sketch's pin assignments, 30 cm detection threshold, 0° open command, 400 ms button-release check, fixed five-second opening/hold period, closing sweep at one degree per 15 ms until the closure button is pressed, 300 ms relaxation delay, servo detach, and two-second cooldown. Startup also homes before approach detection. Scheduling these phases without multi-second delays lets telemetry and capacity sampling continue. A sweep that never finds the button retains the original 90° fallback and reports a fault; it cannot claim a verified closed lid.
 
-1. Generate the embedded dashboard with `python3 tools/embed_dashboard.py` after any UI, guide, logo or diagram changes. This writes `firmware/bin_monitor/dashboard_assets.h`; no SD card, external website, CDN or separate filesystem upload is needed.
-2. Open `firmware/bin_monitor/bin_monitor.ino` in Arduino IDE. Install the official Espressif ESP32 core, select the correct **classic ESP32 DevKit** model and port, then compile and upload. The sketch uses only bundled `WiFi.h` and `WebServer.h` libraries. Firmware target compilation is currently unverified in this cloud environment: the core installation was blocked by HTTP 403 from `downloads.arduino.cc` and `espressif.github.io`.
-3. After this initial flash, power the ESP32 from a suitable regulated supply or USB charger/power bank. A USB data connection to the viewing device is **not required**. Do not connect an external supply and USB together without checking the board's power schematic.
-4. In the phone/laptop Wi-Fi settings, join **BNTS-Bin-Monitor**. It is an open classroom demonstration network with no password. If prompted that there is no internet, choose to stay connected. The AP supplies its own local network; it does not need a router or internet. This is not an automatic captive portal.
-5. Manually open **http://192.168.4.1** (HTTP, not HTTPS). The ESP32 serves the same dashboard, theme, logo and scripts from flash. It automatically starts same-origin `/api/telemetry` polling, approximately twice a second. It never requests USB access in this mode. This avoids browser mixed-content, CORS and Web Serial secure-context restrictions. Opening the cloud/local development page does not join the ESP Wi-Fi; open the board address after joining its network.
-6. Fill changes animate the bin level; reed-switch changes animate the lid. Simulation controls are locked while live. **Return to simulation** pauses monitoring; **Connect via Wi-Fi** resumes. Disconnects, malformed telemetry and stale/failed sensor readings are identified rather than presented as live. The dashboard retries failed HTTP requests automatically.
+## Wiring: one data signal, plus essential common ground
 
-## Wiring and calibration
+See [the Uno + C3 wiring diagram](assets/uno-c3-wiring.svg). This is a connection schematic, not a physical pinout.
 
-See [the wiring diagram](assets/esp32-wiring.svg). It is a connection schematic, not a physical board pinout; check your board's labels. GPIO assignments below are for classic ESP32 DevKit, not ESP32-C3/S3 or ESP8266.
-
-| ESP32 connection | Peripheral |
+| Uno pin | Connection |
 | --- | --- |
-| 5V/VIN board supply, check board documentation | HC-SR04 VCC (5 V) |
-| GND | HC-SR04 GND and shared ground |
-| GPIO5 | HC-SR04 TRIG |
-| GPIO18 | Divider junction: HC-SR04 ECHO → 1 kΩ → junction; junction → 2 kΩ → GND |
-| GPIO19 | Reed switch to GND, switch closed when lid closed; internal INPUT_PULLUP |
+| D2 | Existing active-HIGH closure button; INPUT, not INPUT_PULLUP |
+| D3 | Existing servo signal |
+| D7 | Existing Grove single-signal approach ultrasonic sensor SIG |
+| D8 | Existing status LED, with its current-limiting resistor |
+| D6 | New Grove single-signal capacity ultrasonic sensor SIG |
+| 5 V / GND | Grove sensor supply and common ground |
+| D1 / TX | One-way telemetry through the divider below to C3 GPIO4 |
 
-**Never connect HC-SR04's 5 V ECHO directly to the ESP32's 3.3 V GPIO.** The divider shown reduces nominal 5 V to about 3.33 V; check actual voltage and resistor tolerances on your hardware. Mount the ultrasonic sensor facing into the bin, away from the moving lid. Set `EMPTY_CM` and `FULL_CM` to measured distances (defaults 40 cm and 5 cm). Opening the lid is visual feedback from the switch; the sketch does not drive a servo or motor.
+For a bare closure button: connect the switch between D2 and 5 V, with a 10 kΩ pulldown from D2 to GND. An existing button module may already provide this resistor. Keep the working active-HIGH arrangement from the original program.
 
-## Telemetry and optional USB
+The default second sensor is the same Grove single-signal type. If using an HC-SR04 for capacity instead, select the documented two-pin capacity option in the Uno sketch: TRIG D5, ECHO D6, VCC 5 V and GND. Both sensors are connected to the **5 V Uno**, so their echo signals do not go into ESP32 pins. Ultrasonic bursts alternate, separated by at least 60 ms, to reduce cross-talk.
 
-`GET /api/telemetry` returns uncached JSON:
+### Uno-to-C3 signal
 
-```json
-{"fill":42,"lidOpen":false,"sensorOk":true,"ageMs":0}
+```text
+Uno D1/TX ── 2.2 kΩ ──┬── ESP32-C3-Zero GPIO4 / UART RX
+                      └── 3.3 kΩ ── common GND
+Uno GND ─────────────────────────── C3 GND
 ```
 
-`fill`: finite 0–100, `lidOpen`: boolean, `sensorOk`: last distance measurement succeeded, `ageMs`: milliseconds since the last good distance sample. Sampling runs every 500 ms. On timeout the firmware retains the previous fill, marks `sensorOk:false` and keeps sampling the lid. The dashboard continues lid animation and labels the fill as last known. Data older than five seconds is not displayed as live. Before the first valid reading the fill is unknown, not a simulated measurement.
+The divider reduces nominal 5 V to about 3.0 V. **Never connect Uno TX directly to the C3's 3.3 V GPIO.** Use short wires and verify actual voltages. C3 TX is not connected. “One signal wire” means one data signal; shared ground and suitable power are still necessary. No acknowledgements or commands come back from Wi-Fi to the Uno.
 
-Optional desktop USB mode still accepts newline-delimited JSON at 115200 baud via Chrome/Edge Web Serial on localhost or HTTPS. Close Arduino IDE's Serial Monitor first. Both the updated extended payload and the original `{fill,lidOpen}` format work. Web Serial is optional and is not used by Wi-Fi access at the board's HTTP address.
+Power the servo from a suitable regulated 5 V supply sized for its starting/stall current, with the supply ground joined to the Uno and C3 grounds. Do not power the servo from ESP32 3V3. Follow each board's power documentation; avoid backfeeding USB from an external supply. Either board can have its own USB power, but their grounds still need joining for UART. Uno D1 is also the hardware USB serial output; bootloader/debug noise is rejected by the bridge's framing and checksum checks. Do not add a second transmitter onto this signal.
 
-## Validation
+## Capacity calibration
 
-- `npm test`: telemetry ranges, sensor health, stale metadata and serial framing.
-- `node --check app.js`: module syntax.
-- `python3 tools/embed_dashboard.py --check`: embedded firmware assets match the dashboard sources.
-- `node tests/bin-view-browser.mjs`: actual open/closed browser captures and animated GIF; checks intermediate lid positions, fixed hinge, fill indicator, mobile fit and reduced motion. Requires the development server.
-- `node tests/browser.mjs`: simulation, fill/lid controls, mocked USB and mobile layout; requires the development server.
-- `node tests/wifi-browser.mjs`: intercepts browser requests to `http://192.168.4.1` with packaged dashboard assets and simulated telemetry. Checks automatic Wi-Fi connection, no USB calls, live fill/lid animation, timeouts, stale data, recovery and mobile layout. It does not contact a physical board.
+Mount the capacity sensor inside the bin facing the contents. Set the Uno configuration's empty and full distances to real measurements (defaults 400 mm empty, 50 mm full). The Uno computes and filters the percentage, retains the last valid value on a sensor timeout, and marks it invalid while the lid is open/moving or not confirmed closed. It waits for the closed lid to settle and collects fresh samples before trusting capacity again. The dashboard displays last-known or unknown fill instead of pretending a timeout means empty.
 
-Browser tests use the existing pinned Playwright dependency in the ArduinoPath repository (run `npm ci` at the repository root) and `/usr/bin/chromium`. In this cloud workspace use `npm ci --cache /workspace/.cache/npm` to keep the cache writable. `BIN_MONITOR_URL` overrides the local development-server address for screenshot/USB tests. Node 22+ is needed for tests. Browser tests generate preview screenshots in SANDBOX. Regenerate embedded assets before flashing whenever dashboard files change.
+The closure button detects the closed stop; it does not measure the complete lid angle. `lidOpen` is the Uno's command, `closedSwitch` is the button input, and `lidFault` identifies a failed home or failed release check. Check servo direction, mechanical travel, switch placement and fallback behaviour before unattended operation. Proximity control is not safety-certified obstruction detection.
 
-Still requiring real hardware: compile/upload for the selected board, power stability, actual AP association and DHCP/address access from a phone/laptop, real on-board HTTP serving and polling, RF range/reconnection, divider voltage, sensor readings/calibration, and lid-switch orientation/bounce. Cloud browser tests demonstrate the dashboard protocol and animation, not those physical results.
+## Wi-Fi use
+
+After flashing both boards, power them and join **BNTS-Bin-Monitor** from your phone/laptop. Stay connected if the device warns there is no internet. Manually open **http://192.168.4.1** (HTTP, not HTTPS). The C3 creates the local access point and serves the dashboard from flash; no router, internet or USB data connection is needed by the viewing device. This is not an automatic captive portal.
+
+The dashboard uses your supplied model animation frames: it plays them forward on an open command, holds the final frame while open, and reverses the same frames on a close command. It holds the first frame closed instead of looping continuously. Reduced-motion preferences show the relevant endpoint directly. No replacement bin geometry is drawn. The currently downloadable source is your original MP4, retained at `assets/source/bin-opening.mp4`; the inline GIF messages did not expose a downloadable original GIF. `tools/prepare_bin_media.py` can pack the original `.gif` when that file is available, or reproduce the current assets from the MP4. Only shared-bound cropping, resizing and compression are applied to those supplied pixels.
+
+The page polls same-origin `/api/telemetry`. The C3 forwards the original checked Uno JSON unchanged inside an envelope containing UART connection health and elapsed receive time. Missing/corrupt/stale Uno frames never become a fabricated zero-fill measurement. The dashboard shows the lid command and closure-switch/fault status. Simulation buttons are disabled while connected and do not command the real bin.
+
+## UART and HTTP contract
+
+UART: 115200 baud, 8N1, Uno TX only. One frame per 500 ms:
+
+```text
+@<Uno JSON>*<four uppercase CRC hex digits>\n
+```
+
+CRC-16/CCITT-FALSE covers the exact JSON bytes: polynomial 0x1021, initial 0xFFFF, no reflection or final XOR. JSON is limited to 192 bytes. Required fields: `fill` (integer 0–100), `lidOpen`, `sensorOk`, `ageMs` (unsigned milliseconds since the Uno's last valid capacity sample), `seq` (unsigned frame counter). Additional Uno booleans: `approachOk`, `lidMoving`, `closedSwitch`, `lidFault`, `homing`. This transport check is integrity checking, not encryption or authentication.
+
+Example HTTP response:
+
+```json
+{"connected":true,"receivedAgeMs":8,"telemetry":{"fill":42,"lidOpen":false,"sensorOk":true,"ageMs":90,"seq":12,"approachOk":true,"lidMoving":false,"closedSwitch":true,"lidFault":false,"homing":false}}
+```
+
+Before any valid UART frame: `{"connected":false,"receivedAgeMs":null,"telemetry":null}`. After two seconds without a valid frame, `connected` becomes false and the last JSON is retained solely as last-known data. The C3 does not reinterpret or recompute any of its sensor fields.
+
+Optional direct-Uno USB monitoring uses Chrome/Edge Web Serial on localhost or HTTPS. It accepts the same checksummed frames at 115200. The C3's USB port is for flashing/debug, not Uno sensor telemetry.
+
+## Develop and validate
+
+From the ArduinoPath repository root, install the pinned browser-test tools with `npm ci` (cloud cache: `npm ci --cache /workspace/.cache/npm`). Then:
+
+```sh
+cd SANDBOX/bin-monitor/dashboard
+npm test
+npm run test:firmware
+python3 tools/embed_dashboard.py
+python3 tools/embed_dashboard.py --check
+npm start
+```
+
+With the server running, `node tests/bin-view-browser.mjs` verifies exact source-frame pixels, forward/reverse playback, endpoint holds, interrupted-motion reversal and reduced motion. `node tests/browser.mjs` checks simulation and direct-Uno USB framing. `node tests/wifi-browser.mjs` serves the actual embedded dashboard bytes through intercepted HTTP to test Uno-to-relay responses and Wi-Fi UI behaviour. `BIN_MONITOR_URL` overrides the server address. Cloud browser checks use Chromium at `/usr/bin/chromium`.
+
+The embedding script writes `firmware/esp32_c3_wifi_bridge/dashboard_assets.h`; regenerate after dashboard, wiring or guide changes. The supplied source-video file and gallery GIF are kept in Git for reproducibility; only the compact frame atlas and manifest are embedded on the C3. No SD card, external CDN or separate filesystem upload is needed. The C3 serves static display assets but all bin control and capacity calculations remain on the Uno.
+
+Host C++ tests exercise the actual controller and relay code, including serial integrity and cross-board framing. They are not AVR or ESP32-C3 target builds. Target compilation is currently blocked in this cloud environment by denied Arduino/Espressif package-download hosts. Physical tests still needed: both target builds/uploads, Uno startup/closing calibration and servo safety, two-sensor placement/cross-talk and capacity calibration, divider voltage and shared ground, C3 AP association/HTTP, unplugged-link recovery and power stability.
