@@ -46,11 +46,16 @@ jobs:
           npm test
           npm run test:firmware
           python3 tools/embed_dashboard.py --check
+          python3 tools/make_uno_single_file.py --check
 
       - name: Compile the Uno controller
         run: |
           cli() { "$RUNNER_TEMP/cp/arduino/bin/arduino-cli" --config-file "$RUNNER_TEMP/cp/arduino/arduino-cli.yaml" "$@"; }
           cli compile --fqbn arduino:avr:uno --warnings default --output-dir "$RUNNER_TEMP/out/uno" firmware/uno_bin_controller
+          # The one-file version for ArduinoPath's Free Play must build the same program.
+          cli compile --fqbn arduino:avr:uno --warnings default --output-dir "$RUNNER_TEMP/out/uno1" firmware/uno_single_file
+          cmp "$RUNNER_TEMP/out/uno/uno_bin_controller.ino.hex" "$RUNNER_TEMP/out/uno1/uno_single_file.ino.hex" \
+            && echo "The one-file version builds exactly the same program."
 
       - name: Compile the ESP32-C3 Wi-Fi relay
         run: |
@@ -67,7 +72,8 @@ jobs:
           mkdir -p "$RUNNER_TEMP/flash"
           cp "$RUNNER_TEMP"/out/uno/uno_bin_controller.ino.hex "$RUNNER_TEMP/flash/uno_bin_controller.hex"
           cp "$RUNNER_TEMP"/out/c3/esp32_c3_wifi_bridge.ino.merged.bin "$RUNNER_TEMP/flash/esp32_c3_wifi_bridge-flash-at-0x0.bin"
-          cp FLASHING.md "$RUNNER_TEMP/flash/" 2>/dev/null || true
+          cp firmware/uno_single_file/uno_single_file.ino "$RUNNER_TEMP/flash/"
+          cp ../TEST-NOW.md "$RUNNER_TEMP/flash/"
           ls -l "$RUNNER_TEMP/flash"
 
       - uses: actions/upload-artifact@v4

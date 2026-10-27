@@ -17,7 +17,7 @@ struct Config {
   uint32_t openHoldMs = 5000;
   uint16_t cooldownMs = 2000;
   uint16_t approachIntervalMs = 200;
-  uint16_t openDistanceMm = 300; // Original integer-cm condition: 1..30cm.
+  uint16_t openDistanceMm = 300; // Original integer-cm condition: 1..30 cm.
   uint16_t emptyDistanceMm = 400;
   uint16_t fullDistanceMm = 50;
   uint16_t maxCapacityDistanceMm = 600;
@@ -53,7 +53,7 @@ class Controller {
     if (phase_ == Phase::Homing) {
       if (elapsed(now, lastHomingStepMs_) >= config_.homingStepMs) {
         lastHomingStepMs_ = now;
-        // Original order: write(position), dwell15ms, THEN sample the switch.
+        // Original order: write(position), dwell 15 ms, THEN sample the switch.
         if (closedSwitch_) {
           learnedClosedAngle_ = servoAngle_;
           lidFault_ = false;
@@ -61,7 +61,7 @@ class Controller {
         } else if (servoAngle_ < config_.homeMaxAngle) {
           ++servoAngle_;
         } else {
-          // Original full unsuccessful 0..180 sweep falls back to90deg.
+          // Original full unsuccessful 0..180 sweep falls back to 90 deg.
           learnedClosedAngle_ = config_.fallbackClosedAngle;
           servoAngle_ = learnedClosedAngle_;
           lidFault_ = true;
@@ -76,7 +76,7 @@ class Controller {
         phaseStartedMs_ = now;
         phase_ = cycleClosing_ ? Phase::Cooldown : Phase::Closed;
         // First loop after setup samples immediately. Later cycles retain
-        // cooldown2s followed by the original loop's final200ms delay.
+        // cooldown 2 s followed by the original loop's final 200 ms delay.
         lastApproachMs_ = cycleClosing_ ? now : now - config_.approachIntervalMs;
       }
     } else if (phase_ == Phase::OpeningCheck) {
@@ -106,7 +106,7 @@ class Controller {
   }
 
   // Distance is in integer millimetres. The hardware adapter reproduces the
-  // original Grove duration/29/2 integer centimetres, multiplied by10.
+  // original Grove duration/29/2 integer centimetres, multiplied by 10.
   void approachSample(uint16_t distanceMm, bool valid, uint32_t now) {
     if (!started_) begin(now, false);
     if (!approachDue(now)) return;
@@ -118,7 +118,7 @@ class Controller {
       servoAttached_ = ledOn_ = true;
       servoAngle_ = config_.openAngle;
       commandOpen_ = true;
-      // Preserve original fixed5s cycle even if the hand remains nearby.
+      // Preserve original fixed 5 s cycle even if the hand remains nearby.
       invalidateCapacity();
     }
   }
@@ -186,10 +186,10 @@ class Controller {
     phase_ = Phase::Homing;
     commandOpen_ = false;
     servoAttached_ = ledOn_ = true;
-    servoAngle_ = 0; // Original closeAndRelaxBin always starts its sweep at0.
+    servoAngle_ = 0; // Original closeAndRelaxBin always starts its sweep at 0.
     lastHomingStepMs_ = phaseStartedMs_ = now;
     invalidateCapacity();
-    // The first switch check follows the original15ms dwell at position0.
+    // The first switch check follows the original 15 ms dwell at position 0.
   }
 
   const Config &config_;

@@ -1,7 +1,31 @@
-// Arduino Uno R3: preserve the original Grove lid-control program, adding
-// an internal capacity sensor and one-way telemetry. No Wi-Fi decisions here.
-// D1 TX ->2.2k -> C3 GPIO4 RX junction; junction ->3.3k ->common GND.
-// No C3 TX connection. Never apply the Uno's5V signal directly to C3 GPIO.
+// =====================================================================
+//  BNTS smart bin: Arduino Uno controller
+// =====================================================================
+//  The Uno runs the whole bin. The ESP32-C3 only shows its readings on a
+//  web page, so the bin keeps working with or without Wi-Fi.
+//
+//  What it does:
+//   - A hand within 30 cm of the approach sensor opens the lid for 5 s.
+//   - Then the servo closes the lid until the closed button is pressed.
+//   - A second sensor inside the bin measures how full it is (0-100 %).
+//   - Every half second it sends the readings to the ESP32-C3 on TX (D1).
+//
+//  Wiring (Uno pin -> part):
+//   D2  closed button (active HIGH, with a 10k pull-down to GND)
+//   D3  servo signal (servo power from a separate 5 V supply, GND shared)
+//   D6  Grove ultrasonic SIG, inside the bin (fill level)
+//   D7  Grove ultrasonic SIG, facing out (hand detection)
+//   D8  LED, through a 220 ohm resistor
+//   D1/TX -> 2.2k -> ESP32-C3 GPIO4, and GPIO4 -> 3.3k -> GND.
+//         NEVER connect Uno TX straight to the C3: 5 V damages it.
+//   GND -> ESP32-C3 GND (the boards must share ground)
+//
+//  Upload with board "Arduino Uno". Unplug the wire on D1 if an upload
+//  fails, then plug it back in afterwards.
+//  Settings to check: CAPACITY_USE_HCSR04 below, and the empty/full
+//  distances (emptyDistanceMm, fullDistanceMm) in bin_controller.h.
+// =====================================================================
+
 #include <Servo.h>
 #include <stdio.h>
 #include "bin_controller.h"
@@ -13,7 +37,7 @@ const uint8_t APPROACH_GROVE_PIN = 7;
 const uint8_t LED_PIN = 8;
 
 // Default second sensor is a Grove SINGLE SIGNAL ultrasonic on D6.
-// Set1 only when the capacity sensor is a four-pin HC-SR04: TRIG D5,ECHO D6.
+// Set to 1 only when the capacity sensor is a four-pin HC-SR04: TRIG D5, ECHO D6.
 #define CAPACITY_USE_HCSR04 0
 const uint8_t CAPACITY_GROVE_PIN = 6;
 const uint8_t CAPACITY_TRIG = 5;
@@ -24,9 +48,10 @@ const uint32_t CAPACITY_INTERVAL_MS = 200;
 const uint32_t TELEMETRY_INTERVAL_MS = 500;
 const unsigned long TELEMETRY_BAUD = 115200;
 
-// Original lid defaults: open0deg; close sweep0..180 in15ms steps, learn switch
-// hit, fallback90deg; settle300ms/detach; releasecheck400ms; hold5s; cooldown2s.
-// New capacity defaults: empty400mm, full50mm. Calibrate to your actual bin.
+// Original lid defaults: open at 0 deg; close by sweeping 0..180 deg in 15 ms
+// steps until the button is hit (fallback 90 deg); settle 300 ms then detach;
+// release check at 400 ms; hold open 5 s; cool down 2 s.
+// Capacity defaults: empty 400 mm, full 50 mm. Calibrate to your actual bin.
 bincontrol::Config settings;
 bincontrol::Controller controller(settings);
 Servo myServo;
@@ -88,8 +113,8 @@ void publishTelemetry(uint32_t now) {
 }
 
 void drainTelemetry() {
-  // Use only free hardware-UART buffer space, so a171-byte frame does not
-  // block the original15ms servo sweep while waiting for serial transmission.
+  // Use only free hardware-UART buffer space, so a 171-byte frame does not
+  // block the original 15 ms servo sweep while waiting for serial transmission.
   const int available = Serial.availableForWrite();
   if (available <= 0 || frameOffset == frameLength) return;
   const size_t remaining = frameLength - frameOffset;
@@ -123,7 +148,7 @@ void setup() {
   pinMode(CAPACITY_ECHO, INPUT);
 #endif
   // Edit settings above or assign calibration fields here BEFORE begin().
-  Serial.begin(TELEMETRY_BAUD); // Changed from original9600 for the C3 bridge.
+  Serial.begin(TELEMETRY_BAUD); // Changed from the original 9600 for the C3 bridge.
   const uint32_t now = millis();
   controller.begin(now, digitalRead(BUTTON_PIN) == HIGH);
   applyOutputs();
@@ -144,7 +169,7 @@ void loop() {
     } else if (controller.capacityMeasurementAllowed(now) &&
                (uint32_t)(now - lastCapacityPingMs) >= CAPACITY_INTERVAL_MS &&
                !controller.approachDueSoon(now, PING_GAP_MS)) {
-      // Prioritise the original200ms proximity poll and leave70ms quiet time.
+      // Prioritise the original 200 ms proximity poll and leave 70 ms quiet time.
       lastPingMs = lastCapacityPingMs = now;
       const uint16_t mm = measureCapacityMm(valid);
       now = millis();
