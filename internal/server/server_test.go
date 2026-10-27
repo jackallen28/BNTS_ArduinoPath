@@ -284,6 +284,8 @@ func TestSettings(t *testing.T) {
 	c.want(400, "PUT", "/api/me/settings", map[string]any{"help_level": "beginner", "board": "pico", "nudges": true})
 	c.want(400, "PUT", "/api/me/settings", map[string]any{"help_level": "beginner", "board": "uno", "nudges": true, "board_variant": "old-bootloader"})
 	c.want(400, "PUT", "/api/me/settings", map[string]any{"help_level": "beginner", "board": "uno", "theme": "dark"})
+	c.want(200, "PUT", "/api/me/settings", map[string]any{"help_level": "beginner", "board": "uno", "nudges": true, "coding": "blocks"})
+	c.want(400, "PUT", "/api/me/settings", map[string]any{"help_level": "beginner", "board": "uno", "nudges": true, "coding": "scratch"})
 }
 
 func TestAutosaveIsPrivate(t *testing.T) {

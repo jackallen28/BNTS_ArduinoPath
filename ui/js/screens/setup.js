@@ -1,13 +1,13 @@
-// Step 2 of the journey: how much help, and which board.
+// Step 2 of the journey: how much help, which board, and text or blocks.
 
 import { api } from "../api.js";
 import { h, icon, clear, joinNames } from "../dom.js";
-import { HELP_LEVELS, optionCards, boardOptions } from "../dialogs/settings.js";
+import { HELP_LEVELS, CODING_STYLES, optionCards, boardOptions } from "../dialogs/settings.js";
 import { messageBox } from "../widgets/window.js";
 import { state } from "../state.js";
 
 export function setupScreen(root, { onDone }) {
-  const settings = { ...state.me.settings, help_level: state.me.settings.help_level || "beginner" };
+  const settings = { ...state.me.settings, help_level: state.me.settings.help_level || "beginner", coding: state.me.settings.coding || "text" };
   const go = h("button", { class: "pill big default", type: "button", onclick: save }, "Let's go!");
 
   async function save() {
@@ -34,6 +34,9 @@ export function setupScreen(root, { onDone }) {
             h("legend", { text: "Which board do you have?" }),
             h("p", { class: "small muted", text: "Not sure? Ask your teacher, or look for the name printed on the board." }),
             optionCards({ name: "board", options: boardOptions(), value: settings.board, className: "compact", onChange: (v) => { settings.board = v; settings.board_variant = ""; } })),
+          h("fieldset", { class: "groupbox" },
+            h("legend", { text: "How do you want to write code?" }),
+            optionCards({ name: "coding", options: CODING_STYLES, value: settings.coding, className: "compact", onChange: (v) => { settings.coding = v; } })),
           h("p", { class: "small muted", text: "You can change these any time in Settings." }),
           h("div", { class: "setup-go" }, go)))),
     h("img", { class: "bnts-pixels", src: "img/bnts-pixels.svg", alt: "" })));

@@ -547,3 +547,14 @@
   .run-holder { position: static; width: 100%; height: auto; min-height: 420px; padding: 0 10px 10px; }
 }
 .about-path { word-break: break-all; user-select: all; }
+
+/* ---------- Text or Blocks (the code column) ---------- */
+.coding-tabs { padding: 8px 10px 0; margin-bottom: -10px; }
+.code-column .editor-holder[hidden] { display: none; }
+.blocks-holder { min-height: 0; }
+.blocks-view { flex: 1; min-height: 0; display: flex; flex-direction: column; border: 1px solid #898c95; background: #fff; }
+.blocks-area { flex: 1; min-height: 340px; position: relative; }
+.blocks-code-box { border-top: 1px solid var(--panel-border); background: var(--panel-frame); }
+.blocks-code-box > summary { padding: 4px 10px; cursor: pointer; color: var(--instruction); font-size: var(--font-size-small); }
+.blocks-code { margin: 0; max-height: 170px; overflow: auto; padding: 6px 10px; background: #fff; border-top: 1px solid #dde5ee; font-size: 12px; line-height: 1.4; }
+.blocklyText.ap-raw-line, .ap-raw-line { font-family: var(--font-code) !important; }

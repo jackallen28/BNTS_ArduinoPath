@@ -37,8 +37,9 @@ Nillumbik Tech School (BNTS)**.
 
 1. **Login (the welcome screen, as in PiPath):** pick your name from the profiles on this
    laptop, or **I'm new here**: **first name(s) + school only** (up to 4 names when students share
-   a laptop and kit). No password: it's the student's own laptop → step 2: **how much help** and
-   **which board they have** (Uno, Nano, NodeMCU, ESP32...) → the **project picker**. A
+   a laptop and kit). No password: it's the student's own laptop → step 2: **how much help**,
+   **which board they have** (Uno, Nano, NodeMCU, ESP32...) and **Text or Blocks** → the
+   **project picker**. A
    **Settings** button on every screen changes these at any time. The welcome screen also links
    to the **WIPE page** (§4).
 2. **Free choice:** every project is open from day one, in any order. Tiers are a guide only (a
@@ -51,7 +52,12 @@ Nillumbik Tech School (BNTS)**.
 5. **Programming, one part at a time:** each step has instructions, starter code (may contain `___`
    blanks), a **checklist** checked automatically when the student presses Run / Upload (plus "I saw
    it happen" ticks for hardware), and a **Coach** that explains compiler and runtime errors in
-   plain English with tiered hints.
+   plain English with tiered hints. **Text or Blocks** (tabs above the code, any time): Blocks
+   shows the same code as drag-and-drop blocks (Blockly, MakeCode-style), with the C++ they make
+   underneath. The C++ is always what runs, so checks, the Coach, Run and Upload work the same.
+   Every starter becomes blocks automatically (`ui/js/blocks/cpp.js`): a `___` blank is an empty
+   gap, and C++ with no block yet stays as a grey "C++ code" block, so no project needs extra
+   content for Blocks.
 6. **Simulator or Real board (MakeCode-style):** every project runs on the on-screen board
    (Simulator) or the real board over USB (Upload). **Watch the goal** plays the step's model answer
    in the simulator so students see what should happen before trying it on hardware.
@@ -154,6 +160,9 @@ student laptop (Windows 10/11, no admin rights)
   with arduino-cli and uploads over USB itself (`/api/compile`, `/api/upload`, one job at a time),
   and the Serial Monitor reads the port in Go and streams it to the page (`/api/serial`). No Web
   Serial needed, so any Chromium browser works.
+- **Block coding** uses Blockly 12 (Apache-2.0), vendored in `ui/vendor/blockly/` and loaded
+  only when a student first picks Blocks. Its CSS is saved as a file there (the CSP allows no
+  inline styles).
 - **The web app** is plain HTML / CSS / ES modules, no build step; third-party code is vendored
   with its licence, never loaded from a CDN.
 - **macOS: `ArduinoPath.app`**, the same program as one universal binary (Intel + Apple Silicon,
@@ -353,6 +362,7 @@ Tiers: **Getting Started** (green), **Sensors & Sound**, **Displays & Lights**, 
 | Getting Started | Blink & Traffic Lights | 3 LEDs, resistors | all |
 | Getting Started | Button Night Light | LED, button | all |
 | Getting Started | Serial Chatbot (screen only, Serial Monitor) | none | all |
+| Getting Started | Smart Bin (opens its lid for a hand) | HC-SR04, servo, LED | all (divider on 3.3V) |
 | Sensors & Sound | Light Theremin | LDR, piezo buzzer | all |
 | Sensors & Sound | Servo Dial | potentiometer, servo | all |
 | Sensors & Sound | Parking Sensor | HC-SR04, 3 LEDs, buzzer | all (divider on 3.3V) |
@@ -465,3 +475,4 @@ Classroom kits differ: keep a `content/kit.json` of what the school owns, so the
   the browser.
 - **Separate from PiPath:** different repository, no shared code.
 - Free choice of projects. Stars measure independence. Help level is the student's choice.
+- **Text or Blocks** is the student's choice too (setup, Settings, or the tabs above the code).

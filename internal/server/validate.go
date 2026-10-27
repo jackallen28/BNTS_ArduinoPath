@@ -90,9 +90,11 @@ type Settings struct {
 	Board     string `json:"board"`                   // a board id
 	Nudges    bool   `json:"nudges"`                  // the adaptive Coach's "stuck?" nudges
 	BoardVar  string `json:"board_variant,omitempty"` // e.g. "old-bootloader" for Nano clones
+	Coding    string `json:"coding,omitempty"`        // "" or text | blocks: how they like to write code
 }
 
 var helpLevels = []string{"beginner", "moderate", "advanced"}
+var codingStyles = []string{"text", "blocks"}
 
 func defaultSettings(c *content.Catalogue) Settings {
 	return Settings{Board: c.DefaultBoard(), Nudges: true}
@@ -107,6 +109,9 @@ func storedSettings(data []byte, c *content.Catalogue) Settings {
 	if st.HelpLevel != "" && !contains(helpLevels, st.HelpLevel) {
 		st.HelpLevel = ""
 	}
+	if st.Coding != "" && !contains(codingStyles, st.Coding) {
+		st.Coding = ""
+	}
 	if _, ok := c.Board(st.Board); !ok {
 		st.Board, st.BoardVar = c.DefaultBoard(), ""
 	}
@@ -119,6 +124,9 @@ func storedSettings(data []byte, c *content.Catalogue) Settings {
 func checkSettings(st Settings, c *content.Catalogue) error {
 	if st.HelpLevel != "" && !contains(helpLevels, st.HelpLevel) {
 		return errors.New("Pick Beginner, Moderate or Advanced.")
+	}
+	if st.Coding != "" && !contains(codingStyles, st.Coding) {
+		return errors.New("Pick Text or Blocks.")
 	}
 	b, ok := c.Board(st.Board)
 	if !ok {

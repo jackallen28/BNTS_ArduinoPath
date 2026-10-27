@@ -20,6 +20,7 @@ import { normalise, stepState, stepStars, projectStars, starsMessage, hintsUnloc
 import { review } from "../review.js";
 import * as realboard from "../realboard.js";
 import { pinPlan } from "../sim/pins.js";
+import { blocksView } from "../blocks/view.js";
 import { splitText, showExplanation, starterFor, demoFor, blanks, baudOf, simDiagnostics, checklist, allDone, firstFailing, canSkip, openingStep } from "../guide.js";
 
 export function starterSketch(title) {
@@ -56,6 +57,11 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
   const boardCell = h("span", { class: "cell" });
   const panel = h("aside", { class: "side-panel guide", "aria-label": isFreePlay ? "Free Play" : "Step-by-step guide" });
   const editorHolder = h("div", { class: "editor-holder" }, h("p", { class: "muted loading", text: "Opening..." }));
+  // Text or Blocks: the same code, typed or built from blocks (CLAUDE.md: the student's choice).
+  const blocksHolder = h("div", { class: "editor-holder blocks-holder", hidden: true });
+  const textTab = h("button", { class: "tab", type: "button", role: "tab", id: "tab-text", "aria-selected": "true", onclick: () => setCoding("text", true) }, "Text");
+  const blocksTab = h("button", { class: "tab", type: "button", role: "tab", id: "tab-blocks", "aria-selected": "false", onclick: () => setCoding("blocks", true) }, "Blocks");
+  const codingTabs = h("div", { class: "tabs coding-tabs", role: "tablist", "aria-label": "How to write your code" }, textTab, blocksTab);
   const runHolder = h("div", { class: "run-holder" });
   const portSelect = h("select", { class: "select port-select", "aria-label": "Your board's USB port", title: "The USB port your board is plugged into" },
     h("option", { value: "", text: "Plug in your board..." }));
@@ -84,7 +90,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       spacer(),
       tool("settings", "Settings", () => openSettings({ onSaved: settingsChanged, projectId: isFreePlay ? undefined : projectId })),
     ],
-    body: h("div", { class: "split workspace-split" }, panel, h("main", { class: "code-column", id: "main" }, editorHolder), runHolder),
+    body: h("div", { class: "split workspace-split" }, panel, h("main", { class: "code-column", id: "main" }, codingTabs, editorHolder, blocksHolder), runHolder),
     status: [saveCell, boardCell, h("span", { class: "cell grow" }), cursorCell],
   });
   clear(root).append(win);
@@ -122,6 +128,9 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
   let evalTimer = 0;
   let tickTimer = 0;
   let rowsCache = [];
+  let coding = state.me.settings.coding === "blocks" ? "blocks" : "text";
+  let blocks = null; // the Blocks view, made the first time it's needed
+  let blocksSaveTimer = 0;
   const level = () => state.me.settings.help_level || "beginner";
   let coach = new Coach({ level: level(), nudges: state.me.settings.nudges !== false });
 
@@ -145,6 +154,13 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     }
     refreshPorts();
     renderGuide();
+    if (state.me.settings.coding && state.me.settings.coding !== coding) setCoding(state.me.settings.coding, false);
+    else if (blocks) {
+      // The blocks make the pin #defines for the board, so start them again for the new one.
+      blocks.destroy();
+      blocks = null;
+      if (coding === "blocks") showBlocks();
+    }
   }
 
   function downloadIno() {
@@ -252,7 +268,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       hints.slice(0, clueHints).map((t, i) => h("p", { class: "clue-hint" }, h("strong", { text: `Hint ${i + 1}: ` }), t)),
       clueHints < hints.length ? h("button", { class: "btn small", type: "button", onclick: () => { clueHints++; renderGuide(); } },
         clueHints === 0 ? "Show me a hint" : "Another hint") : null,
-      c.line ? h("button", { class: "btn small", type: "button", onclick: () => editor?.goToLine?.(c.line) }, "Go to the line") : null));
+      c.line ? h("button", { class: "btn small", type: "button", onclick: async () => { if (coding === "blocks") await setCoding("text", false); editor?.goToLine?.(c.line); } }, coding === "blocks" ? "Show me in the code" : "Go to the line") : null));
   }
 
   function hintsBox(s, st, unlocked) {
@@ -384,6 +400,53 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       h("p", { text: "Unplug the USB cable before you change any wires. Always use a resistor with an LED." })));
   }
 
+  // ---------- Text or Blocks ----------
+  /** Switches between typing the code and building it from blocks; `remember` saves it as the student's choice. */
+  async function setCoding(kind, remember) {
+    coding = kind;
+    textTab.setAttribute("aria-selected", String(kind === "text"));
+    blocksTab.setAttribute("aria-selected", String(kind === "blocks"));
+    editorHolder.hidden = kind !== "text";
+    blocksHolder.hidden = kind !== "blocks";
+    if (remember && state.me.settings.coding !== kind) {
+      api.saveSettings({ ...state.me.settings, coding: kind }).then((saved) => { state.me.settings = saved; }).catch(() => {});
+    }
+    if (kind === "blocks") await showBlocks();
+    else editor?.focus();
+  }
+
+  /** The code as blocks (keeping the student's layout when the code hasn't changed in Text). */
+  async function showBlocks() {
+    if (!editor) return;
+    if (!blocks) {
+      blocksHolder.replaceChildren(h("p", { class: "muted loading", text: "Getting the blocks ready..." }));
+      try {
+        blocks = await blocksView({ project, board: board(), onChange: blocksChanged });
+      } catch (err) {
+        blocksHolder.replaceChildren(h("div", { class: "note error" }, icon("warn"), h("span", { text: "The blocks couldn't load. You can still use Text." })));
+        console.error(err);
+        return;
+      }
+      if (closed) return blocks.destroy();
+      blocksHolder.replaceChildren(blocks.el);
+    }
+    blocks.show(code(), progress?.blocks ?? null);
+  }
+
+  function blocksChanged(newCode, blocksState) {
+    if (!editor || newCode === code()) return;
+    editor.value = newCode;
+    saver.change(newCode);
+    coach.changed();
+    if (mode === "sim" && runKind !== "run") scheduleEvaluate();
+    // Keep the layout of the blocks with the progress (it's small), saved a moment after the last change.
+    if (progress) {
+      progress.blocks = blocksState;
+      clearTimeout(blocksSaveTimer);
+      blocksSaveTimer = setTimeout(() => { if (JSON.stringify(progress).length < 60_000) saveProgress(); else delete progress.blocks; }, 1500);
+    }
+  }
+
   // ---------- Steps ----------
   /** Opens step i. Its starter code replaces the code only when the student first moves onto it (never when reopening the project). */
   function enterStep(i, { useStarter = true } = {}) {
@@ -405,6 +468,8 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       if (starter != null && editor && code().trim() !== starter.trim()) {
         editor.value = starter;
         saver.change(starter);
+        if (progress) delete progress.blocks;
+        if (coding === "blocks") showBlocks();
       }
     }
     evaluateNow();
@@ -495,7 +560,8 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
   function blanksClue() {
     const lines = blanks(code());
     if (!lines.length) return false;
-    showClue({ title: "Fill in the blanks first", explain: `Your code still has ___ on line ${lines.join(", ")}. Replace each ___ with the right code, then try again.`, line: lines[0], hints: [] });
+    if (coding === "blocks") showClue({ title: "Fill in the gaps first", explain: "A block still has an empty gap (a dark hole). Drag the right block into each gap, then try again.", hints: [] });
+    else showClue({ title: "Fill in the blanks first", explain: `Your code still has ___ on line ${lines.join(", ")}. Replace each ___ with the right code, then try again.`, line: lines[0], hints: [] });
     return true;
   }
 
@@ -813,6 +879,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       onCursor: (row, col) => { cursorCell.textContent = `Line ${row}, Col ${col}`; },
     });
     editorHolder.replaceChildren(editor.el);
+    if (coding === "blocks") setCoding("blocks", false);
     ensureRunPanel();
     if (isFreePlay) {
       if (firstTime) api.saveProgress(projectId, { step: 0, started_at: Date.now() }).catch(() => {});
@@ -825,7 +892,7 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
       enterStep(stepIndex, { useStarter: false });
       if (!progress.wiring_done && project.parts?.length) openWiring(true);
     }
-    editor.focus();
+    if (coding === "text") editor.focus();
     refreshPorts();
     tickTimer = setInterval(() => {
       if (isFreePlay || !project || nudge) return;
@@ -855,6 +922,8 @@ export function workspaceScreen(root, { projectId, openSettings, back }) {
     window.removeEventListener("online", onOnline);
     window.removeEventListener("pagehide", onLeave);
     closeBoardSerial();
+    clearTimeout(blocksSaveTimer);
+    blocks?.destroy();
     if (rp) rp.destroy();
     await saver.flush();
     saver.stop();

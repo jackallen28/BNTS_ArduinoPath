@@ -15,6 +15,7 @@ export function aboutContent() {
     h("p", { text: "It was developed by the Banyule Nillumbik Tech School (BNTS) and reviewed by teachers." }),
     h("p", { text: "It is not hosted on AI. Every hint was written by people, and ArduinoPath runs on this laptop, so your work stays here. Nothing is sent over the internet." }),
     h("p", { text: "ArduinoPath aims to open up programming to every student by adapting to each student's needs." }),
+    h("p", { class: "muted small", text: "Part pictures: the Fritzing parts library (CC BY-SA 3.0). Blocks: Blockly by Google (Apache License 2.0)." }),
     state.info?.data_dir ? h("p", { class: "muted small" },
       "Saved work and the log file (arduinopath.log), for troubleshooting: ",
       h("code", { class: "about-path", text: state.info.data_dir })) : null);

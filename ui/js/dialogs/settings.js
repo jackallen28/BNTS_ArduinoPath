@@ -7,6 +7,12 @@ import { openDialog, messageBox } from "../widgets/window.js";
 import { aboutContent } from "./about.js";
 import { state, visibleBoards } from "../state.js";
 
+/** Text or Blocks: how a student likes to write code (switch any time above the code). */
+export const CODING_STYLES = [
+  { id: "text", name: "Text", text: "Type the code yourself, like real programmers do." },
+  { id: "blocks", name: "Blocks", text: "Drag blocks together. You'll see the code they make as you go." },
+];
+
 export const HELP_LEVELS = [
   { id: "beginner", name: "Beginner", text: "Lots of help: full explanations, and hints any time you want them." },
   { id: "moderate", name: "Moderate", text: "Some help: each project gives you a little less help as you go." },
@@ -95,6 +101,9 @@ export function openSettings({ tab = "me", onSaved = () => {}, projectId = null 
         h("legend", { text: "Which board do you have?" }),
         optionCards({ name: "board", options: boardOptions(), value: settings.board, className: "compact", onChange: (v) => { settings.board = v; renderVariant(); } }),
         varSelect),
+      h("fieldset", { class: "groupbox" },
+        h("legend", { text: "How do you like to write code?" }),
+        optionCards({ name: "coding", options: CODING_STYLES, value: settings.coding || "text", className: "compact", onChange: (v) => { settings.coding = v; } })),
       h("fieldset", { class: "groupbox" },
         h("legend", { text: "The Coach" }),
         h("label", { class: "check" },
