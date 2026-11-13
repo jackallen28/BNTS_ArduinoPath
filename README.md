@@ -1,5 +1,10 @@
 # ArduinoPath
 
+> **Looking for the newest version?** Circuit Pathways now also runs as a website (ArduinoPath **and** PiPath in the
+> browser, with classes, uploading to boards, a Pi beta and Grove kits): see
+> [BNTS_Circuit_Pathways](https://github.com/jackallen28/BNTS_Circuit_Pathways). This repository is the stand-alone
+> ArduinoPath you install on a laptop (no internet needed), and the home of the bin-monitor work.
+
 A step-by-step Arduino and ESP coding tutor for secondary students, made for the
 Banyule Nillumbik Tech School (BNTS).
 
